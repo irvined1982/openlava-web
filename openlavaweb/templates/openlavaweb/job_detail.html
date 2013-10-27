@@ -49,12 +49,114 @@
 	<dt>Resource Usage Last Updated</dt>
 		<dd>{{ job.resource_usage_last_update_time_datetime_local}}</dd>
 	</dl>
-<!--
-property pend_reasons:
-	property submit:
-	property resource_usage:
-	
--->
+	{% if job.status.name == "JOB_STAT_PEND" %}
+	<h2>Pending Reasons</h2>
+	<table class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>Reason</th>
+				<th>Num Hosts</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for r in job.pend_reasons %}
+			<tr>
+				<td>{{ r }}</td>
+				<td>{{ r.count }}</td>
+				<td>{{ r.description }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+	<h1>Submission Information</h1>
+	<dl class="dl-horizontal">
+		<dt>Options</dt><dd>{{ job.submit.options }}</dd>
+		<dt>Options 2</dt><dd>{{ job.submit.options2 }}</dd>
+		<dt>Job Name</dt><dd>{{ job.submit.job_name }}</dd>
+		<dt>Queue Name</dt><dd>{{ job.submit.queue_name }}</dd>
+		<dt>Requested Hosts</dt><dd>{% for host in  job.submit.asked_hosts %}{{ host }} {% empty %}None {% endfor %}</dd>
+		<dt>Requested Resources</dt><dd>{{ job.submit.requested_resources }}</dd>
+		<dt>Resource Limits</dt><dd>{{ job.submit.resource_limits }}</dd>
+		<dt>Host Specification</dt><dd>{{ job.submit.host_specification }}</dd>
+		<dt>Number of Processors</dt><dd>{{ job.submit.num_processors }}</dd>
+		<dt>Dependency Conditions</dt><dd>{{ job.submit.dependency_condition }}</dd>
+		<dt>Begin Time</dt><dd>{{ job.submit.begin_time_datetime_local }}</dd>
+		<dt>Termination Deadline</dt><dd>{{ job.submit.termination_time_datetime_local }}</dd>
+		<dt>Termination Signal Value</dt><dd>{{ job.submit.signal_value }}</dd>
+		<dt>Input File</dt><dd>{{ job.submit.input_file }}</dd>
+		<dt>Output File</dt><dd>{{ job.submit.output_file }}</dd>
+		<dt>Rrror File</dt><dd>{{ job.submit.error_file }}</dd>
+		<dt>Command</dt><dd>{{ job.submit.command }}</dd>
+		<dt>Checkpoint Period</dt><dd>{{ job.submit.checkpoint_period }}</dd>
+		<dt>Checkpoint Dir</dt><dd>{{ job.submit.checkpoint_dir }}</dd>
+		<dt>Num Transfer Files</dt><dd>{{ job.submit.num_transfer_files }}</dd>
+		<dt>Pre Execution Command</dt><dd>{{ job.submit.pre_execution_command }}</dd>
+		<dt>Email User</dt><dd>{{ job.submit.email_user }}</dd>
+		<dt>Delete Options</dt><dd>{{ job.submit.delete_options }}</dd>
+		<dt>Delete Options 2</dt><dd>{{ job.submit.delete_options2 }}</dd>
+		<dt>Project Name</dt><dd>{{ job.submit.project_name }}</dd>
+		<dt>Max Num Processors</dt><dd>{{ job.submit.max_num_processors }}</dd>
+		<dt>Login Shell</dt><dd>{{ job.submit.login_shell }}</dd>
+		<dt>User Priority</dt><dd>{{ job.submit.user_priority }}</dd>
 
+	</dl>
+	{% if job.submit.num_transfer_files > 0 %}
+	<h1>Files to Transfer</h1>
+	<table class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>Local File</th>
+				<th>Remote File</th>
+				<th>Options</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for file in job.submit.transfer_files %}
+			<tr>
+				<td>{{ file.submission_file_name }}</td>
+				<td>{{ file.execution_file_name }}</td>
+				<td>{{ file.options }}</td>
+			</tr>
+		{% endfor %}
+	{% endif %}
+
+	<h1>Resource Usage</h1>
+	<table class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>Field</th><th>Value</th>
+			</tr>
+		</thead>
+<tbody>
+		<tr><th>Resident Memory</th><td>{{ job.resource_usage.resident_memory_usage}}KB</td></tr>
+		<tr><th>Virtual Memory</th><td>{{ job.resource_usage.virtual_memory_usage}}KB</td></tr>
+		<tr><th>User Time</th><td>{{ job.resource_usage.user_time_timedelta}}</td></tr>
+		<tr><th>System Timey</th><td>{{ job.resource_usage.system_time_timedelta}}</td></tr>
+		<tr><th>Num Active Processes</th><td>{{ job.resource_usage.num_active_processes }}</td></tr>
+	</tbody>
+	</table>
+	<h1>Active Processes</h1>
+	<table class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>Process ID</th>
+				<th>Parent Process ID</th>
+				<th>Group ID</th>
+				<th>Cray Job ID</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for proc in job.resource_usage.active_processes %}
+			<tr>
+				<td>{{ proc.process_id }}</td>
+				<td>{{ proc.parent_process_id }} </td>
+				<td>{{ proc.group_id }}</td>
+				<td>{{ proc.cray_job_id }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
 {% endblock %}
