@@ -1,0 +1,60 @@
+{% extends "openlavaweb/base.html" %}
+{% block content %}
+<h1>Job: {{ job.job_id }}</h1>
+<dl class="dl-horizontal">
+	<dt>Username</dt>
+		<dd>{{ job.user }}</dd>
+	<dt>Status</dt>
+		<dd>{{ job.status.name }}: {{ job.status.description }}</dd>
+	<dt>Process ID</dt>
+		<dd>{{ job.pid }}</dd>
+	<dt>CPU Time Consumed</dt>
+		<dd>{{ job.cpu_time_timedelta }}</dd>
+	<dt>Current Working Directory</dt>
+		<dd>{{ job.cwd }}</dd>
+	<dt>Submit Home Directory</dt>
+		<dd>{{ job.submit_home_dir }}</dd>
+	<dt>Submission Host</dt>
+		<dd>{{ job.submission_host }}</dd>
+	<dt>Execution Hosts</dt>
+		<dd>{% for h in job.execution_hosts %}{{ h }} {% endfor %}</dd>
+	<dt>CPU Factor</dt>
+		<dd>{{ job.cpu_factor }}</dd>
+	<dt>Execution User</dt>
+		<dd>{{ job.execution_user_name }} ({{ job.execution_user_id }})</dd>
+	<dt>Execution Home Directory</dt>
+		<dd>{{ job.execution_home_dir }}</dd>
+	<dt>Execution Current Working Directory</dt>
+		<dd>{{ job.execution_cwd }}</dd>
+	<dt>Parent Group</dt>
+		<dd>{{ job.parent_group }}</dd>
+	<dt>Job ID</dt>
+		<dd>{{ job.job_id }}</dd>
+	<dt>Job Name</dt>
+		<dd>{{ job.name }}</dd>
+	<dt>Service Port</dt>
+		<dd>{{ job.service_port }}</dd>
+	<dt>Job Priority</dt>
+		<dd>{{ job.priority }}</dd>
+	<dt>Submission Time</dt>
+		<dd>{{ job.submit_time_datetime_local }}</dd>
+	<dt>Reservation Time</dt>
+		<dd>{{ job.reservation_time_datetime_local }}</dd>
+	<dt>Start Time</dt>
+		<dd>{{ job.start_time_datetime_local}}</dd>
+	<dt>Predicted Start Time</dt>
+		<dd>{{ job.predicted_start_time_datetime_local }}</dd>
+	<dt>End Time</dt>
+		<dd>{{ job.end_time_datetime_local }}</dd>
+	<dt>Resource Usage Last Updated</dt>
+		<dd>{{ job.resource_usage_last_update_time_datetime_local}}</dd>
+	</dl>
+<!--
+property pend_reasons:
+	property submit:
+	property resource_usage:
+	
+-->
+
+
+{% endblock %}
