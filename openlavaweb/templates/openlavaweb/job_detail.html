@@ -75,7 +75,7 @@
 		<dt>Options</dt><dd>{{ job.submit.options }}</dd>
 		<dt>Options 2</dt><dd>{{ job.submit.options2 }}</dd>
 		<dt>Job Name</dt><dd>{{ job.submit.job_name }}</dd>
-		<dt>Queue Name</dt><dd>{{ job.submit.queue_name }}</dd>
+		<dt>Queue Name</dt><dd><a href="{% url "queue_view" job.submit.queue_name %}">{{ job.submit.queue_name }}</a></dd>
 		<dt>Requested Hosts</dt><dd>{% for host in  job.submit.asked_hosts %}{{ host }} {% empty %}None {% endfor %}</dd>
 		<dt>Requested Resources</dt><dd>{{ job.submit.requested_resources }}</dd>
 		<dt>Resource Limits</dt><dd>{{ job.submit.resource_limits }}</dd>
