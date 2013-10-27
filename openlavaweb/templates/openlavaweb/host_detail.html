@@ -1,0 +1,36 @@
+{% extends "openlavaweb/base.html" %}
+{% block content %}
+<h1>Host: {{ host.name }}</h1>
+<dl class="dl-horizontal">
+	<dt>Status</dt><dd>{{ host.host_status }}</dd>
+	<dt>CPU Factor</dt><dd>{{ host.cpu_factor }}</dd>
+	<dt>Run Windows</dt><dd>{{ host.run_windows }}</dd>
+	<dt>User Job Limit</dt><dd>{{ host.user_job_limit }}</dd>
+	<dt>Max Jobs</dt><dd>{{ host.max_jobs }}</dd>
+	<dt>Migration Threshold</dt><dd>{{ host.migration_threshold }}</dd>
+	<dt>Host Attributes</dt><dd>{% for a in host.host_attributes %}a {% endfor %}</dd>
+	<dt>Checkpoint Signal</dt><dd>{{ host.checkpoint_signal }}</dd>
+</dl>
+<h1>Utilization</h1>
+<table class="table table-striped table-condensed">
+	<thead>
+		<tr>
+			<th>Total Num Jobs</th>
+			<th>Num Running Jobs</th>
+			<th>Num System Suspended Jobs</th>
+			<th>Num User Suspended Jobs</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>{{ host.num_jobs }}</td>
+			<td>{{ host.num_running_jobs }}</td>
+			<td>{{ host.num_system_suspended_jobs }}</td>
+			<td>{{ host.num_user_suspended_jobs }}</td>
+		</tr>
+	</tbody>
+</table>
+<h1>Jobs</h1>
+{% include "openlavaweb/widgets/job_list.html" %}
+<a href="{% url "job_view_by_host" host_name=host.name %}">View All Jobs</a>
+{% endblock %}

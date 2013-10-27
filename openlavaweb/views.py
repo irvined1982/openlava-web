@@ -21,6 +21,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from openlava.jobs import JobList, get_job_by_id
 from openlava.queues import get_all_queues,get_queue_by_name
+from openlava.hosts import get_all_hosts,get_host_by_name
 
 def process_job_list(JobList):
 	attribute_list=['name','job_id','status','submit_time','submit_time_datetime_local','start_time','start_time_datetime_local','end_time','end_time_datetime_local',]
@@ -50,6 +51,20 @@ def queue_view(request,queue_name):
 		raise Http404 ("Queue not found")
 	return render(request, 'openlavaweb/queue_detail.html', {"queue": queue, 'job_list':job_list },)
 
+def host_view(request,host_name):
+	try:
+		host=get_host_by_name(host_name)
+		job_list=process_job_list(JobList(host=host_name))
+		if len(job_list)>20:
+			del(job_list[20:])
+	except ValueError:
+		raise Http404 ("Host not found")
+	return render(request, 'openlavaweb/host_detail.html', {"host": host, 'job_list':job_list },)
+
+def host_list(request):
+	host_list=get_all_hosts()
+	return render(request, 'openlavaweb/host_list.html',{"host_list":host_list})
+
 def job_view(request,job_id):
 	try:
 		job=get_job_by_id(int(job_id))
@@ -58,6 +73,6 @@ def job_view(request,job_id):
 	return render(request, 'openlavaweb/job_detail.html', {"job": job },)
 
 
-def job_list(request, queue_name=""):
-	job_list=process_job_list(JobList(queue=queue_name))
+def job_list(request, queue_name="", host_name=""):
+	job_list=process_job_list(JobList(queue=queue_name,host=host_name))
 	return render(request, 'openlavaweb/job_list.html',{"job_list":job_list})

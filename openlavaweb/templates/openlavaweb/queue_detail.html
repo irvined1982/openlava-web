@@ -2,49 +2,41 @@
 {% block content %}
 <h1>Queue: {{ queue.name }}</h1>
 <p>{{ queue.description }}</p>
-<div class="row">
-	<div class="span4">
-		<dl class="dl-horizontal">
-			<dt>Priority</dt><dd>{{ queue.priority }}</dd>
-			<dt>Nice</dt><dd>{{ queue.nice }}</dd>
-			<dt>Allowed Users</dt><dd>{{ queue.allowed_users }}</dd>
-			<dt>Host List</dt><dd>{{ queue.host_list }}</dd>
-			<dt>Job Limit per User</dt><dd>{{ queue.user_job_limit }}</dd>
-			<dt>Job Limit per Processort</dt><dd>{{ queue.processor_job_limit }}</dd>
-			<dt>Host Specification</dt><dd>{{ queue.host_specification }}</dd>
-			<dt>Default Host Specification</dt><dd>{{ queue.default_host_specification }}</dd>
-			<dt>Attributes</dt><dd>{{ queue.queue_attributes }}</dd>
-			<dt>Status</dt><dd>{{ queue.status }}</dd>
-			<dt>Migration Threashold</dt><dd>{{ queue.migration_threashold }}</dd>
-			<dt>Scheduling Delay</dt><dd>{{ queue.scheduling_delay_timedelta }}</dd>
-			<dt>Accept Interval</dt><dd>{{ queue.accept_interval_timedelta }}</dd>
-			<dt>process_limit</dt><dd>{{ queue.process_limit }}</dd>
-			<dt>Queue Administrators</dt><dd>{{ queue.queue_admins }}</dd>
-		</dl>
-	</div>
-	<div class="span4">
-		<dl class="dl-horizontal">
-			<dt>Pre Execution Command</dt><dd>{{ queue.pre_execution_command }}</dd>
-			<dt>Post Execution Command</dt><dd>{{ queue.post_execution_command }}</dd>
-			<dt>Pre Post Execution User</dt><dd>{{ queue.pre_post_username }}</dd>
-			<dt>Requeue Exit Values</dt><dd>{{ queue.requeue_exit_values }}</dd>
-			<dt>Host Job Limit</dt><dd>{{ queue.host_job_limit }}</dd>
-			<dt>Resource Request</dt><dd>{{ queue.resource_request }}</dd>
-			<dt>Reserved Slots</dt><dd>{{ queue.reserved_slots }}</dd>
-			<dt>Slot Hold Time</dt><dd>{{ queue.slot_hold_time }}</dd>
-			<dt>Resume Condition</dt><dd>{{ queue.resume_condition }}</dd>
-			<dt>Stop Condition</dt><dd>{{ queue.stop_condition }}</dd>
-			<dt>Suspend Command</dt><dd>{{ queue.suspend_command }}</dd>
-			<dt>Resume Command</dt><dd>{{ queue.resume_command }}</dd>
-			<dt>Terminate Command</dt><dd>{{ queue.terminate_command }}</dd>
-			<dt>Job Starter Script</dt><dd>{{ queue.job_starter }}</dd>
-			<dt>Checkpoint Directory</dt><dd>{{ queue.checkpoint_directory }}</dd>
-			<dt>Checkpoint Period</dt><dd>{{ queue.checkpoint_period }}</dd>
-			<dt>Min Processor Limit</dt><dd>{{ queue.min_processor_limit }}</dd>
-			<dt>Default Processor Limit</dt><dd>{{ queue.default_processor_limit }}</dd>
-		</dl>
-	</div>
-</div>
+<dl class="dl-horizontal">
+	<dt>Priority</dt><dd>{{ queue.priority }}</dd>
+	<dt>Nice</dt><dd>{{ queue.nice }}</dd>
+	<dt>Allowed Users</dt><dd>{{ queue.allowed_users }}</dd>
+	<dt>Host List</dt><dd>{{ queue.host_list }}</dd>
+	<dt>Job Limit per User</dt><dd>{{ queue.user_job_limit }}</dd>
+	<dt>Job Limit per Processort</dt><dd>{{ queue.processor_job_limit }}</dd>
+	<dt>Host Specification</dt><dd>{{ queue.host_specification }}</dd>
+	<dt>Default Host Specification</dt><dd>{{ queue.default_host_specification }}</dd>
+	<dt>Attributes</dt><dd>{{ queue.queue_attributes }}</dd>
+	<dt>Status</dt><dd>{{ queue.status }}</dd>
+	<dt>Migration Threashold</dt><dd>{{ queue.migration_threashold }}</dd>
+	<dt>Scheduling Delay</dt><dd>{{ queue.scheduling_delay_timedelta }}</dd>
+	<dt>Accept Interval</dt><dd>{{ queue.accept_interval_timedelta }}</dd>
+	<dt>process_limit</dt><dd>{{ queue.process_limit }}</dd>
+	<dt>Queue Administrators</dt><dd>{{ queue.queue_admins }}</dd>
+	<dt>Pre Execution Command</dt><dd>{{ queue.pre_execution_command }}</dd>
+	<dt>Post Execution Command</dt><dd>{{ queue.post_execution_command }}</dd>
+	<dt>Pre Post Execution User</dt><dd>{{ queue.pre_post_username }}</dd>
+	<dt>Requeue Exit Values</dt><dd>{{ queue.requeue_exit_values }}</dd>
+	<dt>Host Job Limit</dt><dd>{{ queue.host_job_limit }}</dd>
+	<dt>Resource Request</dt><dd>{{ queue.resource_request }}</dd>
+	<dt>Reserved Slots</dt><dd>{{ queue.reserved_slots }}</dd>
+	<dt>Slot Hold Time</dt><dd>{{ queue.slot_hold_time }}</dd>
+	<dt>Resume Condition</dt><dd>{{ queue.resume_condition }}</dd>
+	<dt>Stop Condition</dt><dd>{{ queue.stop_condition }}</dd>
+	<dt>Suspend Command</dt><dd>{{ queue.suspend_command }}</dd>
+	<dt>Resume Command</dt><dd>{{ queue.resume_command }}</dd>
+	<dt>Terminate Command</dt><dd>{{ queue.terminate_command }}</dd>
+	<dt>Job Starter Script</dt><dd>{{ queue.job_starter }}</dd>
+	<dt>Checkpoint Directory</dt><dd>{{ queue.checkpoint_directory }}</dd>
+	<dt>Checkpoint Period</dt><dd>{{ queue.checkpoint_period }}</dd>
+	<dt>Min Processor Limit</dt><dd>{{ queue.min_processor_limit }}</dd>
+	<dt>Default Processor Limit</dt><dd>{{ queue.default_processor_limit }}</dd>
+</dl>
 <h1>Utilization</h1>
 <table class="table table-striped table-condensed">
 	<thead>
