@@ -28,7 +28,7 @@ urlpatterns = patterns('',
 	url(r'^jobs/$', 'openlavaweb.views.job_list', name="job_list"),
 	url(r'^jobs/(\d+)$', 'openlavaweb.views.job_view', name="job_view"),
 	url(r'^users/$', 'openlavaweb.views.user_list', name="user_list"),
-	url(r'^users/(?P<user_name>.+?)/jobs$', 'openlavaweb.views.user_list', name="job_view_by_user"),
+	url(r'^users/(?P<user_name>.+?)/jobs$', 'openlavaweb.views.job_list', name="job_view_by_user"),
 	url(r'^users/(.+?)$', 'openlavaweb.views.user_view', name="user_view"),
 )
 

@@ -29,4 +29,9 @@
 		</tr>
 	</tbody>
 </table>
+<h1>Jobs</h1>
+{% include "openlavaweb/widgets/job_list.html" %}
+<a href="{% url "job_view_by_user" user_name=user.name %}">View All Jobs</a>
+
 {% endblock %}
+
