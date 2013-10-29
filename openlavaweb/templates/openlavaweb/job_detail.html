@@ -102,7 +102,44 @@
 		<dt>User Priority</dt><dd>{{ job.submit.user_priority }}</dd>
 
 	</dl>
-	{% if job.submit.num_transfer_files > 0 %}
+
+<h1>Resource Limits</h1>
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <td>&nbsp;</td>
+            <th>CPU</th>
+            <th>File Size</th>
+            <th>Data Segment Size</th>
+            <th>Stack Size</th>
+            <th>Core Size</th>
+            <th>RSS Size</th>
+            <th>Run Limit</th>
+            <th>Process Limit</th>
+            <th>Swap Limit</th>
+            <th>Num Files</th>
+            <th>Max Open Files</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>Soft Limit</th>
+            <td>{{ job.submit.resource_limits.cpu }}</td>
+            <td>{{ job.submit.resource_limits.file_size }}</td>
+            <td>{{ job.submit.resource_limits.data }}</td>
+            <td>{{ job.submit.resource_limits.stack }}</td>
+            <td>{{ job.submit.resource_limits.core }}</td>
+            <td>{{ job.submit.resource_limits.rss }}</td>
+            <td>{{ job.submit.resource_limits.run }}</td>
+            <td>{{ job.submit.resource_limits.process }}</td>
+            <td>{{ job.submit.resource_limits.swap }}</td>
+            <td>{{ job.submit.resource_limits.nofile }}</td>
+            <td>{{ job.submit.resource_limits.open_files }}</td>
+        </tr>
+	</tbody>
+</table>
+
+{% if job.submit.num_transfer_files > 0 %}
 	<h1>Files to Transfer</h1>
 	<table class="table table-hover table-condensed">
 		<thead>

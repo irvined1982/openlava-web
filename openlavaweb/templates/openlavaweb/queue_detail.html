@@ -11,6 +11,8 @@
 	<dt>Job Limit per Processort</dt><dd>{{ queue.processor_job_limit }}</dd>
 	<dt>Host Specification</dt><dd>{{ queue.host_specification }}</dd>
 	<dt>Default Host Specification</dt><dd>{{ queue.default_host_specification }}</dd>
+	<dt>Job Run Window</dt><dd>{{ queue.run_window }}</dd>
+	<dt>Job Dispatch Window</dt><dd>{{ queue.dispatch_window }}</dt>
 	<dt>Attributes</dt><dd>{{ queue.queue_attributes }}</dd>
 	<dt>Status</dt><dd>{{ queue.status }}</dd>
 	<dt>Migration Threashold</dt><dd>{{ queue.migration_threashold }}</dd>
@@ -37,6 +39,57 @@
 	<dt>Min Processor Limit</dt><dd>{{ queue.min_processor_limit }}</dd>
 	<dt>Default Processor Limit</dt><dd>{{ queue.default_processor_limit }}</dd>
 </dl>
+<h1>Resource Limits</h1>
+<table class="table table-striped table-condensed">
+	<thead>
+		<tr>
+			<td>&nbsp;</td>
+			<th>CPU</th>
+			<th>File Size</th>
+			<th>Data Segment Size</th>
+			<th>Stack Size</th>
+			<th>Core Size</th>
+			<th>RSS Size</th>
+			<th>Run Limit</th>
+			<th>Process Limit</th>
+			<th>Swap Limit</th>
+			<th>Num Files</th>
+			<th>Max Open Files</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>Soft Limit</th>
+			<td>{{ queue.soft_resource_limits.cpu }}</td>
+			<td>{{ queue.soft_resource_limits.file_size }}</td>
+			<td>{{ queue.soft_resource_limits.data }}</td>
+			<td>{{ queue.soft_resource_limits.stack }}</td>
+			<td>{{ queue.soft_resource_limits.core }}</td>
+			<td>{{ queue.soft_resource_limits.rss }}</td>
+			<td>{{ queue.soft_resource_limits.run }}</td>
+			<td>{{ queue.soft_resource_limits.process }}</td>
+			<td>{{ queue.soft_resource_limits.swap }}</td>
+			<td>{{ queue.soft_resource_limits.nofile }}</td>
+			<td>{{ queue.soft_resource_limits.open_files }}</td>
+		</tr>
+		<tr>
+			<th>Hard Limit</th>
+			<td>{{ queue.hard_resource_limits.cpu }}</td>
+			<td>{{ queue.hard_resource_limits.file_size }}</td>
+			<td>{{ queue.hard_resource_limits.data }}</td>
+			<td>{{ queue.hard_resource_limits.stack }}</td>
+			<td>{{ queue.hard_resource_limits.core }}</td>
+			<td>{{ queue.hard_resource_limits.rss }}</td>
+			<td>{{ queue.hard_resource_limits.run }}</td>
+			<td>{{ queue.hard_resource_limits.process }}</td>
+			<td>{{ queue.hard_resource_limits.swap }}</td>
+			<td>{{ queue.hard_resource_limits.nofile }}</td>
+			<td>{{ queue.hard_resource_limits.open_files }}</td>
+		</tr>
+	</tbody>
+</table>
+
+			
 <h1>Utilization</h1>
 <table class="table table-striped table-condensed">
 	<thead>
@@ -54,6 +107,52 @@
 			<td>{{ queue.num_running_jobs }}</td>
 			<td>{{ queue.num_system_suspended_jobs }}</td>
 			<td>{{ queue.num_user_suspended_jobs }}</td>
+		</tr>
+	</tbody>
+</table>
+<h1>Scheduling Thresholds</h1>
+<table class="table table-striped table-condensed">
+	<thead>
+		<tr>
+			<th>&nbsp;</th>
+			<th>15s Load</th>
+			<th>1m Load</th>
+			<th>15m Load</th>
+			<th>Avg CPU Utilization</th>
+			<th>Paging Rate (Pages/Sec)</th>
+			<th>Disk IO Rate (KB/Sec)</th>
+			<th>Num Users</th>
+			<th>Idle Time</th>
+			<th>Tmp Space (MB)</th>
+			<th>Free Memory (MB)</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>Stop Scheduling Threshold</th>
+			<td>{{ queue.stop_scheduling_load.run_queue_15s|floatformat:1 }}</td>
+			<td>{{ queue.stop_scheduling_load.run_queue_1m|floatformat:1 }}</td>
+			<td>{{ queue.stop_scheduling_load.run_queue_15m|floatformat:1 }}</td>
+			<td>{{ queue.stop_scheduling_load.cpu_utilization|floatformat:1 }}</td>
+			<td>{{ queue.stop_scheduling_load.paging_rate|floatformat:1 }}</td>
+			<td>{{ queue.stop_scheduling_load.disk_io_rate|floatformat:1 }}</td>
+			<td>{{ queue.stop_scheduling_load.login_users|floatformat:0 }}</td>
+			<td>{{ queue.stop_scheduling_load.idle_time_timedelta }}</td>
+			<td>{{ queue.stop_scheduling_load.tmp_space|floatformat:0 }}</td>
+			<td>{{ queue.stop_scheduling_load.mem_free|floatformat:0 }}</td>
+		</tr>
+		<tr>
+			<th>Stop Job Load</th>
+			<td>{{ queue.stop_job_load.run_queue_15s|floatformat:1 }}</td>
+			<td>{{ queue.stop_job_load.run_queue_1m|floatformat:1 }}</td>
+			<td>{{ queue.stop_job_load.run_queue_15m|floatformat:1 }}</td>
+			<td>{{ queue.stop_job_load.cpu_utilization|floatformat:1 }}</td>
+			<td>{{ queue.stop_job_load.paging_rate|floatformat:1 }}</td>
+			<td>{{ queue.stop_job_load.disk_io_rate|floatformat:1 }}</td>
+			<td>{{ queue.stop_job_load.login_users|floatformat:0 }}</td>
+			<td>{{ queue.stop_job_load.idle_time_timedelta }}</td>
+			<td>{{ queue.stop_job_load.tmp_space|floatformat:0 }}</td>
+			<td>{{ queue.stop_job_load.mem_free|floatformat:0 }}</td>
 		</tr>
 	</tbody>
 </table>
