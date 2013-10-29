@@ -3,51 +3,51 @@
 <h1>Job: {{ job.job_id }}</h1>
 <dl class="dl-horizontal">
 	<dt>Username</dt>
-	<dd><a href='{% url "user_view" job.user %}'>{{ job.user }}</a></dd>
+	<dd data-toggle="tooltip" title="The name of the user who submitted the job."><a href='{% url "user_view" job.user %}'>{{ job.user }}</a></dd>
 	<dt>Status</dt>
-		<dd>{{ job.status.name }}: {{ job.status.description }}</dd>
+		<dd data-toggle="tooltip" title="The current status of the job.Possible values areshown in job_states.">{{ job.status.name }}: {{ job.status.description }}</dd>
 	<dt>Process ID</dt>
-		<dd>{{ job.pid }}</dd>
+		<dd data-toggle="tooltip" title="The job process ID.">{{ job.pid }}</dd>
 	<dt>CPU Time Consumed</dt>
-		<dd>{{ job.cpu_time_timedelta }}</dd>
+		<dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.cpu_time_timedelta }}</dd>
 	<dt>Current Working Directory</dt>
-		<dd>{{ job.cwd }}</dd>
+		<dd data-toggle="tooltip" title="The current working directory when the job was submitted.">{{ job.cwd }}</dd>
 	<dt>Submit Home Directory</dt>
-		<dd>{{ job.submit_home_dir }}</dd>
+		<dd data-toggle="tooltip" title="Home directory on submission host.">{{ job.submit_home_dir }}</dd>
 	<dt>Submission Host</dt>
-		<dd>{{ job.submission_host }}</dd>
+		<dd data-toggle="tooltip" title="The name of the host from which the job was submitted.">{{ job.submission_host }}</dd>
 	<dt>Execution Hosts</dt>
-	<dd>{% for h in job.execution_hosts %} <a href='{% url "host_view" h %}'>{{ h }}</a> {% endfor %}</dd>
+	<dd data-toggle="tooltip" title="Names of hosts on which the job executes.">{% for h in job.execution_hosts %} <a href='{% url "host_view" h %}'>{{ h }}</a> {% endfor %}</dd>
 	<dt>CPU Factor</dt>
-		<dd>{{ job.cpu_factor }}</dd>
+		<dd data-toggle="tooltip" title="The CPU factor for normalizing CPU and wall clock time limits.">{{ job.cpu_factor }}</dd>
 	<dt>Execution User</dt>
-		<dd>{{ job.execution_user_name }} ({{ job.execution_user_id }})</dd>
+		<dd data-toggle="tooltip" title="Mapped user name on the execution host and mapped UNIX user ID on the execution host.">{{ job.execution_user_name }} ({{ job.execution_user_id }})</dd>
 	<dt>Execution Home Directory</dt>
-		<dd>{{ job.execution_home_dir }}</dd>
+		<dd data-toggle="tooltip" title="Home directory for the job on the execution host.">{{ job.execution_home_dir }}</dd>
 	<dt>Execution Current Working Directory</dt>
-		<dd>{{ job.execution_cwd }}</dd>
+		<dd data-toggle="tooltip" title="Current working directory for the job on the execution host.">{{ job.execution_cwd }}</dd>
 	<dt>Parent Group</dt>
-		<dd>{{ job.parent_group }}</dd>
+		<dd data-toggle="tooltip" title="The parent job group of a job or job group.">{{ job.parent_group }}</dd>
 	<dt>Job ID</dt>
-		<dd>{{ job.job_id }}</dd>
+		<dd data-toggle="tooltip" title="The job ID that the LSF system assigned to the job.">{{ job.job_id }}</dd>
 	<dt>Job Name</dt>
-		<dd>{{ job.name }}</dd>
+		<dd data-toggle="tooltip" title="The name of the job">{{ job.name }}</dd>
 	<dt>Service Port</dt>
-		<dd>{{ job.service_port }}</dd>
+		<dd data-toggle="tooltip" title="Service port of the job.">{{ job.service_port }}</dd>
 	<dt>Job Priority</dt>
-		<dd>{{ job.priority }}</dd>
+		<dd data-toggle="tooltip" title="Job dynamic priority.">{{ job.priority }}</dd>
 	<dt>Submission Time</dt>
-		<dd>{{ job.submit_time_datetime_local }}</dd>
+		<dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.submit_time_datetime_local }}</dd>
 	<dt>Reservation Time</dt>
-		<dd>{{ job.reservation_time_datetime_local }}</dd>
+		<dd data-toggle="tooltip" title="Time when job slots are reserved.">{{ job.reservation_time_datetime_local }}</dd>
 	<dt>Start Time</dt>
-		<dd>{{ job.start_time_datetime_local}}</dd>
+		<dd data-toggle="tooltip" title="The time that the job started running, if it has been dispatched.">{{ job.start_time_datetime_local}}</dd>
 	<dt>Predicted Start Time</dt>
-		<dd>{{ job.predicted_start_time_datetime_local }}</dd>
+		<dd data-toggle="tooltip" title="Job's predicted start time.">{{ job.predicted_start_time_datetime_local }}</dd>
 	<dt>End Time</dt>
-		<dd>{{ job.end_time_datetime_local }}</dd>
+		<dd data-toggle="tooltip" title="The termination time of the job, if it has completed.">{{ job.end_time_datetime_local }}</dd>
 	<dt>Resource Usage Last Updated</dt>
-		<dd>{{ job.resource_usage_last_update_time_datetime_local}}</dd>
+		<dd data-toggle="tooltip" title="Time of the last job resource usage update.">{{ job.resource_usage_last_update_time_datetime_local}}</dd>
 	</dl>
 	{% if job.status.name == "JOB_STAT_PEND" %}
 	<h2>Pending Reasons</h2>
