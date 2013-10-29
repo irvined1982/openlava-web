@@ -1,43 +1,43 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-<h1>Queue: {{ queue.name }}</h1>
-<p>{{ queue.description }}</p>
+<h1 data-toggle="tooltip" title="The name of the queue." >Queue: {{ queue.name }}</h1>
+<p data-toggle="tooltip" title="Describes the typical use of the queue.">{{ queue.description }}</p>
 <dl class="dl-horizontal">
-	<dt>Priority</dt><dd>{{ queue.priority }}</dd>
-	<dt>Nice</dt><dd>{{ queue.nice }}</dd>
-	<dt>Allowed Users</dt><dd>{{ queue.allowed_users }}</dd>
-	<dt>Host List</dt><dd>{{ queue.host_list }}</dd>
-	<dt>Job Limit per User</dt><dd>{{ queue.user_job_limit }}</dd>
-	<dt>Job Limit per Processort</dt><dd>{{ queue.processor_job_limit }}</dd>
-	<dt>Host Specification</dt><dd>{{ queue.host_specification }}</dd>
-	<dt>Default Host Specification</dt><dd>{{ queue.default_host_specification }}</dd>
-	<dt>Job Run Window</dt><dd>{{ queue.run_window }}</dd>
-	<dt>Job Dispatch Window</dt><dd>{{ queue.dispatch_window }}</dt>
-	<dt>Attributes</dt><dd>{{ queue.queue_attributes }}</dd>
-	<dt>Status</dt><dd>{{ queue.status }}</dd>
-	<dt>Migration Threashold</dt><dd>{{ queue.migration_threashold }}</dd>
-	<dt>Scheduling Delay</dt><dd>{{ queue.scheduling_delay_timedelta }}</dd>
-	<dt>Accept Interval</dt><dd>{{ queue.accept_interval_timedelta }}</dd>
-	<dt>process_limit</dt><dd>{{ queue.process_limit }}</dd>
-	<dt>Queue Administrators</dt><dd>{{ queue.queue_admins }}</dd>
-	<dt>Pre Execution Command</dt><dd>{{ queue.pre_execution_command }}</dd>
-	<dt>Post Execution Command</dt><dd>{{ queue.post_execution_command }}</dd>
-	<dt>Pre Post Execution User</dt><dd>{{ queue.pre_post_username }}</dd>
-	<dt>Requeue Exit Values</dt><dd>{{ queue.requeue_exit_values }}</dd>
-	<dt>Host Job Limit</dt><dd>{{ queue.host_job_limit }}</dd>
-	<dt>Resource Request</dt><dd>{{ queue.resource_request }}</dd>
-	<dt>Reserved Slots</dt><dd>{{ queue.reserved_slots }}</dd>
-	<dt>Slot Hold Time</dt><dd>{{ queue.slot_hold_time }}</dd>
-	<dt>Resume Condition</dt><dd>{{ queue.resume_condition }}</dd>
-	<dt>Stop Condition</dt><dd>{{ queue.stop_condition }}</dd>
-	<dt>Suspend Command</dt><dd>{{ queue.suspend_command }}</dd>
-	<dt>Resume Command</dt><dd>{{ queue.resume_command }}</dd>
-	<dt>Terminate Command</dt><dd>{{ queue.terminate_command }}</dd>
-	<dt>Job Starter Script</dt><dd>{{ queue.job_starter }}</dd>
-	<dt>Checkpoint Directory</dt><dd>{{ queue.checkpoint_directory }}</dd>
-	<dt>Checkpoint Period</dt><dd>{{ queue.checkpoint_period }}</dd>
-	<dt>Min Processor Limit</dt><dd>{{ queue.min_processor_limit }}</dd>
-	<dt>Default Processor Limit</dt><dd>{{ queue.default_processor_limit }}</dd>
+	<dt>Priority</dt><dd data-toggle="tooltip" title="Defines the priority of the queue.  This determines the order in which the job queues are searched at job dispatch time: queues with higher priority values are searched first. (This is contrary to UNIX process priority ordering.)">{{ queue.priority }}</dd>
+	<dt>Nice</dt><dd data-toggle="tooltip" title="Defines the nice value at which jobs in this queue will be run.">{{ queue.nice }}</dd>
+	<dt>Allowed Users</dt><dd data-toggle="tooltip" title="List of names of users allowed to submit jobs to this queue.">{% for user in queue.allowed_users %}{{ user }} {% empty %}All users{% endfor %}</dd>
+	<dt>Host List</dt><dd data-toggle="tooltip" title="List of names of hosts to which jobs in this queue may be dispatched.">{% for h in queue.host_list %}{{ h }} {% empty %}All Hosts{% endfor %}</dd>
+	<dt>Job Limit per User</dt><dd data-toggle="tooltip" title="Per-user limit on the number of jobs that can be dispatched from this queue and executed concurrently.">{{ queue.user_job_limit }}</dd>
+	<dt>Job Limit per Processort</dt><dd data-toggle="tooltip" title="Per-processor limit on the number of jobs that can be dispatched from this queue and executed concurrently.">{{ queue.processor_job_limit }}</dd>
+	<dt>Host Specification</dt><dd data-toggle="tooltip" title="A host name or host model name.  If the queue CPULIMIT or RUNLIMIT gives a host specification, hostSpec will be that specification. Otherwise, if defaultHostSpec (see below) is not NULL, hostSpec will be defaultHostSpec. Otherwise, if DEFAULT_HOST_SPEC is defined in the lsb.params file, (see lsb.params), hostSpec will be this value. Otherwise, hostSpec will be the name of the host with the largest CPU factor in the cluster.">{{ queue.host_specification }}</dd>
+	<dt>Default Host Specification</dt><dd data-toggle="tooltip" title="The value of DEFAULT_HOST_SPEC in the Queue section for this queue in the lsb.queues file.">{{ queue.default_host_specification }}</dd>
+	<dt>Job Run Window</dt><dd data-toggle="tooltip" title="When a queue's run window is closed, no job from this queue will be dispatched. When the run window closes, any running jobs from this queue will be suspended until the run window reopens, when they will be resumed. The default is no restriction, or always open (i.e., 24 hours a day, seven days a week).  Note that this run window only applies to batch jobs;interactive jobs scheduled by the LSF Load Information Manager (LIM) are controlled by another set of run windows.">{{ queue.run_window }}</dd>
+	<dt>Job Dispatch Window</dt><dd data-toggle="tooltip" title="When a queue's dispatch window is closed, no job from this queue will be dispatched.The default is no restriction, or always open (i.e., 24 hours a day, seven days a week).">{{ queue.dispatch_window }}</dt>
+	<dt>Attributes</dt><dd data-toggle="tooltip" title="The attributes of the queue.">{{ queue.queue_attributes }}</dd>
+	<dt>Status</dt><dd data-toggle="tooltip" title="The status of the queue.">{{ queue.status }}</dd>
+	<dt>Migration Threashold</dt><dd data-toggle="tooltip" title="The queue migration threshold in minutes.">{{ queue.migration_threshold_timedelta }}</dd>
+	<dt>Scheduling Delay</dt><dd data-toggle="tooltip" title="The number of seconds that a new job waits, before being scheduled.  The number of seconds that a new job waits, before being scheduled.">{{ queue.scheduling_delay_timedelta }}</dd>
+	<dt>Accept Interval</dt><dd data-toggle="tooltip" title="The number of seconds for a host to wait after dispatching a job to a host, before accepting a second job to dispatch to the same host.">{{ queue.accept_interval_timedelta }}</dd>
+	<dt>process_limit</dt><dd data-toggle="tooltip" title="An LSF resource limit used to limit the number of job slots (processors) a (parallel) job in the queue will use.  A job submitted to this queue must specify a number of processors not greater than this limit.">{{ queue.process_limit }}</dd>
+	<dt>Queue Administrators</dt><dd data-toggle="tooltip" title="A list of administrators of the queue.  The users whose names are here are allowed to operate on the jobs in the queue and on the queue itself.">{% for ad in queue.queue_admins %}{{ ad }} {% empty %}No Admins Defined{% endfor %}</dd>
+	<dt>Pre Execution Command</dt><dd data-toggle="tooltip" title="Queue's pre-exec command.  The command is executed before the real batch job is run on the execution host (or on the first host selected for a parallel batch job).">{{ queue.pre_execution_command }}</dd>
+	<dt>Post Execution Command</dt><dd data-toggle="tooltip" title="Queue's post-exec command.  The command is run when a job terminates.">{{ queue.post_execution_command }}</dd>
+	<dt>Pre Post Execution User</dt><dd data-toggle="tooltip" title="The user to execute the pre/post execution command as.">{{ queue.pre_post_username }}</dd>
+	<dt>Requeue Exit Values</dt><dd data-toggle="tooltip" title="Jobs that exit with these values are automatically requeued.">{{ queue.requeue_exit_values }}</dd>
+	<dt>Host Job Limit</dt><dd data-toggle="tooltip" title="The maximum number of job slots a host can process from this queue, including job slots of dispatched jobs which have not finished yet and reserved slots for some PEND jobs.  This limit controls the number of jobs sent to each host, regardless of a uniprocessor host or multiprocessor host. Default value for this limit is infinity.">{{ queue.host_job_limit }}</dd>
+	<dt>Resource Request</dt><dd data-toggle="tooltip" title="Resource requirement string used to determine eligible hosts for a job.">{{ queue.resource_request }}</dd>
+	<dt>Reserved Slots</dt><dd data-toggle="tooltip" title="Resource requirement string used to determine eligible hosts for a job.">{{ queue.reserved_slots }}</dd>
+	<dt>Slot Hold Time</dt><dd data-toggle="tooltip" title="The time used to hold the reserved job slots for a PEND job in this queue.">{{ queue.slot_hold_time }}</dd>
+	<dt>Resume Condition</dt><dd data-toggle="tooltip" title="Resume threshold conditions for a suspended job in this queue.">{{ queue.resume_condition }}</dd>
+	<dt>Stop Condition</dt><dd data-toggle="tooltip" title="Stop threshold conditions for a running job in this queue.">{{ queue.stop_condition }}</dd>
+	<dt>Suspend Command</dt><dd data-toggle="tooltip" title="Command configured for the SUSPEND action.">{{ queue.suspend_command }}</dd>
+	<dt>Resume Command</dt><dd data-toggle="tooltip" title="Command configured for the SUSPEND action.">{{ queue.resume_command }}</dd>
+	<dt>Terminate Command</dt><dd data-toggle="tooltip" title="Command configured for the TERMINATE action.">{{ queue.terminate_command }}</dd>
+	<dt>Job Starter Script</dt><dd data-toggle="tooltip" title="Command configured for the TERMINATE action.">{{ queue.job_starter }}</dd>
+	<dt>Checkpoint Directory</dt><dd data-toggle="tooltip" title="The directory where the checkpoint files are created.">{{ queue.checkpoint_directory }}</dd>
+	<dt>Checkpoint Period</dt><dd data-toggle="tooltip" title="The checkpoint period in minutes.">{{ queue.checkpoint_period_timedelta }}</dd>
+	<dt>Min Processor Limit</dt><dd data-toggle="tooltip" title="The minimum number of job slots (processors) that a job in the queue will use.">{{ queue.min_processor_limit }}</dd>
+	<dt>Default Processor Limit</dt><dd data-toggle="tooltip" title="The default (soft) limit on the number of job slots (processors) that a job in the queue will use.">{{ queue.default_processor_limit }}</dd>
 </dl>
 <h1>Resource Limits</h1>
 <table class="table table-striped table-condensed">

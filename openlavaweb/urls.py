@@ -18,6 +18,7 @@
 from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
+	url(r'^$', 'openlavaweb.views.system_view', name="system_view"),
 	url(r'^hosts/$', 'openlavaweb.views.host_list', name="host_list"),
 	url(r'^hosts/(?P<host_name>.+?)/jobs$', 'openlavaweb.views.job_list', name="job_view_by_host"),
 	url(r'^hosts/(.+?)$', 'openlavaweb.views.host_view', name="host_view"),
@@ -26,5 +27,8 @@ urlpatterns = patterns('',
 	url(r'^queues/(.+?)$', 'openlavaweb.views.queue_view', name="queue_view"),
 	url(r'^jobs/$', 'openlavaweb.views.job_list', name="job_list"),
 	url(r'^jobs/(\d+)$', 'openlavaweb.views.job_view', name="job_view"),
+	url(r'^users/$', 'openlavaweb.views.user_list', name="user_list"),
+	url(r'^users/(?P<user_name>.+?)/jobs$', 'openlavaweb.views.user_list', name="job_view_by_user"),
+	url(r'^users/(.+?)$', 'openlavaweb.views.user_view', name="user_view"),
 )
 

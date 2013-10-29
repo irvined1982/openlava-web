@@ -20,9 +20,11 @@ from django.http import Http404
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.http import HttpResponse
+from openlava.connection import OpenLavaConnection
 from openlava.jobs import JobList, get_job_by_id
 from openlava.queues import get_all_queues,get_queue_by_name
 from openlava.hosts import get_all_hosts,get_host_by_name
+from openlava.users import get_all_users,get_user_by_name
 
 class LavaEncoder(json.JSONEncoder):
 	def default(self,obj):
@@ -90,6 +92,25 @@ def host_list(request):
 		return HttpResponse(json.dumps(host_list,cls=LavaEncoder),content_type='application/json')
 	return render(request, 'openlavaweb/host_list.html',{"host_list":host_list})
 
+def user_list(request):
+	user_list=get_all_users()
+	if request.is_ajax() or request.GET.get("json",None):
+		return HttpResponse(json.dumps(user_list,cls=LavaEncoder),content_type='application/json')
+	return render(request, 'openlavaweb/user_list.html',{"user_list":user_list})
+
+def user_view(request,user_name):
+	try:
+		user=get_user_by_name(user_name)
+		job_list=process_job_list(JobList(user=user_name))
+		if len(job_list)>20:
+			del(job_list[20:])
+	except ValueError:
+		raise Http404 ("User not found")
+
+	if request.is_ajax() or request.GET.get("json",None):
+		return HttpResponse(json.dumps(user,cls=LavaEncoder),content_type='application/json')
+	return render(request, 'openlavaweb/user_detail.html', {"user": user, 'job_list':job_list },)
+
 def job_view(request,job_id):
 	try:
 		job=get_job_by_id(int(job_id))
@@ -100,9 +121,31 @@ def job_view(request,job_id):
 	return render(request, 'openlavaweb/job_detail.html', {"job": job },)
 
 
-def job_list(request, queue_name="", host_name=""):
+
+def job_list(request, queue_name="", host_name="", user_name="all"):
 	if request.is_ajax() or request.GET.get("json",None):
-		job_list=JobList(queue=queue_name,host=host_name)
+		job_list=JobList(queue=queue_name,host=host_name, user=user_name)
 		return HttpResponse(json.dumps(job_list,cls=LavaEncoder),content_type='application/json')
-	job_list=process_job_list(JobList(queue=queue_name,host=host_name))
+	job_list=process_job_list(JobList(queue=queue_name,host=host_name, user=user_name))
 	return render(request, 'openlavaweb/job_list.html',{"job_list":job_list})
+
+
+def system_view(request):
+	l=OpenLavaConnection.get_connection()
+	cluster_name=l.get_cluster_name()
+	master_name=l.get_master_name()
+	problem_hosts=[]
+	for h in get_all_hosts():
+		if h.status.name not in ['HOST_STAT_CU_EXCLUSIVE','HOST_STAT_EXCLUSIVE','HOST_STAT_FULL','HOST_STAT_LOCKED','HOST_STAT_WIND','HOST_STAT_OK']:
+			problem_hosts.append(h)
+	queue_list=get_all_queues()
+	user_list=get_all_users()
+	fields={
+			'cluster_name':cluster_name,
+			'master_name':master_name,
+			'problem_hosts':problem_hosts,
+			'queue_list':queue_list,
+			'user_list':user_list,
+			}
+	return render(request, 'openlavaweb/system_view.html',fields)
+

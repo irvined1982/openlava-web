@@ -1,0 +1,16 @@
+{% extends "openlavaweb/base.html" %}
+{% block content %}
+<h1>{{ cluster_name }}</h1>
+<dl class="dl-horizontal">
+	<dt>Cluster Name:</dt><dd>{{ cluster_name }}</dd>
+	<dt>Master Host:</dt><dd>{{ master_name }}</dd>
+</dl>
+<h1>Problem Hosts</h1>
+{% include "openlavaweb/widgets/host_list.html" with host_list=problem_hosts %}
+
+<h1>Queue Utilization</h1>
+{% include "openlavaweb/widgets/queue_list.html" %}
+
+<h1>Active Users</h1>
+{% include "openlavaweb/widgets/user_list.html" %}
+{% endblock %}
