@@ -14,7 +14,7 @@
   			{% for queue in queue_list %}
 			<tr>
 				<td><a href='{% url 'queue_view' queue.name %}'>{{ queue.name }}</a></td>
-				<td>{{ queue.status }}</td>
+				<td>{% for stat in queue.status %}{{ stat.name }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
 				<td>{{ queue.num_jobs }}</td>
 				<td>{{ queue.num_pending_jobs }}</td>
 				<td>{{ queue.num_running_jobs }}</td>

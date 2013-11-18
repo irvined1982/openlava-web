@@ -76,7 +76,7 @@
 	{% endif %}
 	<h1>Submission Information</h1>
 	<dl class="dl-horizontal">
-		<dt>Options</dt><dd>{% for option in job.submit.options %}{{ option }}<br>{% endfor %}</dd>
+		<dt>Options</dt><dd>{% for option in job.submit.options %}{{ option.friendly }}<br>{% endfor %}</dd>
 		<dt>Unused Options</dt><dd>{% for option in job.submit.delete_options %}{{ option.friendly }}<br>{% endfor %}</dd>
 		<dt>Job Name</dt><dd>{{ job.submit.job_name }}</dd>
 		<dt>Queue Name</dt><dd><a href="{% url "queue_view" job.submit.queue_name %}">{{ job.submit.queue_name }}</a></dd>
