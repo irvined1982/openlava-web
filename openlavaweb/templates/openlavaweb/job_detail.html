@@ -1,6 +1,6 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-<h1>Job: {{ job.job_id }}</h1>
+<h1>Job: {{ job.job_id }} {% if job.array_id > 0 %} Array Index: {{ job.array_id }}{% endif %}</h1>
 <dl class="dl-horizontal">
 	<dt>Username</dt>
 	<dd data-toggle="tooltip" title="The name of the user who submitted the job."><a href='{% url "user_view" job.user %}'>{{ job.user }}</a></dd>
@@ -30,6 +30,10 @@
 		<dd data-toggle="tooltip" title="The parent job group of a job or job group.">{{ job.parent_group }}</dd>
 	<dt>Job ID</dt>
 		<dd data-toggle="tooltip" title="The job ID that the LSF system assigned to the job.">{{ job.job_id }}</dd>
+	<dt>Array Index ID</dt>
+		<dd data-toggle="tooltip" title="The Array ID that the LSF system assigned to the job.">{{ job.array_id }}</dd>
+	<dt>Full ID</dt>
+		<dd data-toggle="tooltip" title="The combined job and array ids of the job">{{ job.full_id }}</dd>
 	<dt>Job Name</dt>
 		<dd data-toggle="tooltip" title="The name of the job">{{ job.name }}</dd>
 	<dt>Service Port</dt>

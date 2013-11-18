@@ -41,7 +41,7 @@ class LavaEncoder(json.JSONEncoder):
 		return json.JSONEncoder.default(self, obj)
 
 def process_job_list(JobList):
-	attribute_list=['name','job_id','status','submit_time','submit_time_datetime_local','start_time','start_time_datetime_local','end_time','end_time_datetime_local',]
+	attribute_list=['name','job_id','user','array_id','status','submit_time','submit_time_datetime_local','start_time','start_time_datetime_local','end_time','end_time_datetime_local',]
 	job_list=[]
 	try:
 		for j in JobList:
@@ -111,9 +111,9 @@ def user_view(request,user_name):
 		return HttpResponse(json.dumps(user,cls=LavaEncoder),content_type='application/json')
 	return render(request, 'openlavaweb/user_detail.html', {"user": user, 'job_list':job_list },)
 
-def job_view(request,job_id):
+def job_view(request,job_id, array_id=0):
 	try:
-		job=get_job_by_id(int(job_id))
+		job=get_job_by_id(int(job_id), int(array_id))
 	except ValueError:
 		raise Http404 ("Job not found")
 	if request.is_ajax() or request.GET.get("json",None):
