@@ -12,7 +12,7 @@
 		<tbody>
   			{% for host in host_list %}
 			<tr>
-				<td><a href='{% url 'host_view' host.host_name %}'>{{ host.host_name }}</a></td>
+				<td><a href='{% url 'olw_host_view' host.host_name %}'>{{ host.host_name }}</a></td>
 				<td>{{ host.status }}</td>
 				<td>{{ host.num_jobs }}</td>
 				<td>{{ host.num_running_jobs }}</td>

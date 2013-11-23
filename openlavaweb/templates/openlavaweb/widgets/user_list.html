@@ -13,9 +13,9 @@
 		<tbody>
   			{% for user in user_list %}
 			<tr>
-				<td><a href='{% url 'user_view' user.name %}'>{{ user.name }}</a></td>
+				<td><a href='{% url 'olw_user_view' user.name %}'>{{ user.name }}</a></td>
 				<td>{{ user.num_jobs }}</td>
-				<td>{{ user.num_start_jobs }}</td>
+				<td>{{ user.num_started_jobs }}</td>
 				<td>{{ user.num_pending_jobs }}</td>
 				<td>{{ user.num_running_jobs }}</td>
 				<td>{{ user.num_system_suspended_jobs }}</td>

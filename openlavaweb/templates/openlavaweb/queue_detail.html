@@ -158,5 +158,5 @@
 </table>
 <h1>Jobs</h1>
 {% include "openlavaweb/widgets/job_list.html" %}
-<a href="{% url "job_view_by_queue" queue_name=queue.name %}">View All Jobs</a>
+<a href="{% url "olw_job_view_by_queue" queue_name=queue.name %}">View All Jobs</a>
 {% endblock %}
