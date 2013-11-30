@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2011 David Irvine
 #
-# This file is part of Openlava Webm
+# This file is part of Openlava Web
 #
 # Openlava Web is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
