@@ -1,11 +1,11 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-<h1>User: {{ user.name }}</h1>
+<h1>User: {{ oluser.name }}</h1>
 
 <dl class="dl-horizontal">
-	<dt>User Name</dt><dd data-toggle="tooltip" title="Name of the user or user group.">{{ user.name }}</dd>
-	<dt>Per Processor Job Limit</dt><dd data-toggle="tooltip" title="The maximum number of job slots the user or user group can use on each processor.  The job slots can be used by started jobs or reserved for PEND jobs.">{{ user.process_job_limit }}</dd>
-	<dt>Max Jobs</dt><dd data-toggle="tooltip" title="The maximum number of job slots that the user or user group can use simultaneously in the local LSF cluster.  The job slots can be used by started jobs or reserved for PEND jobs.">{{ user.max_jobs }}</dd>
+	<dt>User Name</dt><dd data-toggle="tooltip" title="Name of the user or user group.">{{ oluser.name }}</dd>
+	<dt>Per Processor Job Limit</dt><dd data-toggle="tooltip" title="The maximum number of job slots the user or user group can use on each processor.  The job slots can be used by started jobs or reserved for PEND jobs.">{{ oluser.process_job_limit }}</dd>
+	<dt>Max Jobs</dt><dd data-toggle="tooltip" title="The maximum number of job slots that the user or user group can use simultaneously in the local LSF cluster.  The job slots can be used by started jobs or reserved for PEND jobs.">{{ oluser.max_jobs }}</dd>
 </dl>
 <table class="table table-striped table-condensed">
 	<thead>
@@ -20,18 +20,18 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td>{{ user.num_jobs }}</td>
-			<td>{{ user.num_started_jobs }}</td>
-			<td>{{ user.num_pending_jobs }}</td>
-			<td>{{ user.num_running_jobs }}</td>
-			<td>{{ user.num_system_suspended_jobs }}</td>
-			<td>{{ user.num_user_suspended_jobs }}</td>
+			<td>{{ oluser.num_jobs }}</td>
+			<td>{{ oluser.num_started_jobs }}</td>
+			<td>{{ oluser.num_pending_jobs }}</td>
+			<td>{{ oluser.num_running_jobs }}</td>
+			<td>{{ oluser.num_system_suspended_jobs }}</td>
+			<td>{{ oluser.num_user_suspended_jobs }}</td>
 		</tr>
 	</tbody>
 </table>
 <h1>Jobs</h1>
 {% include "openlavaweb/widgets/job_list.html" %}
-<a href="{% url "olw_job_view_by_user" user_name=user.name %}">View All Jobs</a>
+<a href="{% url "olw_job_view_by_user" user_name=oluser.name %}">View All Jobs</a>
 
 {% endblock %}
 

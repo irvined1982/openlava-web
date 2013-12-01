@@ -17,7 +17,7 @@
 # along with Openlava Web. If not, see <http://www.gnu.org/licenses/>.
 import json
 from django.http import Http404
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from openlava import OpenLava, OpenLavaCAPI, User, Host, Job, Queue, OpenLavaEncoder
@@ -78,7 +78,7 @@ def user_view(request,user_name):
 
 	if request.is_ajax() or request.GET.get("json",None):
 		return HttpResponse(json.dumps(user, sort_keys=True, indent=3, cls=OpenLavaEncoder),content_type='application/json')
-	return render(request, 'openlavaweb/user_detail.html', {"user": user, 'job_list':job_list },)
+	return render(request, 'openlavaweb/user_detail.html', {"oluser": user, 'job_list':job_list },)
 
 def job_kill(request,job_id, array_id=0):
 	job_id=int(job_id)
@@ -213,9 +213,19 @@ def get_execution_hosts(job):
 
 def job_list(request, queue_name="", host_name="", user_name="all"):
 	job_list=OpenLava.get_job_list(queue=queue_name,host=host_name, user=user_name)
+
 	if request.is_ajax() or request.GET.get("json",None):
 		return HttpResponse(json.dumps(job_list, sort_keys=True, indent=3, cls=OpenLavaEncoder),content_type='application/json')
-	return render(request, 'openlavaweb/job_list.html',{"job_list":job_list})
+
+	paginator = Paginator(job_list, 25)
+	page = request.GET.get('page')
+	try:
+		job_list = paginator.page(page)
+	except PageNotAnInteger:
+		job_list= paginator.page(1)
+	except EmptyPage:
+		job_list=paginator.page(paginator.num_pages)
+	return render(request, 'openlavaweb/job_list.html',{"job_list":job_list, })
 
 
 def system_view(request):

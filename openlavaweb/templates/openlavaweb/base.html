@@ -34,7 +34,7 @@
 				<li><a href='{% url "olw_logout" %}'>Logout</a></li>
 				{% else %}
 			   <li><p class="navbar-text">Not Logged In</p></li>
-				<li><a href='{% url "olw_login" %}'>Login</a></li>
+			   <li><a href='{% url "olw_login" %}?next={{request.path}}'>Login</a></li>
 				{% endif %}
 		   </ul>
 	   </div>
