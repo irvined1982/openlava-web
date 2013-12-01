@@ -98,13 +98,16 @@
 
 </script>
 <div class="btn-group">
-	<button type="button" class="btn dropdown-toggle btn-lg btn-primary active" data-toggle="dropdown" >Requeue<span class="caret"></span></button>
+	<button type="button" class="btn dropdown-toggle btn-lg btn-primary {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="dropdown" >Requeue<span class="caret"></span></button>
 	<ul class="dropdown-menu" role="menu">
-		<li><a href="#" data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
-		<li><a href="#" data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
+		<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
+		<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
 	</ul>
 </div>
-<button class="btn btn-primary btn-lg active" data-toggle="modal" data-target="#killModal">Kill </button>
+<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#killModal">Kill </button>
+<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#suspendModal">Suspend</button>
+<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#resumeModal">Resume</button>
+
 <div class="modal fade" id="killModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -122,7 +125,6 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->														
 </div>
-<button class="btn btn-primary btn-lg active" data-toggle="modal" data-target="#suspendModal">Suspend</button>
 <div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -140,7 +142,6 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->														
 </div>
-<button class="btn btn-primary btn-lg active" data-toggle="modal" data-target="#resumeModal">Resume</button>
 <div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">

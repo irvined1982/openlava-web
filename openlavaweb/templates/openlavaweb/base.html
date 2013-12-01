@@ -30,7 +30,7 @@
 		   </ul>
 		   <ul class="nav navbar-nav navbar-right">
 			   {% if user.is_authenticated %}
-			   <li><p class="navbar-text">{{ user.name }}</p></li>
+			   <li><p class="navbar-text">{{ user.username }}</p></li>
 				<li><a href='{% url "olw_logout" %}'>Logout</a></li>
 				{% else %}
 			   <li><p class="navbar-text">Not Logged In</p></li>

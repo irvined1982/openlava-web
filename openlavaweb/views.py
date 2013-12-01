@@ -87,6 +87,8 @@ def job_kill(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
+	if request.user not in job.admins:
+		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.kill()==0:
 			return HttpResponseRedirect(reverse("olw_job_list"))
@@ -110,6 +112,8 @@ def job_suspend(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
+	if request.user not in job.admins:
+		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.suspend()==0:
 			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
@@ -133,6 +137,8 @@ def job_resume(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
+	if request.user not in job.admins:
+		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.resume()==0:
 			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
@@ -162,6 +168,8 @@ def job_requeue(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
+	if request.user not in job.admins:
+		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.requeue(hold=hold) == 0:
 			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
