@@ -20,7 +20,7 @@
 				<td>{% if job.end_time %}{{ job.end_time_datetime_local }}{% else %}Not yet finished{% endif %}</td>
 			</tr>
 			{% empty %}
-			<tr><td colspan="1">No Jobs.</td></tr>
+			<tr><td colspan="6">No Jobs.</td></tr>
 			{% endfor %}
 		</tbody>
 	</table>

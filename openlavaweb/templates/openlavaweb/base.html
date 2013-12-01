@@ -7,6 +7,7 @@
     <!-- Bootstrap -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
   </head>
   <body>
@@ -26,6 +27,15 @@
 			   <li><a href="{% url "olw_job_list" %}">Jobs</a></li>
 			   <li><a href="{% url "olw_host_list" %}">Hosts</a></li>
 			   <li><a href="{% url "olw_user_list" %}">Users</a></li>
+		   </ul>
+		   <ul class="nav navbar-nav navbar-right">
+			   {% if user.is_authenticated %}
+			   <li><p class="navbar-text">{{ user.name }}</p></li>
+				<li><a href='{% url "olw_logout" %}'>Logout</a></li>
+				{% else %}
+			   <li><p class="navbar-text">Not Logged In</p></li>
+				<li><a href='{% url "olw_login" %}'>Login</a></li>
+				{% endif %}
 		   </ul>
 	   </div>
 	   </nav>

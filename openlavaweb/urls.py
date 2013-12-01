@@ -35,5 +35,7 @@ urlpatterns = patterns('',
 	url(r'^users/$', 'openlavaweb.views.user_list', name="olw_user_list"),
 	url(r'^users/(?P<user_name>.+?)/jobs$', 'openlavaweb.views.job_list', name="olw_job_view_by_user"),
 	url(r'^users/(.+?)$', 'openlavaweb.views.user_view', name="olw_user_view"),
+	url(r'^accounts/login/$', 'django.contrib.auth.views.login',{'template_name': 'openlavaweb/login.html'}, name="olw_login"),
+	url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'template_name': 'openlavaweb/logout.html'}, name="olw_logout"),
 )
 
