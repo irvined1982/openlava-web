@@ -19,8 +19,9 @@ import json
 from django.http import Http404
 from django.core.paginator import Paginator
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from openlava import OpenLava, OpenLavaCAPI, User, Host, Job, Queue
+from django.core.urlresolvers import reverse
 
 class LavaEncoder(json.JSONEncoder):
 	def default(self,obj):
@@ -93,6 +94,95 @@ def user_view(request,user_name):
 		return HttpResponse(json.dumps(user,cls=LavaEncoder),content_type='application/json')
 	return render(request, 'openlavaweb/user_detail.html', {"user": user, 'job_list':job_list },)
 
+def job_kill(request,job_id, array_id=0):
+	job_id=int(job_id)
+	array_id=int(array_id)
+	try:
+		job=Job(job_id=job_id, array_id=array_id)
+	except ValueError:
+		raise Http404 ("Job not found")
+	if request.GET.get('confirm', None):
+		if job.kill()==0:
+			return HttpResponseRedirect(reverse("olw_job_list"))
+		else:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+
+	elif request.is_ajax() or request.GET.get("json",None):
+		if job.kill()==0:
+			return HttpResponse("OK", content_type="text/plain")
+		else:
+			return HttpResponse("FAIL", content_type="text/plain")
+	else:
+		return render(request, 'openlavaweb/job_kill_confirm.html', {"object": job})
+
+def job_suspend(request,job_id, array_id=0):
+	job_id=int(job_id)
+	array_id=int(array_id)
+	try:
+		job=Job(job_id=job_id, array_id=array_id)
+	except ValueError:
+		raise Http404 ("Job not found")
+	if request.GET.get('confirm', None):
+		if job.suspend()==0:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+		else:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+
+	elif request.is_ajax() or request.GET.get("json",None):
+		if job.suspend()==0:
+			return HttpResponse("OK", content_type="text/plain")
+		else:
+			return HttpResponse("FAIL", content_type="text/plain")
+	else:
+		return render(request, 'openlavaweb/job_suspend_confirm.html', {"object": job})
+
+def job_resume(request,job_id, array_id=0):
+	job_id=int(job_id)
+	array_id=int(array_id)
+	try:
+		job=Job(job_id=job_id, array_id=array_id)
+	except ValueError:
+		raise Http404 ("Job not found")
+	if request.GET.get('confirm', None):
+		if job.resume()==0:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+		else:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+
+	elif request.is_ajax() or request.GET.get("json",None):
+		if job.resume()==0:
+			return HttpResponse("OK", content_type="text/plain")
+		else:
+			return HttpResponse("FAIL", content_type="text/plain")
+	else:
+		return render(request, 'openlavaweb/job_resume_confirm.html', {"object": job})
+
+
+
+def job_requeue(request,job_id, array_id=0):
+	job_id=int(job_id)
+	array_id=int(array_id)
+	hold=False
+	if request.GET.get("hold",False):
+		hold=True
+
+	try:
+		job=Job(job_id=job_id, array_id=array_id)
+	except ValueError:
+		raise Http404 ("Job not found")
+	if request.GET.get('confirm', None):
+		if job.requeue(hold=hold) == 0:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+		else:
+			return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
+	elif request.is_ajax() or request.GET.get("json",None):
+		if job.requeue(hold=hold):
+			return HttpResponse("OK", content_type="text/plain")
+		else:
+			return HttpResponse("false", content_type="text/plain")
+	else:
+		return render(request, 'openlavaweb/job_requeue_confirm.html', {"object": job})
+
 def job_view(request,job_id, array_id=0):
 	job_id=int(job_id)
 	array_id=int(array_id)
@@ -102,7 +192,7 @@ def job_view(request,job_id, array_id=0):
 		raise Http404 ("Job not found")
 	if request.is_ajax() or request.GET.get("json",None):
 		return HttpResponse(json.dumps(job,cls=LavaEncoder),content_type='application/json')
-	return render(request, 'openlavaweb/job_detail.html', {"job": job },)
+	return render(request, 'openlavaweb/job_detail.html', {"job": job, },)
 
 
 

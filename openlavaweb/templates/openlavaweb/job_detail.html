@@ -1,5 +1,13 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
+{% for m in messages %}
+<div class="alert alert-{{ m.level }}">{{ m.mesage }}</div>
+{% endfor %}
+<a href="{% url "olw_job_kill" job.job_id job.array_id %}" class="btn btn-primary btn-lg active" role="button">Kill</a>
+<a href="{% url "olw_job_requeue" job.job_id job.array_id %}" class="btn btn-primary btn-lg active" role="button">Requeue</a>
+<a href="{% url "olw_job_suspend" job.job_id job.array_id %}" class="btn btn-primary btn-lg active" role="button">Suspend</a>
+<a href="{% url "olw_job_resume" job.job_id job.array_id %}" class="btn btn-primary btn-lg active" role="button">Resume</a>
+
 <h1>Job: {{ job.job_id }} {% if job.array_id > 0 %} Array Index: {{ job.array_id }}{% endif %}</h1>
 <dl class="dl-horizontal">
 	<dt>Username</dt>
