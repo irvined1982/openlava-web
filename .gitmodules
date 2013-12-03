@@ -1,0 +1,3 @@
+[submodule "openlavaweb/static/bootstrap"]
+	path = openlavaweb/static/bootstrap
+	url = https://github.com/twbs/bootstrap.git
