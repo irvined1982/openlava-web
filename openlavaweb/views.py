@@ -20,8 +20,9 @@ from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from openlava import OpenLava, OpenLavaCAPI, User, Host, Job, Queue, OpenLavaEncoder
 from django.core.urlresolvers import reverse
+from django import forms
+from openlava import OpenLava, OpenLavaCAPI, User, Host, Job, Queue, OpenLavaEncoder
 
 def queue_list(request):
 	queue_list=OpenLava.get_queue_list()
@@ -245,4 +246,48 @@ def system_view(request):
 			'user_list':user_list,
 			}
 	return render(request, 'openlavaweb/system_view.html',fields)
+
+
+def job_submit(request):
+	form = JobSubmitForm()
+	return render( request, 'openlavaweb/job_submit.html', {'form':form})
+
+class JobSubmitForm(forms.Form):
+	# options....
+	opts=[
+			(0x40, "Exclusive"),
+			(0x4000, "Re-Runnable"),
+			]
+
+	options=forms.MultipleChoiceField(choices=opts, required=False)
+	num_processors=forms.IntegerField(initial=1)
+	command=forms.CharField(widget=forms.TextArea, max_length=512)
+	job_name=forms.CharField(max_length=512, required=False)
+	queues=[(u'', u'Default') ]
+	for q in OpenLava.get_queue_list():
+		queues.append([q.name, q.name])
+	queue_name=forms.ChoiceField(choices=queues, required=False)
+	hosts=[]
+	for h in OpenLava.get_host_list():
+		hosts.append([h.name, h.name])
+	requested_hosts=forms.MultipleChoiceField(choices=hosts, required=False )
+	resource_request=forms.CharField(max_length=512, required=False)
+	## Rlimits
+	host_specification=forms.CharField(max_length=512, required=False)
+	dependency_conditions=forms.CharField(max_length=512, required=False)
+	begin_time=forms.DateTimeField(required=False)
+	term_time=forms.DateTimeField(required=False)
+	signal_value=forms.IntegerField(required=False)
+	input_file=forms.CharField(max_length=512, required=False)
+	output_file=forms.CharField(max_length=512, required=False)
+	error_file=forms.CharField(max_length=512, required=False)
+	checkpoint_period=forms.CharField(max_length=512, required=False)
+	checkpoint_directory=forms.CharField(max_length=512, required=False)
+	email_user=forms.EmailField(required=False)
+	project_name=forms.CharField(max_length=128, required=False)
+	max_num_processors=forms.IntegerField(required=False)
+	login_shell=forms.CharField(128, required=False)
+	priority=forms.IntegerField(required=False)
+
+
 
