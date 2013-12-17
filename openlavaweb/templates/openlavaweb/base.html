@@ -5,10 +5,10 @@
     <title>OpenLava Web</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
-	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="{% static "openlavaweb/bootstrap/dist/css/bootstrap.min.css" %}">
+	<link rel="stylesheet" href="{% static "openlavaweb/bootstrap/dist/css/bootstrap-theme.min.css" %}">
+	<script src="{% static "openlavaweb/jquery/jquery.js" %}"></script>
+	<script src="{% static "openlavaweb/bootstrap/dist/js/bootstrap.min.js" %}"></script>
   </head>
   <body>
 	  <nav class="navbar navbar-default" role="navigation">
@@ -27,6 +27,7 @@
 			   <li><a href="{% url "olw_job_list" %}">Jobs</a></li>
 			   <li><a href="{% url "olw_host_list" %}">Hosts</a></li>
 			   <li><a href="{% url "olw_user_list" %}">Users</a></li>
+			   {% if user.is_authenticated %}<li><a href="{% url "olw_job_submit" %}">Submit</a></li>{% endif %}
 		   </ul>
 		   <ul class="nav navbar-nav navbar-right">
 			   {% if user.is_authenticated %}

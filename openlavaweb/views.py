@@ -22,7 +22,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django import forms
-from openlava import OpenLava, OpenLavaCAPI, User, Host, Job, Queue, OpenLavaEncoder
+from openlava import OpenLava, OpenLavaCAPI, User, Host, Job, Queue, OpenLavaEncoder, JobSubmitError
 
 def queue_list(request):
 	queue_list=OpenLava.get_queue_list()
@@ -88,7 +88,7 @@ def job_kill(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
-	if request.user not in job.admins:
+	if unicode(request.user) not in job.admins:
 		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.kill()==0:
@@ -113,7 +113,7 @@ def job_suspend(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
-	if request.user not in job.admins:
+	if unicode(request.user) not in job.admins:
 		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.suspend()==0:
@@ -138,7 +138,7 @@ def job_resume(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
-	if request.user not in job.admins:
+	if unicode(request.user) not in job.admins:
 		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.resume()==0:
@@ -169,7 +169,7 @@ def job_requeue(request,job_id, array_id=0):
 		job=Job(job_id=job_id, array_id=array_id)
 	except ValueError:
 		raise Http404 ("Job not found")
-	if request.user not in job.admins:
+	if unicode(request.user) not in job.admins:
 		return HttpResponseForbidden("User: %s is not a job admin" % request.user)
 	if request.GET.get('confirm', None):
 		if job.requeue(hold=hold) == 0:
@@ -212,11 +212,14 @@ def get_execution_hosts(job):
 	return hosts.values()
 
 
-def job_list(request, queue_name="", host_name="", user_name="all"):
-	job_list=OpenLava.get_job_list(queue=queue_name,host=host_name, user=user_name)
+def job_list(request, job_id=0, queue_name="", host_name="", user_name="all"):
+	job_list=OpenLava.get_job_list(job_id=int(job_id), queue=queue_name,host=host_name, user=user_name)
 
 	if request.is_ajax() or request.GET.get("json",None):
 		return HttpResponse(json.dumps(job_list, sort_keys=True, indent=3, cls=OpenLavaEncoder),content_type='application/json')
+
+	if len(job_list)==1:
+		return HttpResponseRedirect(reverse("olw_job_view_array",args=[job_list[0].job_id, job_list[0].array_id])) 
 
 	paginator = Paginator(job_list, 25)
 	page = request.GET.get('page')
@@ -249,19 +252,56 @@ def system_view(request):
 
 
 def job_submit(request):
-	form = JobSubmitForm()
+	if request.method == 'POST':
+		form = JobSubmitForm(request.POST)
+		if form.is_valid():
+			# submit the job
+			kwargs={}
+			if 'options' in form.cleaned_data:
+				opt=0
+				for i in form.cleaned_data['options']:
+					opt=opt|int(i)
+				kwargs['options']=opt
+				del form.cleaned_data['options']
+
+			if 'options2' in form.cleaned_data:
+				opt=0
+				for i in form.cleaned_data['options2']:
+					opt=opt|int(i)
+				kwargs['options2']=opt
+				del form.cleaned_data['options2']
+
+			for field,value in form.cleaned_data.items():
+				if field in ['options','options2']:
+					continue
+				if value:
+					kwargs[field]=value
+			try:
+				job_id=OpenLava.submit_job(**kwargs)
+				return HttpResponseRedirect(reverse("olw_job_list", kwargs={'job_id':job_id}))
+			except JobSubmitError as e:
+				return render( request, 'openlavaweb/job_submit.html', {'form':form, 'error': e})
+	else:
+		form = JobSubmitForm()
 	return render( request, 'openlavaweb/job_submit.html', {'form':form})
 
 class JobSubmitForm(forms.Form):
 	# options....
 	opts=[
-			(0x40, "Exclusive"),
-			(0x4000, "Re-Runnable"),
+			(OpenLavaCAPI.SUB_EXCLUSIVE, "Exclusive"),
+			(OpenLavaCAPI.SUB_NOTIFY_END, "Notify End"),
+			(OpenLavaCAPI.SUB_NOTIFY_BEGIN, "Notify Begin"),
+			(OpenLavaCAPI.SUB_RERUNNABLE, "Re-Runnable"),
 			]
-
+	opts2=[
+			(OpenLavaCAPI.SUB2_HOLD, "Hold Job"),
+			(OpenLavaCAPI.SUB2_QUEUE_CHKPNT , "Checkpointable Queue Only"),
+			(OpenLavaCAPI.SUB2_QUEUE_RERUNNABLE, "Re-Runnable Queue Only"),
+			]
 	options=forms.MultipleChoiceField(choices=opts, required=False)
+	options2=forms.MultipleChoiceField(choices=opts2, required=False)
 	num_processors=forms.IntegerField(initial=1)
-	command=forms.CharField(widget=forms.TextArea, max_length=512)
+	command=forms.CharField(widget=forms.Textarea, max_length=512)
 	job_name=forms.CharField(max_length=512, required=False)
 	queues=[(u'', u'Default') ]
 	for q in OpenLava.get_queue_list():
@@ -287,7 +327,7 @@ class JobSubmitForm(forms.Form):
 	project_name=forms.CharField(max_length=128, required=False)
 	max_num_processors=forms.IntegerField(required=False)
 	login_shell=forms.CharField(128, required=False)
-	priority=forms.IntegerField(required=False)
+	user_priority=forms.IntegerField(required=False)
 
-
+	# Remember and set maxNumProcessors if its not set.
 
