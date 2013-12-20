@@ -6,7 +6,7 @@ README = open(os.path.join(os.path.dirname(__file__), 'README')).read()
 setup(
 		name='django-openlavaweb',
 		version='1.0',
-		packages=['openlavaweb'],
+		packages=['openlavaweb','cluster'],
 		include_package_data=True,	
 		license="GPL 3",
 		description="Openlava Web is a REST based web interface to the Openlava scheduling system. Openlava Web provides both HTML and JSON interfaces allowing users to view information on jobs, queues, hosts, and other components of the scheduling environment.",

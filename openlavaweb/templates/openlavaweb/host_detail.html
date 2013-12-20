@@ -1,100 +1,96 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
 <h1>Host: {{ host.host_name }}</h1>
+
 <dl class="dl-horizontal">
-	<dt>Status</dt><dd>{{ host.status }}</dd>
-	<dt>CPU Factor</dt><dd data-toggle="tooltip" title="The host CPU factor used to scale CPU load values to account for differences in CPU speeds.  The faster the CPU, the larger the CPU factor.">{{ host.cpu_factor }}</dd>
-	<dt>Run Windows</dt><dd data-toggle="tooltip" title="One or more time windows in a week during which batch jobs may be dispatched to run on this host.  The default is no restriction, or always open (i.e., 24 hours a day seven days a week). These windows are similar to the dispatch windows of batch job queues.">{% if host.run_windows %}{{ host.run_windows }}{% else %}Always Open{% endif %}</dd>
-	<dt>User Job Limit</dt><dd data-toggle="tooltip" title="The maximum number of job slots any user is allowed to use on this host.">{{ host.user_job_limit }}</dd>
-	<dt>Max Jobs</dt><dd data-toggle="tooltip" title="The maximum number of job slots that the host can process concurrently.">{{ host.max_jobs }}</dd>
-	<dt>Migration Threshold</dt><dd data-toggle="tooltip" title="The migration threshold in minutes after which a suspended job will be considered for migration.">{{ host.migration_threshold }}</dd>
-	<dt>Host Attributes</dt><dd data-toggle="tooltip" title="The host attributes.">{% for a in host.host_attributes %}a {% endfor %}</dd>
-	<dt>Checkpoint Signal</dt><dd data-toggle="tooltip" title="If attr has an H_ATTR_CHKPNT_COPY attribute, chkSig is set to the signal which triggers checkpoint and copy operation.  Otherwise, chkSig is set to the signal which triggers checkpoint operation on the host.">{{ host.checkpoint_signal }}</dd>
+	<dt>Status</dt><dd>{% for status in host.status %}<span title="{{ status.description }}">{{ status.friendly }}</span> {% endfor %}</dd>
+	<dt>Host Type</dt><dd>{{ host.host_type }}</dd>
+	<dt>Host Model</dt><dd>{{ host.host_model }}</dd>
+	{% if host.cluster_type == "openlava" %}
+	<dt>Compute Type</dt><dd>{% if host.is_server %}Server{% else %}Submission Host{% endif %}</dd>
+	<dt>CPU Factor</dt><dd>{{ host.cpu_factor }}</dd>
+	<dt>Checkpoint Support</dt><dd>{% if host.has_checkpoint_support %}Yes{% else %}No{% endif %}</dd>
+	<dt>Kernel Checkpoint Copy Support</dt><dd>{% if host.has_kernel_checkpoint_support %}Yes{% else %}No{% endif %}</dd>
+
+	{% endif %}
+	<dt>Max Processors</dt><dd>{{ host.max_processors }} Processors</dd>
+	<dt>Max Ram</dt><dd>{{ host.max_ram }}MB</dd>
+	<dt>Max Swap</dt><dd>{{ host.max_swap }}MB</dd>
+	<dt>Max Temp Space</dt><dd> {{ host.max_tmp }}MB</dd>
+	{% if host.cluster_type == "openlava" %}
+	<dt>Number of Disks</dt><dd>{{ host.num_disks }} Disks</dd>
+	{% endif %}
 </dl>
+
 <h1>Utilization</h1>
 <table class="table table-striped table-condensed">
 	<thead>
 		<tr>
-			<th>Total Num Jobs</th>
-			<th>Num Running Jobs</th>
-			<th>Num System Suspended Jobs</th>
-			<th>Num User Suspended Jobs</th>
+			<td>&nbsp;</td>
+			<th>Max</th>
+			<th>Total</th>
+			<th>Running</th>
+			<th>Suspended</th>
+			{% if host.cluster_type == "openlava" %}
+			<th>System Suspended</th>
+			<th>User Suspended</th>
+			{% endif %}
+			<th>Reserved</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td>{{ host.num_jobs }}</td>
+			<th>Jobs</th>
+			<td>{{ host.max_jobs }}</td>
+			<td>{{ host.total_jobs }}</td>
 			<td>{{ host.num_running_jobs }}</td>
+			<td>{{ host.num_suspended_jobs }}</td>
+			{% if host.cluster_type == "openlava" %}
 			<td>{{ host.num_system_suspended_jobs }}</td>
 			<td>{{ host.num_user_suspended_jobs }}</td>
+			{% endif %}
+			<td>N/A</td>
+		</tr>
+		<tr>
+			<th>Slots</th>
+			<td>{{ host.max_slots }}</td>
+			<td>{{ host.total_slots }}</td>
+			<td>{{ host.num_running_slots }}</td>
+			<td>{{ host.num_suspended_slots }}</td>
+			{% if host.cluster_type == "openlava" %}
+			<td>{{ host.num_system_suspended_slots }}</td>
+			<td>{{ host.num_user_suspended_slots }}</td>
+			{% endif %}
+			<td>{{ host.num_reserved_slots|default_if_none:"Not Applicable" }}</td>
 		</tr>
 	</tbody>
 </table>
-<h1>Load</h1>
+<h1>Load Information</h1>
 <table class="table table-striped table-condensed">
 	<thead>
 		<tr>
 			<th>&nbsp;</th>
-			<th>15s Load</th>
-			<th>1m Load</th>
-			<th>15m Load</th>
-			<th>Avg CPU Utilization</th>
-			<th>Paging Rate (Pages/Sec)</th>
-			<th>Disk IO Rate (KB/Sec)</th>
-			<th>Num Users</th>
-			<th>Idle Time</th>
-			<th>Tmp Space (MB)</th>
-			<th>Free Memory (MB)</th>
+			{% for name in host.load_information.names %}
+			<th>{{ name }}</th>
+			{% endfor %}
 		</tr>
 	</thead>
 	<tbody>
+		{% for index in host.load_information.values %}
 		<tr>
-			<th>Actual Load</th>
-			{% if host.status.name = "HOST_STAT_UNAVAIL" %}
-			<td colspan=10>Host unavailable</td>
-			{% else %}
-			<td>{{ host.load.run_queue_15s|floatformat:1 }}</td>
-			<td>{{ host.load.run_queue_1m|floatformat:1 }}</td>
-			<td>{{ host.load.run_queue_15m|floatformat:1 }}</td>
-			<td>{{ host.load.cpu_utilization|floatformat:1 }}</td>
-			<td>{{ host.load.paging_rate|floatformat:1 }}</td>
-			<td>{{ host.load.disk_io_rate|floatformat:1 }}</td>
-			<td>{{ host.load.login_users|floatformat:0 }}</td>
-			<td>{{ host.load.idle_time_timedelta }}</td>
-			<td>{{ host.load.tmp_space|floatformat:0 }}</td>
-			<td>{{ host.load.mem_free|floatformat:0 }}</td>
-			{% endif %}
+			<th>{{ index.name }}</th>
+			{% for value in index.values %}
+			<td>{% if host.cluster_type == "openlava" %}{{ value|floatformat:2 }}{% else %}{{value}}{% endif %}</td>
+			{% endfor %}
 		</tr>
-		<tr>
-			<th>Stop Scheduling Threshold</th>
-			<td>{{ host.busy_schedule_load.run_queue_15s|floatformat:1 }}</td>
-			<td>{{ host.busy_schedule_load.run_queue_1m|floatformat:1 }}</td>
-			<td>{{ host.busy_schedule_load.run_queue_15m|floatformat:1 }}</td>
-			<td>{{ host.busy_schedule_load.cpu_utilization|floatformat:1 }}</td>
-			<td>{{ host.busy_schedule_load.paging_rate|floatformat:1 }}</td>
-			<td>{{ host.busy_schedule_load.disk_io_rate|floatformat:1 }}</td>
-			<td>{{ host.busy_schedule_load.login_users|floatformat:0 }}</td>
-			<td>{{ host.busy_schedule_load.idle_time_timedelta }}</td>
-			<td>{{ host.busy_schedule_load.tmp_space|floatformat:0 }}</td>
-			<td>{{ host.busy_schedule_load.mem_free|floatformat:0 }}</td>
-		</tr>
-		<tr>
-			<th>Stop Job Load</th>
-			<td>{{ host.busy_stop_load.run_queue_15s|floatformat:1 }}</td>
-			<td>{{ host.busy_stop_load.run_queue_1m|floatformat:1 }}</td>
-			<td>{{ host.busy_stop_load.run_queue_15m|floatformat:1 }}</td>
-			<td>{{ host.busy_stop_load.cpu_utilization|floatformat:1 }}</td>
-			<td>{{ host.busy_stop_load.paging_rate|floatformat:1 }}</td>
-			<td>{{ host.busy_stop_load.disk_io_rate|floatformat:1 }}</td>
-			<td>{{ host.busy_stop_load.login_users|floatformat:0 }}</td>
-			<td>{{ host.busy_stop_load.idle_time_timedelta }}</td>
-			<td>{{ host.busy_stop_load.tmp_space|floatformat:0 }}</td>
-			<td>{{ host.busy_stop_load.mem_free|floatformat:0 }}</td>
-		</tr>
+		{% endfor %}
 	</tbody>
 </table>
 
+<h1>Resources</h1>
+{% include "openlavaweb/widgets/resource_list.html" with resource_list=host.resources%}
+
+
 <h1>Jobs</h1>
-{% include "openlavaweb/widgets/job_list.html" %}
-<a href="{% url "olw_job_view_by_host" host_name=host.host_name %}">View All Jobs</a>
+{% include "openlavaweb/widgets/job_list.html" with job_list=host.jobs%}
 {% endblock %}

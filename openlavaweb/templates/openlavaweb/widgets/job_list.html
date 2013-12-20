@@ -12,8 +12,8 @@
 		<tbody>
   			{% for job in job_list %}
 			<tr>
-				<td><a href='{% url 'olw_job_view_array' job.job_id job.array_id %}'>{{ job.job_id }}{% if job.array_id > 0 %}[{{ job.array_id }}]{% endif %}</a></td>
-				<td><a href='{% url 'olw_user_view' job.user %}'>{{ job.user }}</a></td>
+				<td><a href='{% url 'olw_job_view_array' job.job_id job.array_index %}'>{{ job.job_id }}{% if job.array_index > 0 %}[{{ job.array_index }}]{% endif %}</a></td>
+				<td><a href='{% url 'olw_user_view' job.user_name %}'>{{ job.user_name }}</a></td>
 				<td>{{ job.status }}</td>
 				<td>{{ job.submit_time_datetime_local }}</td>
 				<td>{% if job.start_time %}{{ job.start_time_datetime_local }}{% else %}Not yet started{% endif %}</td>

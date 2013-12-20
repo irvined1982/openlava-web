@@ -18,6 +18,7 @@
 from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
+        url(r'^cluster$', 'openlavaweb.views.cluster_view', name="olw_cluster_view"),                       
 	url(r'^$', 'openlavaweb.views.system_view', name="olw_system_view"),
 	url(r'^hosts/$', 'openlavaweb.views.host_list', name="olw_host_list"),
 	url(r'^hosts/(?P<host_name>.+?)/jobs$', 'openlavaweb.views.job_list', name="olw_job_view_by_host"),
@@ -39,5 +40,6 @@ urlpatterns = patterns('',
 	url(r'^users/(.+?)$', 'openlavaweb.views.user_view', name="olw_user_view"),
 	url(r'^accounts/login/$', 'django.contrib.auth.views.login',{'template_name': 'openlavaweb/login.html'}, name="olw_login"),
 	url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'template_name': 'openlavaweb/logout.html'}, name="olw_logout"),
+	url(r'^accounts/ajax_login$', 'openlavaweb.views.ajax_login', name="olw_ajax_login"),
 )
 
