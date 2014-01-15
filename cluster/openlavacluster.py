@@ -488,9 +488,10 @@ class Job(JobBase):
 		return attribs
 	
 	@classmethod
-	def get_job_list(cls):
+	def get_job_list(cls, job_id=0, array_index=0, queue_name="", host_name="", user_name="all"):
 		initialize()
-		num_jobs=lsblib.lsb_openjobinfo()
+		real_job_id=lsblib.create_job_id(job_id=0, array_index=array_index)
+		num_jobs=lsblib.lsb_openjobinfo(job_id=real_job_id, user=user_name, queue=queue_name, host=host_name)
 		jl= [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
 		lsblib.lsb_closejobinfo()
 		return jl
@@ -695,6 +696,24 @@ class Job(JobBase):
 		return self._input_file_name
 	
 	@property
+	def is_pending(self):
+		if self.status.name=="JOB_STAT_PEND":
+			return True
+		return False
+	
+	@property
+	def is_running(self):
+		if self.status.name=="JOB_STAT_RUN":
+			return True
+		return False
+	
+	@property
+	def is_suspended(self):
+		if self.status.name=="JOB_STAT_USUSP" or self.status.name=="JOB_STAT_SSUSP" or  self.status.name=="JOB_STAT_PSUSP":
+			return True
+		return False
+	
+	@property
 	def max_requested_slots(self):
 		'''The maximum number of job slots that could be used by the job'''
 		self._update_jobinfo()
@@ -836,9 +855,75 @@ class Job(JobBase):
 		self._update_jobinfo()
 		return [Host(hn) for hn in self._requested_hosts]
 	
-
-
-
+	def kill(self):
+		full_job_id=lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+		rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
+		if rc == 0:
+			return rc
+		lsb_error=lslib.get_lserrno()
+		print lsb_error
+		if lsb_error == lslib.LSBE_NO_JOB:
+			raise NoSuchJobError("Job doesnt exist")
+		elif lsb_error==lslib.LSBE_PERMISSION:
+			raise PermissionError("Only job owners, and administrators can perform this action")
+		elif lsb_error != lslib.LSBE_NO_ERROR:
+			raise ClusterException("Error code: %s" % lsb_error)
+		
+	
+	def suspend(self):
+		full_job_id=lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+		rc=lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
+		if rc == 0:
+			return rc
+		lsb_error=lslib.get_lserrno()
+		if lsb_error == lslib.LSBE_NO_JOB:
+			raise NoSuchJobError("Job doesnt exist")
+		elif lsb_error==lslib.LSBE_PERMISSION:
+			raise PermissionError("Only job owners, and administrators can perform this action")
+		elif lsb_error != lslib.LSBE_NO_ERROR:
+			raise ClusterException("Error code: %s" % lsb_error)
+	
+	def requeue(self, hold=False):
+		rq=lsblib.JobRequeue()
+		rq.jobId=lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+		rq.status=lsblib.JOB_STAT_PEND
+		if hold:
+			rq.status=lsblib.JOB_STAT_PSUSP
+		
+		if self.status.name==u"JOB_STAT_DONE":
+			rq.options=lsblib.REQUEUE_DONE
+		elif self.status.name==u"JOB_STAT_RUN":
+			rq.options=lsblib.REQUEUE_RUN
+		elif self.status.name==u"JOB_STAT_EXIT":
+			rq.options=lsblib.REQUEUE_EXIT
+		else:
+			raise ValueError(self.status)
+		
+		rc=lsblib.lsb_requeuejob(rq)
+		if rc == 0:
+			return rc
+		lsb_error=lslib.get_lserrno()
+		if lsb_error == lslib.LSBE_NO_JOB:
+			raise NoSuchJobError("Job doesnt exist")
+		elif lsb_error==lslib.LSBE_PERMISSION:
+			raise PermissionError("Only job owners, and administrators can perform this action")
+		elif lsb_error != lslib.LSBE_NO_ERROR:
+			raise ClusterException("Error code: %s" % lsb_error)
+		
+	def resume(self):
+		full_job_id=lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+		rc=lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)
+		if rc == 0:
+			return rc
+		lsb_error=lslib.get_lserrno()
+		if lsb_error == lslib.LSBE_NO_JOB:
+			raise NoSuchJobError("Job doesnt exist")
+		elif lsb_error==lslib.LSBE_PERMISSION:
+			raise PermissionError("Only job owners, and administrators can perform this action")
+		elif lsb_error != lslib.LSBE_NO_ERROR:
+			raise ClusterException("Error code: %s" % lsb_error)
+		
+		
 	## Openlava Only
 	@property
 	def checkpoint_directory(self):

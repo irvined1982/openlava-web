@@ -202,6 +202,27 @@ class JobBase:
 		raise NotImplementedError
 	
 	@property
+	def is_pending(self):
+		'''True if the job is pending'''
+		if self.status.name=="JOB_STAT_PEND":
+			return True
+		return false
+	
+	@property
+	def is_running(self):
+		'''True if the job is executing'''
+		if self.status.name=="JOB_STAT_RUN":
+			return True
+		return False
+	
+	@property
+	def is_suspended(self):
+		'''True if the job is suspended'''
+		if self.status=="JOB_STAT_USUSP" or self.status=="JOB_STAT_SSUSP" or "JOB_STAT_PSUSP":
+			return True
+		return False
+	
+	@property
 	def max_requested_slots(self):
 		'''The maximum number of job slots that could be used by the job'''
 		raise NotImplementedError

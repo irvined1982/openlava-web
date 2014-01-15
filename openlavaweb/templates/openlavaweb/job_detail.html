@@ -1,37 +1,256 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
+<div id="failMessageBody"></div>
+<div id="killMessageBody"></div>
+<div id="suspendMessageBody"></div>
+<div id="resumeMessageBody"></div>
+<div id="requeuePendMessageBody"></div>
+<div id="requeueHoldMessageBody"></div>
+
+<div id="jobPendingAlert' class="alert alert-info alert-dismissable">
+	{% if job.is_pending %}<strong>Pending</strong>: The job is currently pending.  The scheduler has not executed the job yet because of the following reasons:  {{ job.pending_reasons}}{% endif %}
+</div>
+
+
+<div id="jobRunningAlert' class="alert alert-success alert-dismissable">
+	{% if job.is_running %}<strong>Running</strong>: The job is currently running.{% endif %}
+</div>
+
+
+<div id="jobSuspendAlert' class="alert alert-warning alert-dismissable">
+	{% if job.is_suspended %}<strong>Suspended</strong>: The job is currently suspended.  The job is suspended because of the following reasons:  {{ job.suspension_reasons}}{% endif %}
+</div>
+
+
+<script>
+        var url='{% url "olw_job_view_array" job.job_id job.array_index %}';
+        var killUrl='{% url "olw_job_kill" job.job_id job.array_index %}';
+        var suspendUrl='{% url "olw_job_suspend" job.job_id job.array_index %}';
+        var resumeUrl='{% url "olw_job_resume" job.job_id job.array_index %}';
+        var requeueHoldUrl='{% url "olw_job_requeue" job.job_id job.array_index %}?hold=1';
+        var requeuePendUrl='{% url "olw_job_requeue" job.job_id job.array_index %}';
+
+        function killJob(){
+                $("#killModal").modal('hide');
+                var jqxhr = $.getJSON( killUrl, function(data) {
+                        $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-success">Job kill request sent successfully.</div>');
+                        $("#killMessage").alert();
+                })
+                .fail(function() {
+                        $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-warning">Unable to kill job.</div>');
+                        $("#killMessage").alert();
+                })
+                .always(function(){
+                        setTimeout(function(){
+                                $("#killMessage").alert('close');
+                        },10000);                        
+                });
+        }
+        function suspendJob(){
+                $("#suspendModal").modal('hide');
+                var jqxhr = $.getJSON( suspendUrl, function(data) {
+                        $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-success">Job suspend request sent successfully.</div>');
+                        $("#suspendMessage").alert();
+                })
+                .fail(function() {
+                        $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-warning">Unable to suspend job.</div>');
+                        $("#suspendMessage").alert();
+                })
+                .always(function(){
+                        setTimeout(function(){
+                                $("#suspendMessage").alert('close');
+                        },10000);                        
+                });
+        }
+        function resumeJob(){
+                $("#resumeModal").modal('hide');
+                var jqxhr = $.getJSON( resumeUrl, function(data) {
+                        $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-success">Job resume request sent successfully.</div>');
+                        $("#resumeMessage").alert();
+                })
+                .fail(function() {
+                        $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-warning">Unable to resume job.</div>');
+                        $("#resumeMessage").alert();
+                })
+                .always(function(){
+                        setTimeout(function(){
+                                $("#resumeMessage").alert('close');
+                        },10000);                        
+                });
+        }
+        function requeueHoldJob(){
+                $("#requeueHoldModal").modal('hide');
+                var jqxhr = $.getJSON( requeueHoldUrl, function(data) {
+                        $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
+                        $("#requeueHoldMessage").alert();
+                })
+                .fail(function() {
+                        $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
+                        $("#requeueHoldMessage").alert();
+                })
+                .always(function(){
+                        setTimeout(function(){
+                                $("#requeueHoldMessage").alert('close');
+                        },10000);                        
+                });
+        }
+        function requeuePendJob(){
+                $("#requeuePendModal").modal('hide');
+                var jqxhr = $.getJSON( requeuePendUrl, function(data) {
+                        $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
+                        $("#requeuePendMessage").alert();
+                })
+                .fail(function() {
+                        $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
+                        $("#requeuePendMessage").alert();
+                })
+                .always(function(){
+                        setTimeout(function(){
+                                $("#requeuePendMessage").alert('close');
+                        },10000);                        
+                });
+        }
+
+</script>
+
+<!-- Job Manangement -->
+<div>
+	<div class="btn-group">
+		<button type="button" class="btn dropdown-toggle btn-lg btn-primary {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="dropdown" >Requeue<span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu">
+			<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
+			<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
+		</ul>
+	</div>
+	<button class="btn btn-primary btn-lg active" data-toggle="modal" data-target="#killModal">Kill </button>
+	<button class="btn btn-primary btn-lg active" data-toggle="modal" data-target="#suspendModal">Suspend</button>
+	<button class="btn btn-primary btn-lg active" data-toggle="modal" data-target="#resumeModal">Resume</button>
+	
+	<div class="modal fade" id="killModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Kill Job?</h4>
+				</div>
+				<div class="modal-body">
+					If the job is running, it shall be terminated with a SIGTERM signal. The job will be removed from the queue, and will not be automatically restarted.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="killJob(); return false;" type="button" class="btn btn-primary">Kill</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+	<div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Suspend Job?</h4>
+				</div>
+				<div class="modal-body">
+					If the job is running, it shall be sent a SIGSTOP signal. The job will enter the USUSP or PSUSP state.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="suspendJob(); return false;"type="button" class="btn btn-primary">Suspend</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+	<div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Resume Job?</h4>
+				</div>
+				<div class="modal-body">
+					If the job is running, it shall be sent a SIGCONT signal. The job will move to either a RUN or PEND state.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="resumeJob(); return false;" type="button" class="btn btn-primary">Resume</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+
+<div class="modal fade" id="requeuePendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">Requeue Job?</h4>
+                        </div>
+                        <div class="modal-body">
+                                If the job is running, it shall be sent a SIGTERM signal. The job shall be requeued and will pend until resources are available to execute it.
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button onClick="requeuePendJob(); return false;" type="button" class="btn btn-primary">Requeue</button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->                                                                                                                
+</div>
+
+<div class="modal fade" id="requeueHoldModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">Resume Job?</h4>
+                        </div>
+                        <div class="modal-body">
+                                If the job is running, it shall be sent a SIGTERM signal. The job will be requeued, however it will be suspended, and will not execute until it has been unsuspended by the user.
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button onClick="requeueHoldJob(); return false;" type="button" class="btn btn-primary">Requeue</button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->                                                                                                                
+</div>
+
+
+
+</div>
+
+<!-- Job Info -->
 <h1>Job: {{ job.job_id }} {% if job.array_array_index > 0 %} Array Index: {{ job.array_index }}{% endif %}</h1>
 <dl class="dl-horizontal">
 	<dt>Job ID</dt><dd data-toggle="tooltip" title="The job ID that the LSF system assigned to the job.">{{ job.job_id }}</dd>
 	<dt>Array Index ID</dt><dd data-toggle="tooltip" title="The Array ID that the LSF system assigned to the job.">{{ job.array_index }}</dd>
 	<dt>Status</dt>	<dd data-toggle="tooltip" id="status" title="The current status of the job.Possible values areshown in job_states.">{{ job.status.friendly }}: {{ job.status.description }}</dd>
 	<dt>Username</dt><dd data-toggle="tooltip" title="The name of the user who submitted the job."><a href='{% url "olw_user_view" job.user_name %}'>{{ job.user_name }}</a></dd>
-	<dt>Process ID</dt><dd id="pid" data-toggle="tooltip" title="The job process ID.">{{ job.process_id }}</dd>
+	<dt>Process ID</dt><dd id="pid" data-toggle="tooltip" title="The job process ID.">{{ job.process_id|default:"Not Available" }}</dd>
 	<dt>CPU Time Consumed</dt><dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.cpu_time_timedelta }}</dd>
 	<dt>Current Working Directory</dt><dd data-toggle="tooltip" title="The current working directory when the job was submitted.">{{ job.cwd }}</dd>
 	<dt>Submission Host</dt><dd data-toggle="tooltip" title="The name of the host from which the job was submitted.">{{ job.submission_host.host_name }}</dd>
-	<dt>Execution Hosts</dt><dd id="execution_hosts" data-toggle="tooltip" title="Names of hosts on which the job executes.">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }}</a> {% endfor %}</dd>
+	<dt>Execution Hosts</dt><dd id="execution_hosts" data-toggle="tooltip" title="Names of hosts on which the job executes.">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }}</a> {% empty %}Not executing{% endfor %}</dd>
 	<dt>Job Name</dt><dd data-toggle="tooltip" title="The name of the job">{{ job.name }}</dd>
 	<dt>Job Priority</dt><dd id="priority" data-toggle="tooltip" title="Job dynamic priority.">{{ job.priority }}</dd>
 	<dt>Submission Time</dt><dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.submit_time_datetime_local }}</dd>
-	<dt>Reservation Time</dt><dd data-toggle="tooltip" title="Time when job slots are reserved.">{{ job.reservation_time_datetime_local }}</dd>
-	<dt>Start Time</dt><dd id="start_time" data-toggle="tooltip" title="The time that the job started running, if it has been dispatched.">{{ job.start_time_datetime_local}}</dd>
-	<dt>Predicted Start Time</dt><dd id="predicted_start_time" data-toggle="tooltip" title="Job's predicted start time.">{{ job.predicted_start_time_datetime_local }}</dd>
-	<dt>End Time</dt><dd id="end_time" data-toggle="tooltip" title="The termination time of the job, if it has completed.">{{ job.end_time_datetime_local }}</dd>
+	<dt>Reservation Time</dt><dd data-toggle="tooltip" title="Time when job slots are reserved.">{% if job.reservation_time > 0 %}{{ job.reservation_time_datetime_local }}{% else %}Not Specified{% endif %}</dd>
+	<dt>Start Time</dt><dd id="start_time" data-toggle="tooltip" title="The time that the job started running, if it has been dispatched.">{% if job.start_time > 0 %}{{ job.start_time_datetime_local}}{% else %}Not yet started{% endif %}</dd>
+	<dt>Predicted Start Time</dt><dd id="predicted_start_time" data-toggle="tooltip" title="Job's predicted start time.">{% if job.predicted_start_time > 0 %}{{ job.predicted_start_time_datetime_local }}{% else %}Not Available{% endif %}</dd>
+	<dt>End Time</dt><dd id="end_time" data-toggle="tooltip" title="The termination time of the job, if it has completed.">{% if job.end_time > 0 %}{{ job.end_time_datetime_local }}{% else %}Not yet finished{% endif %}</dd>
 	<dt>Options</dt><dd>{% for option in job.options %}{{ option.friendly }}<br>{% endfor %}</dd>
-	<dt>Job Name</dt><dd>{{ job.submit.job_name }}</dd>
+	<dt>Job Name</dt><dd>{{ job.job_name|default:"Not Specified" }}</dd>
 	<dt>Queue Name</dt><dd><a href="{% url "olw_queue_view" job.queue.name %}">{{ job.queue.name }}</a></dd>
 	<dt>Requested Hosts</dt><dd>{% for host in job.requested_hosts %}{{ host.name }} {% empty %}No hosts requested{% endfor %}</dd>
-	<dt>Requested Resources</dt><dd>{{ job.requested_resources }}</dd>
+	<dt>Requested Resources</dt><dd>{{ job.requested_resources|default:"Not Specified" }}</dd>
 	<dt>Max Num Processors</dt><dd>{{ job.max_requested_slots }}</dd>
-	<dt>Dependency Conditions</dt><dd>{{ job.dependency_condition }}</dd>
-	<dt>Begin Time</dt><dd>{{ job.begin_time_datetime_local }}</dd>
-	<dt>Termination Deadline</dt><dd>{{ job.termination_time_datetime_local }}</dd>
+	<dt>Dependency Conditions</dt><dd>{{ job.dependency_condition|default:"Not Specified" }}</dd>
+	<dt>Begin Time</dt><dd>{% if job.begin_time > 0 %}{{ job.begin_time_datetime_local }}{% else %}Not Specified{% endif %}</dd>
+	<dt>Termination Deadline</dt><dd>{% if job.termination_time > 0 %}{{ job.termination_time_datetime_local }}{% else %}Not Specified{% endif %}</dd>
 	<dt>Input File</dt><dd>{{ job.input_file_name }}</dd>
 	<dt>Output File</dt><dd>{{ job.output_file_name }}</dd>
 	<dt>Error File</dt><dd>{{ job.error_file_name }}</dd>
-	<dt>Command</dt><dd>{{ job.submit.command }}</dd>
-	<dt>Email User</dt><dd>{{ job.email_user }}</dd>
+	<dt>Command</dt><dd>{{ job.command }}</dd>
+	<dt>Email User</dt><dd>{{ job.email_user|default:"Not Specified" }}</dd>
 	<dt>Project</dt><dd>{% for project in job.project_names %}{{ project }} {% empty %}No Projects {% endfor %}</dd>
 	<dt>Groups</dt><dd>{% for group in job.group_names %}{{ group }} {% empty %}No groups{% endfor %}<dd>
 	<dt>User Priority</dt><dd>{{ job.user_priority }}</dd>
@@ -41,9 +260,9 @@
 	<dt>Checkpoint Dir</dt><dd>{{ job.checkpoint_directory|default:"Not checkpointable" }}</dd>
 	<dt>CPU Factor</dt><dd id="cpu_factor" data-toggle="tooltip" title="The CPU factor for normalizing CPU and wall clock time limits.">{{ job.cpu_factor }}</dd>
 	<dt>Execution Current Working Directory</dt><dd id="execution_cwd"  data-toggle="tooltip" title="Current working directory for the job on the execution host.">{{ job.execution_cwd }}</dd>
-	<dt>Execution Home Directory</dt><dd id="execution_home_dir" data-toggle="tooltip" title="Home directory for the job on the execution host.">{{ job.execution_home_directory }}</dd>
+	<dt>Execution Home Directory</dt><dd id="execution_home_dir" data-toggle="tooltip" title="Home directory for the job on the execution host.">{{ job.execution_home_directory|default:"Not Available" }}</dd>
 	<dt>Execution User</dt><dd>{{ job.execution_user_name }} ({{ job.execution_user_id }})</dd>
-	<dt>Host Specification</dt><dd>{{ job.host_specification }}</dd>
+	<dt>Host Specification</dt><dd>{{ job.host_specification|default:"Not Specified" }}</dd>
 	<dt>Number of Processors</dt><dd>{{ job.requested_slots }}</dd>
 	<dt>Login Shell</dt><dd>{{ job.login_shell|default:"Default"}}</dd>
 	<dt>Parent Group</dt><dd id="parent_group" data-toggle="tooltip" title="The parent job group of a job or job group.">{{ job.parent_group }}</dd>
@@ -76,72 +295,53 @@
 	</tbody>
 </table>
 
-{% if job.submit.num_transfer_files > 0 %}
-	<h1>Files to Transfer</h1>
+
+<h1>Resource Usage</h1>
+<table class="table table-hover table-condensed">
+	<thead>
+		<tr>
+			<th>Field</th><th>Value</th><th>Limit</th>
+		</tr>
+	</thead>
+<tbody>
+	{% for res in job.consumed_resources %}
+	<tr><th>{{ res.name }}</th><td>{{ res.value }}{% if res.unit %} {{ res.unit }}{% endif %}</td><td>{{ res.limit|default:"No Limit" }}</td></tr>
+	{% endfor %}
+</tbody>
+</table>
+
+<h1>Active Processes</h1>
+<div id="active_processes">
+	{% if job.processes %}
 	<table class="table table-hover table-condensed">
 		<thead>
 			<tr>
-				<th>Local File</th>
-				<th>Remote File</th>
-				<th>Options</th>
+				<th>Hostname</th>
+				<th>Process ID</th>
+				{% if job.cluster_type == "openlava" %}
+				<th>Parent Process ID</th>
+				<th>Group ID</th>
+				<th>Cray Job ID</th>
+				{% endif %}
 			</tr>
 		</thead>
 		<tbody>
-		{% for file in job.submit.transfer_files %}
+			{% for proc in job.processes %}
 			<tr>
-				<td>{{ file.submission_file_name }}</td>
-				<td>{{ file.execution_file_name }}</td>
-				<td>{{ file.options }}</td>
+				<td>{{ proc.hostname|default:"Unknown" }}</td>
+				<td>{{ proc.process_id }}</td>
+				{% if job.cluster_type == "openlava" %}
+				<td>{{ proc.parent_process_id }} </td>
+				<td>{{ proc.process_group_id }}</td>
+				<td>{{ proc.cray_job_id }}</td>
+				{% endif %}
 			</tr>
-		{% endfor %}
-	{% endif %}
-
-	<h1>Resource Usage</h1>
-	<table class="table table-hover table-condensed">
-		<thead>
-			<tr>
-				<th>Field</th><th>Value</th><th>Limit</th>
-			</tr>
-		</thead>
-<tbody>
-		{% for res in job.consumed_resources %}
-		<tr><th>{{ res.name }}</th><td>{{ res.value }}{% if res.unit %} {{ res.unit }}{% endif %}</td><td>{{ res.limit|default:"No Limit" }}</td></tr>
-		{% endfor %}
-	</tbody>
+			{% endfor %}
+		</tbody>
 	</table>
-
-	<h1>Active Processes</h1>
-	<div id="active_processes">
-		{% if job.processes %}
-		<table class="table table-hover table-condensed">
-			<thead>
-				<tr>
-					<th>Hostname</th>
-					<th>Process ID</th>
-					{% if job.cluster_type == "openlava" %}
-					<th>Parent Process ID</th>
-					<th>Group ID</th>
-					<th>Cray Job ID</th>
-					{% endif %}
-				</tr>
-			</thead>
-			<tbody>
-				{% for proc in job.processes %}
-				<tr>
-					<td>{{ proc.hostname|default:"Unknown" }}</td>
-					<td>{{ proc.process_id }}</td>
-					{% if job.cluster_type == "openlava" %}
-					<td>{{ proc.parent_process_id }} </td>
-					<td>{{ proc.process_group_id }}</td>
-					<td>{{ proc.cray_job_id }}</td>
-					{% endif %}
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	{% else %}
-		<div class="alert alert-info">No processes yet.</div>
-	{% endif %}
+{% else %}
+	<div class="alert alert-info">No processes yet.</div>
+{% endif %}
 </div>
 
 

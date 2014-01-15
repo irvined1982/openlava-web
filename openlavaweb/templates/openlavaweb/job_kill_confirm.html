@@ -1,6 +1,6 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-<p>Are you sure you want to kill job: {{ object.job_id }} array index {{ object.array_id }}?</p>
-<a href="{% url "olw_job_kill" object.job_id object.array_id %}?confirm=true" class="btn btn-danger btn-lg active" role="button">Kill</a>
-<a href="{% url "olw_job_view_array" object.job_id object.array_id %}" class="btn btn-default btn-lg active" role="button">Back</a>
+<p>Are you sure you want to kill job: {{ object.job_id }} array index {{ object.array_index }}?</p>
+<a href="{% url "olw_job_kill" object.job_id object.array_index %}?confirm=true" class="btn btn-danger btn-lg active" role="button">Kill</a>
+<a href="{% url "olw_job_view_array" object.job_id object.array_index %}" class="btn btn-default btn-lg active" role="button">Back</a>
 {% endblock %}

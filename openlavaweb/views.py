@@ -109,111 +109,235 @@ def user_view(request,user_name):
 	#	return HttpResponse(json.dumps(user, sort_keys=True, indent=3, cls=OpenLavaEncoder),content_type='application/json')
 	#return render(request, 'openlavaweb/user_detail.html', {"oluser": user, 'job_list':job_list },)
 	pass
-def job_kill(request,job_id, array_id=0):
-	#job_id=int(job_id)
-	#array_id=int(array_id)
-	#try:
-	#	job=Job(job_id=job_id, array_id=array_id)
-	#except ValueError:
-	#	raise Http404 ("Job not found")
-	#if unicode(request.user) not in job.admins:
-	#	return HttpResponseForbidden("User: %s is not a job admin" % request.user)
-	#if request.GET.get('confirm', None):
-	#	if job.kill()==0:
-	#		return HttpResponseRedirect(reverse("olw_job_list"))
-	#	else:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#
-	#elif request.is_ajax() or request.GET.get("json",None):
-	#	if job.kill()==0:
-	#		data={'status':'OK'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#	else:
-	#		data={'status':'FAIL'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#else:
-	#	return render(request, 'openlavaweb/job_kill_confirm.html', {"object": job})
-	pass
-def job_suspend(request,job_id, array_id=0):
-	#job_id=int(job_id)
-	#array_id=int(array_id)
-	#try:
-	#	job=Job(job_id=job_id, array_id=array_id)
-	#except ValueError:
-	#	raise Http404 ("Job not found")
-	#if unicode(request.user) not in job.admins:
-	#	return HttpResponseForbidden("User: %s is not a job admin" % request.user)
-	#if request.GET.get('confirm', None):
-	#	if job.suspend()==0:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#	else:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#
-	#elif request.is_ajax() or request.GET.get("json",None):
-	#	if job.suspend()==0:
-	#		data={'status':'OK'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#	else:
-	#		data={'status':'FAIL'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#else:
-	#	return render(request, 'openlavaweb/job_suspend_confirm.html', {"object": job})
-	pass
-def job_resume(request,job_id, array_id=0):
-	#job_id=int(job_id)
-	#array_id=int(array_id)
-	#try:
-	#	job=Job(job_id=job_id, array_id=array_id)
-	#except ValueError:
-	#	raise Http404 ("Job not found")
-	#if unicode(request.user) not in job.admins:
-	#	return HttpResponseForbidden("User: %s is not a job admin" % request.user)
-	#if request.GET.get('confirm', None):
-	#	if job.resume()==0:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#	else:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#
-	#elif request.is_ajax() or request.GET.get("json",None):
-	#	if job.resume()==0:
-	#		data={'status':'OK'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#	else:
-	#		data={'status':'FAIL'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#else:
-	#	return render(request, 'openlavaweb/job_resume_confirm.html', {"object": job})
-	#
-	pass	
 
-def job_requeue(request,job_id, array_id=0):
-	#job_id=int(job_id)
-	#array_id=int(array_id)
-	#hold=False
-	#if request.GET.get("hold",False):
-	#	hold=True
-	#
-	#try:
-	#	job=Job(job_id=job_id, array_id=array_id)
-	#except ValueError:
-	#	raise Http404 ("Job not found")
-	#if unicode(request.user) not in job.admins:
-	#	return HttpResponseForbidden("User: %s is not a job admin" % request.user)
-	#if request.GET.get('confirm', None):
-	#	if job.requeue(hold=hold) == 0:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#	else:
-	#		return HttpResponseRedirect(reverse("olw_job_view_array", args=[str(job.job_id), str(job.array_id)]))
-	#elif request.is_ajax() or request.GET.get("json",None):
-	#	if job.requeue(hold=hold):
-	#		data={'status':'OK'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#	else:
-	#		data={'status':'FAIL'}
-	#		return HttpResponse(json.dumps(data), content_type="application/json")
-	#else:
-	#	return render(request, 'openlavaweb/job_requeue_confirm.html', {"object": job})
-	pass
+
+@login_required
+def job_kill(request,job_id, array_index=0):
+	job_id=int(job_id)
+	array_index=int(array_index)
+	if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json",None):
+		try:
+			q = MPQueue()
+			kwargs={
+				'job_id':job_id,
+				'array_index':array_index,
+				'request':request,
+				'queue':q,
+			}
+			p = MPProcess(target=execute_job_kill, kwargs=kwargs)
+			p.start()
+			p.join()
+			rc=q.get(False)
+			if isinstance(rc,Exception):
+				raise rc
+			else:		
+				return rc
+		except ClusterException as e:
+			if request.is_ajax() or request.GET.get("json",None):
+				return HttpResponse(e.to_json(), content_type='application/json')
+			else:
+				return render(request, 'openlavaweb/exception.html',{'exception':e})
+	else:
+		job=Job(job_id=job_id, array_index=array_index)
+		return render(request, 'openlavaweb/job_kill_confirm.html', {"object": job})
+	
+		
+def execute_job_kill(request, queue, job_id, array_index):
+	try:
+		user_id = pwd.getpwnam(request.user.username).pw_uid
+		os.setuid(user_id)
+		job=Job(job_id=job_id, array_index=array_index)
+		job.kill()
+		if request.is_ajax():
+			queue.put( HttpResponse(json.dumps({'status':"OK"}), content_type="application/json") )
+		else:
+			queue.put( HttpResponseRedirect(reverse("olw_job_list")))
+	except Exception as e:
+		queue.put(e)
+
+@login_required
+def job_suspend(request, job_id, array_index=0):
+	job_id=int(job_id)
+	array_index=int(array_index)
+	if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json",None):
+		try:
+			q = MPQueue()
+			kwargs={
+				'job_id':job_id,
+				'array_index':array_index,
+				'request':request,
+				'queue':q,
+			}
+			p = MPProcess(target=execute_job_suspend, kwargs=kwargs)
+			p.start()
+			p.join()
+			rc=q.get(False)
+			if isinstance(rc,Exception):
+				raise rc
+			else:		
+				return rc
+		except ClusterException as e:
+			if request.is_ajax() or request.GET.get("json",None):
+				return HttpResponse(e.to_json(), content_type='application/json')
+			else:
+				return render(request, 'openlavaweb/exception.html',{'exception':e})
+	else:
+		job=Job(job_id=job_id, array_index=array_index)
+		return render(request, 'openlavaweb/job_suspend_confirm.html', {"object": job})
+	
+		
+def execute_job_kill(request, queue, job_id, array_index):
+	try:
+		user_id = pwd.getpwnam(request.user.username).pw_uid
+		os.setuid(user_id)
+		job=Job(job_id=job_id, array_index=array_index)
+		job.suspend()
+		if request.is_ajax():
+			queue.put( HttpResponse(json.dumps({'status':"OK"}), content_type="application/json") )
+		else:
+			queue.put( HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
+	except Exception as e:
+		queue.put(e)
+
+@login_required
+def job_suspend(request, job_id, array_index=0):
+	job_id=int(job_id)
+	array_index=int(array_index)
+	if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json",None):
+		try:
+			q = MPQueue()
+			kwargs={
+				'job_id':job_id,
+				'array_index':array_index,
+				'request':request,
+				'queue':q,
+			}
+			p = MPProcess(target=execute_job_suspend, kwargs=kwargs)
+			p.start()
+			p.join()
+			rc=q.get(False)
+			if isinstance(rc,Exception):
+				raise rc
+			else:		
+				return rc
+		except ClusterException as e:
+			if request.is_ajax() or request.GET.get("json",None):
+				return HttpResponse(e.to_json(), content_type='application/json')
+			else:
+				return render(request, 'openlavaweb/exception.html',{'exception':e})
+	else:
+		job=Job(job_id=job_id, array_index=array_index)
+		return render(request, 'openlavaweb/job_suspend_confirm.html', {"object": job})
+	
+		
+def execute_job_suspend(request, queue, job_id, array_index):
+	try:
+		user_id = pwd.getpwnam(request.user.username).pw_uid
+		os.setuid(user_id)
+		job=Job(job_id=job_id, array_index=array_index)
+		job.suspend()
+		if request.is_ajax():
+			queue.put( HttpResponse(json.dumps({'status':"OK"}), content_type="application/json") )
+		else:
+			queue.put( HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
+	except Exception as e:
+		queue.put(e)
+		
+@login_required
+def job_resume(request, job_id, array_index=0):
+	job_id=int(job_id)
+	array_index=int(array_index)
+	if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json",None):
+		try:
+			q = MPQueue()
+			kwargs={
+				'job_id':job_id,
+				'array_index':array_index,
+				'request':request,
+				'queue':q,
+			}
+			p = MPProcess(target=execute_job_resume, kwargs=kwargs)
+			p.start()
+			p.join()
+			rc=q.get(False)
+			if isinstance(rc,Exception):
+				raise rc
+			else:		
+				return rc
+		except ClusterException as e:
+			if request.is_ajax() or request.GET.get("json",None):
+				return HttpResponse(e.to_json(), content_type='application/json')
+			else:
+				return render(request, 'openlavaweb/exception.html',{'exception':e})
+	else:
+		job=Job(job_id=job_id, array_index=array_index)
+		return render(request, 'openlavaweb/job_resume_confirm.html', {"object": job})
+	
+		
+def execute_job_resume(request, queue, job_id, array_index):
+	try:
+		user_id = pwd.getpwnam(request.user.username).pw_uid
+		os.setuid(user_id)
+		job=Job(job_id=job_id, array_index=array_index)
+		job.resume()
+		if request.is_ajax():
+			queue.put( HttpResponse(json.dumps({'status':"OK"}), content_type="application/json") )
+		else:
+			queue.put( HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
+	except Exception as e:
+		queue.put(e)
+		
+@login_required
+def job_requeue(request, job_id, array_index=0):
+	job_id=int(job_id)
+	array_index=int(array_index)
+	hold=False
+	if request.GET.get("hold",False):
+		hold=True
+	if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json",None):
+		try:
+			
+			q = MPQueue()
+			kwargs={
+				'job_id':job_id,
+				'array_index':array_index,
+				'request':request,
+				'queue':q,
+				'hold':hold,
+			}
+			p = MPProcess(target=execute_job_requeue, kwargs=kwargs)
+			p.start()
+			p.join()
+			rc=q.get(False)
+			if isinstance(rc,Exception):
+				raise rc
+			else:		
+				return rc
+		except ClusterException as e:
+			if request.is_ajax() or request.GET.get("json",None):
+				return HttpResponse(e.to_json(), content_type='application/json')
+			else:
+				return render(request, 'openlavaweb/exception.html',{'exception':e})
+	else:
+		job=Job(job_id=job_id, array_index=array_index)
+		return render(request, 'openlavaweb/job_requeue_confirm.html', {"object": job, 'hold':hold})
+	
+		
+def execute_job_requeue(request, queue, job_id, array_index, hold):
+	try:
+		user_id = pwd.getpwnam(request.user.username).pw_uid
+		os.setuid(user_id)
+		job=Job(job_id=job_id, array_index=array_index)
+		job.requeue(hold=hold)
+		if request.is_ajax():
+			queue.put( HttpResponse(json.dumps({'status':"OK"}), content_type="application/json") )
+		else:
+			queue.put( HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
+	except Exception as e:
+		queue.put(e)
+
+
+
 
 class ClusterEncoder(json.JSONEncoder):
 	def check(self,obj):
@@ -264,11 +388,12 @@ class ClusterEncoder(json.JSONEncoder):
 
 
 
-def job_view(request,job_id, array_id=0):
+
+def job_view(request,job_id, array_index=0):
 	job_id=int(job_id)
-	array_id=int(array_id)
+	array_index=int(array_index)
 	try:
-		job=Job(job_id=job_id, array_index=array_id)
+		job=Job(job_id=job_id, array_index=array_index)
 	except ClusterException as e:
 		if request.is_ajax() or request.GET.get("json",None):
 			return HttpResponse(e.to_json(), content_type='application/json')
@@ -280,18 +405,7 @@ def job_view(request,job_id, array_id=0):
 	else:
 		return render(request, 'openlavaweb/job_detail.html', {"job": job, },)
 	
-def get_execution_hosts(job):
-	#hosts={}
-	#for host in job.execution_hosts:
-	#	if host not in hosts:
-	#		hosts[host]={
-	#			'host':host,
-	#			'url':reverse("olw_host_view", args=[host]),
-	#			'num_slots':0,
-	#			}
-	#	hosts[host]['num_slots']+=1
-	#return hosts.values()
-	pass	
+
 
 def job_list(request, job_id=0, queue_name="", host_name="", user_name="all"):
 	job_list=Job.get_job_list()
