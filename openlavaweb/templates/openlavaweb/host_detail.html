@@ -11,7 +11,6 @@
 	<dt>CPU Factor</dt><dd>{{ host.cpu_factor }}</dd>
 	<dt>Checkpoint Support</dt><dd>{% if host.has_checkpoint_support %}Yes{% else %}No{% endif %}</dd>
 	<dt>Kernel Checkpoint Copy Support</dt><dd>{% if host.has_kernel_checkpoint_support %}Yes{% else %}No{% endif %}</dd>
-
 	{% endif %}
 	<dt>Max Processors</dt><dd>{{ host.max_processors }} Processors</dd>
 	<dt>Max Ram</dt><dd>{{ host.max_ram }}MB</dd>

@@ -1,418 +1,78 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-<div id="failMessageBody"></div>
-<div id="killMessageBody"></div>
-<div id="suspendMessageBody"></div>
-<div id="resumeMessageBody"></div>
-<div id="requeuePendMessageBody"></div>
-<div id="requeueHoldMessageBody"></div>
-
-<script>
-	var url='{% url "olw_job_view_array" job.job_id job.array_id %}';
-	var killUrl='{% url "olw_job_kill" job.job_id job.array_id %}';
-	var suspendUrl='{% url "olw_job_suspend" job.job_id job.array_id %}';
-	var resumeUrl='{% url "olw_job_resume" job.job_id job.array_id %}';
-	var requeueHoldUrl='{% url "olw_job_requeue" job.job_id job.array_id %}?hold=1';
-	var requeuePendUrl='{% url "olw_job_requeue" job.job_id job.array_id %}';
-
-	function killJob(){
-		$("#killModal").modal('hide');
-		var jqxhr = $.getJSON( killUrl, function(data) {
-			$("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-success">Job kill request sent successfully.</div>');
-			$("#killMessage").alert();
-		})
-		.fail(function() {
-			$("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-warning">Unable to kill job.</div>');
-			$("#killMessage").alert();
-		})
-		.always(function(){
-			setTimeout(function(){
-				$("#killMessage").alert('close');
-			},10000);			
-		});
-	}
-	function suspendJob(){
-		$("#suspendModal").modal('hide');
-		var jqxhr = $.getJSON( suspendUrl, function(data) {
-			$("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-success">Job suspend request sent successfully.</div>');
-			$("#suspendMessage").alert();
-		})
-		.fail(function() {
-			$("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-warning">Unable to suspend job.</div>');
-			$("#suspendMessage").alert();
-		})
-		.always(function(){
-			setTimeout(function(){
-				$("#suspendMessage").alert('close');
-			},10000);			
-		});
-	}
-	function resumeJob(){
-		$("#resumeModal").modal('hide');
-		var jqxhr = $.getJSON( resumeUrl, function(data) {
-			$("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-success">Job resume request sent successfully.</div>');
-			$("#resumeMessage").alert();
-		})
-		.fail(function() {
-			$("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-warning">Unable to resume job.</div>');
-			$("#resumeMessage").alert();
-		})
-		.always(function(){
-			setTimeout(function(){
-				$("#resumeMessage").alert('close');
-			},10000);			
-		});
-	}
-	function requeueHoldJob(){
-		$("#requeueHoldModal").modal('hide');
-		var jqxhr = $.getJSON( requeueHoldUrl, function(data) {
-			$("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
-			$("#requeueHoldMessage").alert();
-		})
-		.fail(function() {
-			$("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
-			$("#requeueHoldMessage").alert();
-		})
-		.always(function(){
-			setTimeout(function(){
-				$("#requeueHoldMessage").alert('close');
-			},10000);			
-		});
-	}
-	function requeuePendJob(){
-		$("#requeuePendModal").modal('hide');
-		var jqxhr = $.getJSON( requeuePendUrl, function(data) {
-			$("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
-			$("#requeuePendMessage").alert();
-		})
-		.fail(function() {
-			$("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
-			$("#requeuePendMessage").alert();
-		})
-		.always(function(){
-			setTimeout(function(){
-				$("#requeuePendMessage").alert('close');
-			},10000);			
-		});
-	}
-
-</script>
-<div class="btn-group">
-	<button type="button" class="btn dropdown-toggle btn-lg btn-primary {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="dropdown" >Requeue<span class="caret"></span></button>
-	<ul class="dropdown-menu" role="menu">
-		<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
-		<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
-	</ul>
-</div>
-<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#killModal">Kill </button>
-<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#suspendModal">Suspend</button>
-<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#resumeModal">Resume</button>
-
-<div class="modal fade" id="killModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="myModalLabel">Kill Job?</h4>
-			</div>
-			<div class="modal-body">
-				If the job is running, it shall be terminated with a SIGTERM signal.  The job will be removed from the queue, and will not be automatically restarted.
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button onClick="killJob(); return false;" type="button" class="btn btn-primary">Kill</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->														
-</div>
-<div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="myModalLabel">Suspend Job?</h4>
-			</div>
-			<div class="modal-body">
-				If the job is running, it shall be sent a SIGSTOP signal.  The job will enter the USUSP or PSUSP state.
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button onClick="suspendJob(); return false;"type="button" class="btn btn-primary">Suspend</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->														
-</div>
-<div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="myModalLabel">Resume Job?</h4>
-			</div>
-			<div class="modal-body">
-				If the job is running, it shall be sent a SIGCONT signal.  The job will move to either a RUN or PEND state.
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button onClick="resumeJob(); return false;" type="button" class="btn btn-primary">Resume</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->														
-</div>
-
-<div class="modal fade" id="requeuePendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="myModalLabel">Requeue Job?</h4>
-			</div>
-			<div class="modal-body">
-				If the job is running, it shall be sent a SIGTERM signal.  The job shall be requeued and will pend until resources are available to execute it.
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button onClick="requeuePendJob(); return false;" type="button" class="btn btn-primary">Requeue</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->														
-</div>
-
-<div class="modal fade" id="requeueHoldModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="myModalLabel">Resume Job?</h4>
-			</div>
-			<div class="modal-body">
-				If the job is running, it shall be sent a SIGTERM signal.  The job will be requeued, however it will be suspended, and will not execute until it has been unsuspended by the user.
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button onClick="requeueHoldJob(); return false;" type="button" class="btn btn-primary">Requeue</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->														
-</div>
-
-
-
-<script>
-	setTimeout(update, 5000);
-	function update(){
-		var jqxhr = $.getJSON( url, function(data) {
-			var status=data.status.name +": "+ data.status.description;
-			$("#status").text(status);
-			$("#pid").text(data.pid);
-			var h="";
-			data.execution_hosts.forEach(function(entry) {
-				h+='<a href="' + entry.url + '">' + entry.host +'</a> (' + entry.num_slots + ' slots)<br />';
-			});
-			$("#execution_hosts").html(h);
-			$("#cpu_factor").text(data.cpu_factor);
-			$("#execution_user_name").text(data.execution_user_name + " (" + data.execution_user_id + ")");
-			$("#execution_home_dir").text(data.execution_home_dir);
-			$("#execution_cwd").text(data.execution_cwd);
-			$("#parent_group").text(data.parent_group);
-			$("#service_port").text(data.service_port);
-			$("#priority").text(data.priority);
-			$("#predicted_start_time").text(data.start_time_datetime);
-			$("#start_time").text(data.start_time_datetime);
-			$("#end_time").text(data.end_time_datetime);
-			$("#resource_usage_last_update_time").text(data.resource_usage_last_update_time_datetime);
-			if (data.status.name=="JOB_STAT_PEND"){
-				html= "<h2>Pending Reasons</h2>";
-				html+='<table class="table table-hover table-condensed">';
-				html+='	<thead>';  
-				html+='		<tr>';
-				html+='			<th>Reason</th>';
-				html+='			<th>Num Hosts</th>';
-				html+='			<th>Description</th>';
-				html+='		</tr>';
-				html+='		</thead>';
-				html+='		<tbody>';
-				data.reasons.forEach(function(entry) {
-					html+='<tr>';
-						html+='<td>'+entry.name+ '</td>';
-						html+='<td>'+entry.count+ '</td>';
-						html+='<td>'+entry.description+ '</td>';
-					html+='/<tr>';
-				});
-				html+='</tbody>';
-				html+='</table>';
-						
-				}
-			else{
-				$("#pend_reasons").html("");
-			}
-			if (data.resource_usage.active_processes.length > 0){
-				var r='<table class="table table-hover table-condensed"><thead><tr><th>Process ID</th><th>Parent Process ID</th><th>Group ID</th><th>Cray Job ID</th></tr></thead><tbody>';
-				data.resource_usage.active_processes.forEach(function(entry) {
-					r += "<tr><td>" + entry.process_id + "</td><td>" + entry.parent_process_id + "</td><td>" + entry.group_id + "</td><td>" + entry.cray_job_id + "</td></tr>";
-				});
-				r+="</tbody></table>";
-				$("#active_processes").html(r);
-			}
-			else{
-				$("#active_processes").html('<div class="alert alert-info">No processes yet.</div>');
-			}
-
-			$("#ru_resident_memory_usage").text(data.resource_usage.resident_memory_usage);
-			$("#ru_virtual_memory_usage").text(data.resource_usage.virtual_memory_usage);
-			$("#ru_user_time_timedelta").text(data.resource_usage.user_time_timedelta);
-			$("#ru_system_time_timtedelta").text(data.resource_usage.system_time_timedelta);
-			$("#ru_num_active_processes").text(data.resource_usage.num_active_processes);
-		})
-		.fail(function() {
-			$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-warning">Unable to get job information.  Job may no longer exist, or is not available to the scheduler.  Trying again...</div>');
-			$("#failMessage").alert()
-		})
-		.always(function(){
-			setTimeout(function(){
-				$("#failMessage").alert('close');
-			},10000);			
-			setTimeout(update,5000);
-		});
-	}
-</script>
-<h1>Job: {{ job.job_id }} {% if job.array_id > 0 %} Array Index: {{ job.array_id }}{% endif %}</h1>
+<h1>Job: {{ job.job_id }} {% if job.array_array_index > 0 %} Array Index: {{ job.array_index }}{% endif %}</h1>
 <dl class="dl-horizontal">
-	<dt>Username</dt>
-	<dd data-toggle="tooltip" title="The name of the user who submitted the job."><a href='{% url "olw_user_view" job.user %}'>{{ job.user }}</a></dd>
-	<dt>Status</dt>
-		<dd data-toggle="tooltip" id="status" title="The current status of the job.Possible values areshown in job_states.">{{ job.status.name }}: {{ job.status.description }}</dd>
-	<dt>Process ID</dt>
-		<dd id="pid" data-toggle="tooltip" title="The job process ID.">{{ job.pid }}</dd>
-	<dt>CPU Time Consumed</dt>
-		<dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.cpu_time_timedelta }}</dd>
-	<dt>Current Working Directory</dt>
-		<dd data-toggle="tooltip" title="The current working directory when the job was submitted.">{{ job.cwd }}</dd>
-	<dt>Submit Home Directory</dt>
-		<dd data-toggle="tooltip" title="Home directory on submission host.">{{ job.submit_home_dir }}</dd>
-	<dt>Submission Host</dt>
-		<dd data-toggle="tooltip" title="The name of the host from which the job was submitted.">{{ job.submission_host }}</dd>
-	<dt>Execution Hosts</dt>
-	<dd id="execution_hosts" data-toggle="tooltip" title="Names of hosts on which the job executes.">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h %}'>{{ h }}</a> {% endfor %}</dd>
-	<dt>CPU Factor</dt>
-		<dd id="cpu_factor" data-toggle="tooltip" title="The CPU factor for normalizing CPU and wall clock time limits.">{{ job.cpu_factor }}</dd>
-	<dt>Execution User</dt>
-		<dd id="execution_usaer_name" data-toggle="tooltip" title="Mapped user name on the execution host and mapped UNIX user ID on the execution host.">{{ job.execution_user_name }} ({{ job.execution_user_id }})</dd>
-	<dt>Execution Home Directory</dt>
-		<dd id="execution_home_dir" data-toggle="tooltip" title="Home directory for the job on the execution host.">{{ job.execution_home_dir }}</dd>
-	<dt>Execution Current Working Directory</dt>
-		<dd id="execution_cwd"  data-toggle="tooltip" title="Current working directory for the job on the execution host.">{{ job.execution_cwd }}</dd>
-	<dt>Parent Group</dt>
-		<dd id="parent_group" data-toggle="tooltip" title="The parent job group of a job or job group.">{{ job.parent_group }}</dd>
-	<dt>Job ID</dt>
-		<dd data-toggle="tooltip" title="The job ID that the LSF system assigned to the job.">{{ job.job_id }}</dd>
-	<dt>Array Index ID</dt>
-		<dd data-toggle="tooltip" title="The Array ID that the LSF system assigned to the job.">{{ job.array_id }}</dd>
-	<dt>Job Name</dt>
-		<dd data-toggle="tooltip" title="The name of the job">{{ job.name }}</dd>
-	<dt>Service Port</dt>
-		<dd id="service_port" data-toggle="tooltip" title="Service port of the job.">{{ job.service_port }}</dd>
-	<dt>Job Priority</dt>
-		<dd id="priority" data-toggle="tooltip" title="Job dynamic priority.">{{ job.priority }}</dd>
-	<dt>Submission Time</dt>
-		<dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.submit_time_datetime_local }}</dd>
-	<dt>Reservation Time</dt>
-		<dd data-toggle="tooltip" title="Time when job slots are reserved.">{{ job.reservation_time_datetime_local }}</dd>
-	<dt>Start Time</dt>
-		<dd id="start_time" data-toggle="tooltip" title="The time that the job started running, if it has been dispatched.">{{ job.start_time_datetime_local}}</dd>
-	<dt>Predicted Start Time</dt>
-		<dd id="predicted_start_time" data-toggle="tooltip" title="Job's predicted start time.">{{ job.predicted_start_time_datetime_local }}</dd>
-	<dt>End Time</dt>
-		<dd id="end_time" data-toggle="tooltip" title="The termination time of the job, if it has completed.">{{ job.end_time_datetime_local }}</dd>
-	<dt>Resource Usage Last Updated</dt>
-		<dd id="resource_usage_last_update_time" data-toggle="tooltip" title="Time of the last job resource usage update.">{{ job.resource_usage_last_update_time_datetime_local}}</dd>
-	</dl>
-	<div id="pend_reasons">
-	{% if job.status.name == "JOB_STAT_PEND" %}
-		<h2>Pending Reasons</h2>
-		<table class="table table-hover table-condensed">
-			<thead>
-				<tr>
-					<th>Reason</th>
-					<th>Num Hosts</th>
-					<th>Description</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for r in job.reasons %}
-				<tr>
-					<td>{{ r.name }}</td>
-					<td>{{ r.count }}</td>
-					<td>{{ r.description }}</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-		{% endif %}
-	</div>
-	<h1>Submission Information</h1>
-	<dl class="dl-horizontal">
-		<dt>Options</dt><dd>{% for option in job.submit.options %}{{ option.friendly }}<br>{% endfor %}</dd>
-		<dt>Unused Options</dt><dd>{% for option in job.submit.delete_options %}{{ option.friendly }}<br>{% endfor %}</dd>
-		<dt>Job Name</dt><dd>{{ job.submit.job_name }}</dd>
-		<dt>Queue Name</dt><dd><a href="{% url "olw_queue_view" job.submit.queue_name %}">{{ job.submit.queue_name }}</a></dd>
-		<dt>Requested Hosts</dt><dd>{% for host in  job.submit.asked_hosts %}{{ host }} {% empty %}None {% endfor %}</dd>
-		<dt>Requested Resources</dt><dd>{{ job.submit.requested_resources }}</dd>
-		<dt>Host Specification</dt><dd>{{ job.submit.host_specification }}</dd>
-		<dt>Number of Processors</dt><dd>{{ job.submit.num_processors }}</dd>
-		<dt>Dependency Conditions</dt><dd>{{ job.submit.dependency_condition }}</dd>
-		<dt>Begin Time</dt><dd>{{ job.submit.begin_time_datetime_local }}</dd>
-		<dt>Termination Deadline</dt><dd>{{ job.submit.termination_time_datetime_local }}</dd>
-		<dt>Termination Signal Value</dt><dd>{{ job.submit.signal_value }}</dd>
-		<dt>Input File</dt><dd>{{ job.submit.input_file }}</dd>
-		<dt>Output File</dt><dd>{{ job.submit.output_file }}</dd>
-		<dt>Error File</dt><dd>{{ job.submit.error_file }}</dd>
-		<dt>Command</dt><dd>{{ job.submit.command }}</dd>
-		<dt>Checkpoint Period</dt><dd>{{ job.submit.checkpoint_period }}</dd>
-		<dt>Checkpoint Dir</dt><dd>{{ job.submit.checkpoint_dir }}</dd>
-		<dt>Num Transfer Files</dt><dd>{{ job.submit.num_transfer_files }}</dd>
-		<dt>Pre Execution Command</dt><dd>{{ job.submit.pre_execution_command }}</dd>
-		<dt>Email User</dt><dd>{{ job.submit.email_user }}</dd>
-		<dt>Project Name</dt><dd>{{ job.submit.project_name }}</dd>
-		<dt>Max Num Processors</dt><dd>{{ job.submit.max_num_processors }}</dd>
-		<dt>Login Shell</dt><dd>{{ job.submit.login_shell }}</dd>
-		<dt>User Priority</dt><dd>{{ job.submit.user_priority }}</dd>
+	<dt>Job ID</dt><dd data-toggle="tooltip" title="The job ID that the LSF system assigned to the job.">{{ job.job_id }}</dd>
+	<dt>Array Index ID</dt><dd data-toggle="tooltip" title="The Array ID that the LSF system assigned to the job.">{{ job.array_index }}</dd>
+	<dt>Status</dt>	<dd data-toggle="tooltip" id="status" title="The current status of the job.Possible values areshown in job_states.">{{ job.status.friendly }}: {{ job.status.description }}</dd>
+	<dt>Username</dt><dd data-toggle="tooltip" title="The name of the user who submitted the job."><a href='{% url "olw_user_view" job.user_name %}'>{{ job.user_name }}</a></dd>
+	<dt>Process ID</dt><dd id="pid" data-toggle="tooltip" title="The job process ID.">{{ job.process_id }}</dd>
+	<dt>CPU Time Consumed</dt><dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.cpu_time_timedelta }}</dd>
+	<dt>Current Working Directory</dt><dd data-toggle="tooltip" title="The current working directory when the job was submitted.">{{ job.cwd }}</dd>
+	<dt>Submission Host</dt><dd data-toggle="tooltip" title="The name of the host from which the job was submitted.">{{ job.submission_host.host_name }}</dd>
+	<dt>Execution Hosts</dt><dd id="execution_hosts" data-toggle="tooltip" title="Names of hosts on which the job executes.">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }}</a> {% endfor %}</dd>
+	<dt>Job Name</dt><dd data-toggle="tooltip" title="The name of the job">{{ job.name }}</dd>
+	<dt>Job Priority</dt><dd id="priority" data-toggle="tooltip" title="Job dynamic priority.">{{ job.priority }}</dd>
+	<dt>Submission Time</dt><dd data-toggle="tooltip" title="The time the job was submitted.">{{ job.submit_time_datetime_local }}</dd>
+	<dt>Reservation Time</dt><dd data-toggle="tooltip" title="Time when job slots are reserved.">{{ job.reservation_time_datetime_local }}</dd>
+	<dt>Start Time</dt><dd id="start_time" data-toggle="tooltip" title="The time that the job started running, if it has been dispatched.">{{ job.start_time_datetime_local}}</dd>
+	<dt>Predicted Start Time</dt><dd id="predicted_start_time" data-toggle="tooltip" title="Job's predicted start time.">{{ job.predicted_start_time_datetime_local }}</dd>
+	<dt>End Time</dt><dd id="end_time" data-toggle="tooltip" title="The termination time of the job, if it has completed.">{{ job.end_time_datetime_local }}</dd>
+	<dt>Options</dt><dd>{% for option in job.options %}{{ option.friendly }}<br>{% endfor %}</dd>
+	<dt>Job Name</dt><dd>{{ job.submit.job_name }}</dd>
+	<dt>Queue Name</dt><dd><a href="{% url "olw_queue_view" job.queue.name %}">{{ job.queue.name }}</a></dd>
+	<dt>Requested Hosts</dt><dd>{% for host in job.requested_hosts %}{{ host.name }} {% empty %}No hosts requested{% endfor %}</dd>
+	<dt>Requested Resources</dt><dd>{{ job.requested_resources }}</dd>
+	<dt>Max Num Processors</dt><dd>{{ job.max_requested_slots }}</dd>
+	<dt>Dependency Conditions</dt><dd>{{ job.dependency_condition }}</dd>
+	<dt>Begin Time</dt><dd>{{ job.begin_time_datetime_local }}</dd>
+	<dt>Termination Deadline</dt><dd>{{ job.termination_time_datetime_local }}</dd>
+	<dt>Input File</dt><dd>{{ job.input_file_name }}</dd>
+	<dt>Output File</dt><dd>{{ job.output_file_name }}</dd>
+	<dt>Error File</dt><dd>{{ job.error_file_name }}</dd>
+	<dt>Command</dt><dd>{{ job.submit.command }}</dd>
+	<dt>Email User</dt><dd>{{ job.email_user }}</dd>
+	<dt>Project</dt><dd>{% for project in job.project_names %}{{ project }} {% empty %}No Projects {% endfor %}</dd>
+	<dt>Groups</dt><dd>{% for group in job.group_names %}{{ group }} {% empty %}No groups{% endfor %}<dd>
+	<dt>User Priority</dt><dd>{{ job.user_priority }}</dd>
 
-	</dl>
+	{% if job.cluster_type == "openlava" %}
+	<dt>Checkpoint Period</dt><dd>{% if job.checkpoint_period > 0 %}{{ job.checkpoint_period_timedelta }}{% else %}Not checkpointable{% endif %}</dd>
+	<dt>Checkpoint Dir</dt><dd>{{ job.checkpoint_directory|default:"Not checkpointable" }}</dd>
+	<dt>CPU Factor</dt><dd id="cpu_factor" data-toggle="tooltip" title="The CPU factor for normalizing CPU and wall clock time limits.">{{ job.cpu_factor }}</dd>
+	<dt>Execution Current Working Directory</dt><dd id="execution_cwd"  data-toggle="tooltip" title="Current working directory for the job on the execution host.">{{ job.execution_cwd }}</dd>
+	<dt>Execution Home Directory</dt><dd id="execution_home_dir" data-toggle="tooltip" title="Home directory for the job on the execution host.">{{ job.execution_home_directory }}</dd>
+	<dt>Execution User</dt><dd>{{ job.execution_user_name }} ({{ job.execution_user_id }})</dd>
+	<dt>Host Specification</dt><dd>{{ job.host_specification }}</dd>
+	<dt>Number of Processors</dt><dd>{{ job.requested_slots }}</dd>
+	<dt>Login Shell</dt><dd>{{ job.login_shell|default:"Default"}}</dd>
+	<dt>Parent Group</dt><dd id="parent_group" data-toggle="tooltip" title="The parent job group of a job or job group.">{{ job.parent_group }}</dd>
+	<dt>Pre Execution Command</dt><dd>{{ job.pre_execution_command|default:"Not Specified" }}</dd>
+	<dt>Resource Usage Last Updated</dt><dd id="resource_usage_last_update_time" data-toggle="tooltip" title="Time of the last job resource usage update.">{{ job.resource_usage_last_update_time_local }}</dd>
+	<dt>Service Port</dt><dd id="service_port" data-toggle="tooltip" title="Service port of the job.">{{ job.service_port }}</dd>
+	<dt>Submit Home Directory</dt><dd data-toggle="tooltip" title="Home directory on submission host.">{{ job.submit_home_directory }}</dd>
+	<dt>Termination Signal Value</dt><dd>{{ job.termination_value|default:"Not Specified" }}</dd>
+	{% endif %}
+</dl>
 
-<h1>Resource Limits</h1>
+
+<h1>Runtime Resource Limits</h1>
 <table class="table table-striped table-condensed">
     <thead>
         <tr>
-            <td>&nbsp;</td>
-            <th>CPU</th>
-            <th>File Size</th>
-            <th>Data Segment Size</th>
-            <th>Stack Size</th>
-            <th>Core Size</th>
-            <th>RSS Size</th>
-            <th>Run Limit</th>
-            <th>Process Limit</th>
-            <th>Swap Limit</th>
-            <th>Num Files</th>
-            <th>Max Open Files</th>
+            <th>Resource</th>
+            <th>Soft Limit</th>
+            <th>Hard Limit</th>
         </tr>
     </thead>
     <tbody>
+		{% for res in job.runtime_limits %}
         <tr>
-            <th>Soft Limit</th>
-            <td>{{ job.submit.resource_limits.cpu }}</td>
-            <td>{{ job.submit.resource_limits.file_size }}</td>
-            <td>{{ job.submit.resource_limits.data }}</td>
-            <td>{{ job.submit.resource_limits.stack }}</td>
-            <td>{{ job.submit.resource_limits.core }}</td>
-            <td>{{ job.submit.resource_limits.rss }}</td>
-            <td>{{ job.submit.resource_limits.run }}</td>
-            <td>{{ job.submit.resource_limits.process }}</td>
-            <td>{{ job.submit.resource_limits.swap }}</td>
-            <td>{{ job.submit.resource_limits.nofile }}</td>
-            <td>{{ job.submit.resource_limits.open_files }}</td>
+			<td>{{ res.name }}</td>
+			<td>{% if job.cluster_type == "openlava" and res.soft_limit == -1 %}Unlimited{% else %} {{ res.soft_limit }}{% if res.unit %} {{ res.unit }}{% endif %}{% endif %}</td>
+			<td>{% if job.cluster_type == "openlava" and res.hard_limit == -1 %}Unlimited{% else %} {{ res.hard_limit }}{% if res.unit %} {{ res.unit }}{% endif %}{% endif %}</td>
         </tr>
+		{% endfor %}
 	</tbody>
 </table>
 
@@ -440,40 +100,45 @@
 	<table class="table table-hover table-condensed">
 		<thead>
 			<tr>
-				<th>Field</th><th>Value</th>
+				<th>Field</th><th>Value</th><th>Limit</th>
 			</tr>
 		</thead>
 <tbody>
-		<tr><th>Resident Memory</th><td id="ru_resident_memory_usage">{{ job.resource_usage.resident_memory_usage}}KB</td></tr>
-		<tr><th>Virtual Memory</th><td id="ru_virtual_memory_usage">{{ job.resource_usage.virtual_memory_usage}}KB</td></tr>
-		<tr><th>User Time</th><td id="ru_user_time_timedelta">{{ job.resource_usage.user_time_timedelta}}</td></tr>
-		<tr><th>System Time</th><td id="ru_system_time_timedelta">{{ job.resource_usage.system_time_timedelta}}</td></tr>
-		<tr><th>Num Active Processes</th><td id="ru_num_active_processes">{{ job.resource_usage.num_active_processes }}</td></tr>
+		{% for res in job.consumed_resources %}
+		<tr><th>{{ res.name }}</th><td>{{ res.value }}{% if res.unit %} {{ res.unit }}{% endif %}</td><td>{{ res.limit|default:"No Limit" }}</td></tr>
+		{% endfor %}
 	</tbody>
 	</table>
+
 	<h1>Active Processes</h1>
 	<div id="active_processes">
-	{% if job.resource_usage.num_active_processes > 0 %}
-	<table class="table table-hover table-condensed">
-		<thead>
-			<tr>
-				<th>Process ID</th>
-				<th>Parent Process ID</th>
-				<th>Group ID</th>
-				<th>Cray Job ID</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for proc in job.resource_usage.active_processes %}
-			<tr>
-				<td>{{ proc.process_id }}</td>
-				<td>{{ proc.parent_process_id }} </td>
-				<td>{{ proc.group_id }}</td>
-				<td>{{ proc.cray_job_id }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+		{% if job.processes %}
+		<table class="table table-hover table-condensed">
+			<thead>
+				<tr>
+					<th>Hostname</th>
+					<th>Process ID</th>
+					{% if job.cluster_type == "openlava" %}
+					<th>Parent Process ID</th>
+					<th>Group ID</th>
+					<th>Cray Job ID</th>
+					{% endif %}
+				</tr>
+			</thead>
+			<tbody>
+				{% for proc in job.processes %}
+				<tr>
+					<td>{{ proc.hostname|default:"Unknown" }}</td>
+					<td>{{ proc.process_id }}</td>
+					{% if job.cluster_type == "openlava" %}
+					<td>{{ proc.parent_process_id }} </td>
+					<td>{{ proc.process_group_id }}</td>
+					<td>{{ proc.cray_job_id }}</td>
+					{% endif %}
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	{% else %}
 		<div class="alert alert-info">No processes yet.</div>
 	{% endif %}

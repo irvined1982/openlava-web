@@ -19,6 +19,7 @@ import json
 import os
 import pwd
 import sys
+import datetime
 from multiprocessing import Process as MPProcess
 from multiprocessing import Queue as MPQueue
 from django import forms
@@ -30,7 +31,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from cluster import ClusterException
-from cluster.openlavacluster import Cluster, Host
+from cluster.openlavacluster import Cluster, Host, Job, Queue
 
 class WebCluster(Cluster):
 	def to_json(self):
@@ -51,7 +52,7 @@ def cluster_view(request):
 		if request.is_ajax() or request.GET.get("json",None):
 			return HttpResponse(e.to_json(), content_type='application/json')
 		else:
-			return render(request, openlavaweb/exception.html,{'exception':e})
+			return render(request, 'openlavaweb/exception.html',{'exception':e})
 		
 def queue_list(request):
 	#queue_list=OpenLava.get_queue_list()
@@ -212,20 +213,73 @@ def job_requeue(request,job_id, array_id=0):
 	#		return HttpResponse(json.dumps(data), content_type="application/json")
 	#else:
 	#	return render(request, 'openlavaweb/job_requeue_confirm.html', {"object": job})
-	pass	
+	pass
+
+class ClusterEncoder(json.JSONEncoder):
+	def check(self,obj):
+		if isinstance(obj, Host):
+			print "Is host, returning simple"
+			return {
+				'type':"Host",
+				'name':obj.name,
+				'url':reverse("olw_host_view", args=[obj.name]),
+			}
+		if isinstance(obj, Job):
+			print "Is job, returning simple"
+			return {
+				'type':"Job",
+				'name':obj.name,
+				'job_id':obj.job_id,
+				'array_index':obj.array_index,
+				'url':reverse("olw_job_view_array", args=[obj.job_id, obj.array_index]),
+			}
+		if isinstance(obj, Queue):
+			return {
+				'type':"Queue",
+				'name':obj.name,
+				'url':reverse("olw_queue_view", args=[obj.name]),
+			}
+		return obj
+	
+	def default(self, obj):
+		
+		print obj		
+		if isinstance(obj, datetime.timedelta):
+			return obj.total_seconds()
+		
+		d={}
+		for name in obj.json_attributes():
+			value=getattr(obj,name)
+			if hasattr(value, '__call__'):
+				value=value()
+			if isinstance(value, list):
+				value=[self.check(i) for i in value]
+			else:
+				value=self.check(value)
+			
+			
+			d[name]=value
+		return d
+
+
+
+
 def job_view(request,job_id, array_id=0):
-	#job_id=int(job_id)
-	#array_id=int(array_id)
-	#try:
-	#	job=Job(job_id=job_id, array_id=array_id)
-	#except ValueError:
-	#	raise Http404 ("Job not found")
-	#if request.is_ajax() or request.GET.get("json",None):
-	#	jobdict=job.to_dict()
-	#	jobdict['execution_hosts']=get_execution_hosts(job)
-	#	return HttpResponse(json.dumps(jobdict,sort_keys=True, indent=3, cls=OpenLavaEncoder),content_type='application/json')
-	#return render(request, 'openlavaweb/job_detail.html', {"job": job, },)
-	pass	
+	job_id=int(job_id)
+	array_id=int(array_id)
+	try:
+		job=Job(job_id=job_id, array_index=array_id)
+	except ClusterException as e:
+		if request.is_ajax() or request.GET.get("json",None):
+			return HttpResponse(e.to_json(), content_type='application/json')
+		else:
+			return render(request, 'openlavaweb/exception.html',{'exception':e})
+		
+	if request.is_ajax() or request.GET.get("json",None):
+		return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+	else:
+		return render(request, 'openlavaweb/job_detail.html', {"job": job, },)
+	
 def get_execution_hosts(job):
 	#hosts={}
 	#for host in job.execution_hosts:
@@ -240,30 +294,24 @@ def get_execution_hosts(job):
 	pass	
 
 def job_list(request, job_id=0, queue_name="", host_name="", user_name="all"):
-	#job_list=OpenLava.get_job_list(job_id=int(job_id), queue=queue_name,host=host_name, user=user_name)
-	#
-	#if request.is_ajax() or request.GET.get("json",None):
-	#	jobs=[]
-	#	for job in job_list:
-	#		jobdict=job.to_dict()
-	#		jobdict['execution_hosts']=get_execution_hosts(job)
-	#		jobs.append(jobdict)
-	#	return HttpResponse(json.dumps(jobs, sort_keys=True, indent=3, cls=OpenLavaEncoder),content_type='application/json')
-	#
-	#if len(job_list)==1:
-	#	return HttpResponseRedirect(reverse("olw_job_view_array",args=[job_list[0].job_id, job_list[0].array_id])) 
-	#
-	#paginator = Paginator(job_list, 25)
-	#page = request.GET.get('page')
-	#try:
-	#	job_list = paginator.page(page)
-	#except PageNotAnInteger:
-	#	job_list= paginator.page(1)
-	#except EmptyPage:
-	#	job_list=paginator.page(paginator.num_pages)
-	#return render(request, 'openlavaweb/job_list.html',{"job_list":job_list, })
-	pass	
-
+	job_list=Job.get_job_list()
+	
+	if request.is_ajax() or request.GET.get("json",None):
+		return HttpResponse(json.dumps(job_list, sort_keys=True, indent=3, cls=ClusterEncoder),content_type='application/json')
+	
+	if len(job_list)==1:
+		return HttpResponseRedirect(reverse("olw_job_view_array",args=[job_list[0].job_id, job_list[0].array_index])) 
+	
+	paginator = Paginator(job_list, 25)
+	page = request.GET.get('page')
+	try:
+		job_list = paginator.page(page)
+	except PageNotAnInteger:
+		job_list= paginator.page(1)
+	except EmptyPage:
+		job_list=paginator.page(paginator.num_pages)
+	return render(request, 'openlavaweb/job_list.html',{"job_list":job_list, })
+	
 def system_view(request):
 	#cluster_name=OpenLavaCAPI.ls_getclustername()
 	#master_name=OpenLavaCAPI.ls_getmastername()
@@ -285,32 +333,31 @@ def system_view(request):
 
 @csrf_exempt
 def ajax_login(request):
-	#try:
-	#	data=json.loads(request.body)
-	#	user = authenticate(username=data['username'], password=data['password'])
-	#except:
-	#	response = HttpResponse()
-	#	response.status_code = 400
-	#	return response
-	#if user:
-	#	if user.is_active:
-	#		login(request, user)
-	#		res={
-	#				'status':"OK",
-	#				'description':"Success"
-	#			}
-	#	else:
-	#		res={
-	#				'status':'Fail',
-	#				'description':"User is inactive"
-	#				}
-	#else:
-	#	res={
-	#			'status':"Fail",
-	#			'description':"Unable to authenticate",
-	#		}
-	#return HttpResponse(json.dumps(res), content_type="application/json")
-	pass
+	try:
+		data=json.loads(request.body)
+		user = authenticate(username=data['username'], password=data['password'])
+	except:
+		response = HttpResponse()
+		response.status_code = 400
+		return response
+	if user:
+		if user.is_active:
+			login(request, user)
+			res={
+					'status':"OK",
+					'description':"Success"
+				}
+		else:
+			res={
+					'status':'Fail',
+					'description':"User is inactive"
+					}
+	else:
+		res={
+				'status':"Fail",
+				'description':"Unable to authenticate",
+			}
+	return HttpResponse(json.dumps(res), content_type="application/json")
 
 @login_required
 def job_submit(request):

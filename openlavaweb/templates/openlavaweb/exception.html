@@ -1,5 +1,5 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-<h1>Error: {{ exception.__class__}}</h1>
+<h1>Error: {{ exception.get_class}}</h1>
 <p>{{ exception.message }}</p>
 {% endblock %}
