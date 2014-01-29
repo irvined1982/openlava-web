@@ -3,23 +3,23 @@
 			  <tr>
 				  <th>Queue Name</th>
 				  <th>Status</th>
-				  <th>Total Num Jobs</th>
-				  <th>Num Pending Jobs</th>
-				  <th>Num Running Jobs</th>
-				  <th>Num System Suspended Jobs</th>
-				  <th>Num User Suspended Jobs</th>
+				  <th>Attributes</th>
+				  <th>Total Num Jobs (Slots)</th>
+				  <th>Num Pending Jobs (Slots)</th>
+				  <th>Num Running Jobs (Slots)</th>
+				  <th>Num Suspended Jobs (Slots)</th>
 			  </tr>
 		</thead>
 		<tbody>
   			{% for queue in queue_list %}
 			<tr>
 				<td><a href='{% url 'olw_queue_view' queue.name %}'>{{ queue.name }}</a></td>
-				<td>{% for stat in queue.status %}{{ stat.name }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
-				<td>{{ queue.num_jobs }}</td>
-				<td>{{ queue.num_pending_jobs }}</td>
-				<td>{{ queue.num_running_jobs }}</td>
-				<td>{{ queue.num_system_suspended_jobs }}</td>
-				<td>{{ queue.num_user_suspended_jobs }}</td>
+				<td>{% for stat in queue.statuses %}{{ stat.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
+				<td>{% for attr in queue.attributes %}{{ attr.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
+				<td>{{ queue.total_jobs }} ({{ queue.total_slots }})</td>
+				<td>{{ queue.num_pending_jobs }} ({{queue.num_pending_slots}})</td>
+				<td>{{ queue.num_running_jobs }} ({{ queue.num_running_slots }})</td>
+				<td>{{ queue.num_suspended_jobs }} ({{ queue.num_suspended_jobs }})</td>
 			</tr>
 			{% empty %}
 			<tr><td colspan="6">No Queues.</td></tr>

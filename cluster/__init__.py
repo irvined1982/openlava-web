@@ -18,6 +18,7 @@
 import datetime
 import json
 
+
 class ClusterBase:
 	@property
 	def name(self):
@@ -33,33 +34,39 @@ class ClusterBase:
 		'''Returns an array of hosts that are part of the cluster'''
 		raise NotImplementedError
 
-	def queues(self, queue_name=None, host_name=None, user_name=None):
+	def queues(self):
 		'''Returns an array of queues that are part of the cluster'''
 		raise NotImplementedError
 
-	def jobs(self, job_id=None, job_name=None, user_name=None, host_name=None, job_state="all" ):
+	def jobs(self):
 		'''Returns an array of jobs that are part of the cluster'''
 		raise NotImplementedError
 	
-	def pending_jobs(self, job_id=None, job_name=None, user_name=None, host_name=None):
-		'''Returns an array of Jobs that are pending'''
-		return self.jobs(job_id=job_id, job_name=job_name, user_name=user_name, host_name=host_name, job_state="pending")
-
-	def running_jobs(self, job_id=None, job_name=None, user_name=None, host_name=None):
-		'''Returns an array of Jobs that are running'''
-		return self.jobs(job_id=job_id, job_name=job_name, user_name=user_name, host_name=host_name, job_state="running")
+	def users(self):
+		'''Returns an array of users that are known to the cluster'''
+		raise NotImplementedError
 	
-	def suspended_jobs(self, job_id=None, job_name=None, user_name=None, host_name=None):
-		'''Returns an array of Jobs that are suspended'''
-		return self.jobs(job_id=job_id, job_name=job_name, user_name=user_name, host_name=host_name, job_state="suspended")
-	
-	def held_jobs(self, job_id=None, job_name=None, user_name=None, host_name=None):
-		'''Returns an array of Jobs that are held in the queue'''
-		return self.jobs(job_id=job_id, job_name=job_name, user_name=user_name, host_name=host_name, job_state="held")
+	def problem_hosts(self):
+		host_list=[]
+		for host in self.hosts():
+			if host.is_down():
+				host_list.append(host)
+		return host_list
 	
 	def resources(self, resource_name=None, host_name=None, user_name=None):
 		raise NotImplementedError
 
+	def json_attributes(self):
+		return [
+			'cluster_type',
+			'name',
+			'master',
+			'hosts',
+			'problem_hosts',
+			'queues',
+			'jobs',
+			'resources',
+		]
 class JobBase:
 	def json_attributes(self):
 		return [
@@ -100,6 +107,11 @@ class JobBase:
 			'user_priority',
 			'queue',
 			'requested_hosts',
+			'is_pending',
+			'is_running',
+			'is_suspended',
+			'is_failed',
+			'is_completed',
 		]
 	@property
 	def job_id(self):
@@ -200,27 +212,31 @@ class JobBase:
 	def input_file_name(self):
 		'''Path to the input file'''
 		raise NotImplementedError
+
+	@property
+	def is_completed(self):
+		'''True if the job exited cleanly'''
+		raise NotImplementedError	
+
+	@property
+	def is_failed(self):
+		'''True if the job exited uncleanly'''
+		raise NotImplementedError
 	
 	@property
 	def is_pending(self):
 		'''True if the job is pending'''
-		if self.status.name=="JOB_STAT_PEND":
-			return True
-		return false
+		raise NotImplementedError
 	
 	@property
 	def is_running(self):
 		'''True if the job is executing'''
-		if self.status.name=="JOB_STAT_RUN":
-			return True
-		return False
+		raise NotImplementedError
 	
 	@property
 	def is_suspended(self):
 		'''True if the job is suspended'''
-		if self.status=="JOB_STAT_USUSP" or self.status=="JOB_STAT_SSUSP" or "JOB_STAT_PSUSP":
-			return True
-		return False
+		raise NotImplementedError
 	
 	@property
 	def max_requested_slots(self):
@@ -343,9 +359,9 @@ class JobBase:
 
 
 class HostBase:
-	
 	def json_attributes(self):
 		return [
+			'admins',
 			'name',
 			'host_name',
 			'description',
@@ -353,6 +369,9 @@ class HostBase:
 			'host_model',
 			'host_type',
 			'resources',
+			'is_busy',
+			'is_closed',
+			'is_down',
 			'max_jobs',
 			'max_processors',
 			'max_ram',
@@ -364,7 +383,7 @@ class HostBase:
 			'num_running_slots',
 			'num_suspended_jobs',
 			'num_suspended_slots',
-			'status',
+			'statuses',
 			'total_jobs',
 			'total_slots',
 			'jobs',
@@ -376,7 +395,15 @@ class HostBase:
 		self.name=host_name
 		self.host_name=host_name
 		self.description=description
-
+	
+	def open(self):
+		'''Opens the node for job execution'''
+		raise NotImplementedError
+	
+	def close(self):
+		'''Closes the node for job execution'''
+		raise NotImplementedError
+		
 	@property
 	def has_checkpoint_support(self):
 		'''True if the host supports checkpointing'''
@@ -454,7 +481,7 @@ class HostBase:
 		raise NotImplementedError
 
 	@property
-	def status(self):
+	def statuses(self):
 		'''Array of statuses that apply to the host'''
 		raise NotImplementedError
 
@@ -523,12 +550,33 @@ class ClusterException(Exception):
 		return u"%s" % self.__class__
 	
 	def to_json(self):
-		return json.dumps({'type':str(type(self)),'message':self.message})
+		fields={
+			'status':'Fail',
+			'type':"Exception",
+			'message':self.message,
+		}
+		for f in self._extras:
+			fields[f]=getattr(self,f)
+		return json.dumps(fields)
+	
+	def __init__(self, message, **kwargs):
+		Exception.__init__(self, message)
+		self._extras=[]
+		for k,v in kwargs.iteritems():
+			self._extras.append(k)
+			setattr(self,k,v)
+
 
 class NoSuchHostError(ClusterException):
 	pass
 
 class NoSuchJobError(ClusterException):
+	pass
+
+class NoSuchQueueError(ClusterException):
+	pass
+
+class NoSuchUserError(ClusterException):
 	pass
 
 class ResourceDoesntExistError(ClusterException):
@@ -537,8 +585,31 @@ class ResourceDoesntExistError(ClusterException):
 class ClusterInterfaceError(ClusterException):
 	pass
 
+class PermissionDeniedError(ClusterException):
+	pass
+
 class Status:
 	pass
+
+class UserBase:
+	def json_attributes(self):
+		return [
+			'cluster_type',
+			'name',
+			'max_jobs_per_processor',
+			'max_slots',
+			'total_slots',
+			'num_running_slots',
+			'num_pending_slots',
+			'num_suspended_slots',
+			'num_reserved_slots',
+			'max_jobs',
+			'total_jobs',
+			'num_running_jobs',
+			'num_pending_jobs',
+			'num_suspended_jobs',
+			'jobs',
+			]
 
 class Process:
 	def __init__(self, hostname, process_id, **kwargs):
@@ -573,4 +644,6 @@ class ConsumedResource:
 	def json_attributes(self):
 		return ['name','value','limit','unit']
 
-__ALL__=[ClusterBase, ResourceLimit, ConsumedResource, HostBase, JobBase, Status, Process, ClusterException, NoSuchHostError, NoSuchJobError, ResourceDoesntExistError, ClusterInterfaceError]
+
+
+__ALL__=[UserBase, ClusterBase, JobBase, HostBase, LoadIndex, BaseResource, ClusterException, NoSuchHostError, NoSuchJobError, NoSuchQueueError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError, Status, Process, ResourceLimit, ConsumedResource]

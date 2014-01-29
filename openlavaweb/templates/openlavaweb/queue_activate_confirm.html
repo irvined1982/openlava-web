@@ -1,0 +1,6 @@
+{% extends "openlavaweb/base.html" %}
+{% block content %}
+<p>Are you sure you want to suspend queue: {{ object.name }}?</p>
+<a href="{% url "olw_queue_activate" object.name %}?confirm=true" class="btn btn-danger btn-lg active" role="button">Activate</a>
+<a href="{% url "olw_queue_view" object.name %}" class="btn btn-default btn-lg active" role="button">Back</a>
+{% endblock %}

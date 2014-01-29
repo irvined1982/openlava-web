@@ -1,5 +1,20 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-	<h1>hosts</h1>
+	<h1>Hosts</h1>
 	{% include "openlavaweb/widgets/host_list.html" %}
+        <ul class="pager">
+		{% if host_list.has_previous %}
+		<li class="previous"><a href="?page={{ host_list.previous_page_number }}">Prev &larr;</a></li>
+		{% else %}
+		<li class="previous disabled"><a href="#">&larr; Prev</a></li>
+		{% endif %}
+
+
+		{% if host_list.has_next %}
+		<li class="next"><a href="?page={{ host_list.next_page_number }}">Next &rarr;</a></li>
+		{% else %}
+		<li class="next disabled"><a href="#">&rarr; Next</a></li>
+		{% endif %}
+	</ul>
+        
 {% endblock %}

@@ -1,162 +1,401 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
+<div id="failMessageBody"></div>
+<div id="closeMessageBody"></div>
+<div id="openMessageBody"></div>
+<div id="inactivateMessageBody"></div>
+<div id="activateMessageBody"></div>
+<div id="statusMessageBody"></div>
+<script>
+        var url='{% url "olw_queue_view" queue.name %}';
+        var closeUrl='{% url "olw_queue_close" queue.name %}';
+	var openUrl='{% url "olw_queue_open" queue.name %}';
+	var inactivateUrl='{% url "olw_queue_inactivate" queue.name %}';
+	var activateUrl='{% url "olw_queue_activate" queue.name %}';
+	
+	function setStatus(message,cls) {
+		var html='<div id="statusMessage" class="fade in alert alert-'+cls+'">'+message+'</div>';
+		if ($("#statusMessageBody").html() != html ) {
+			$("#statusMessageBody").html(html);	
+		}
+	}
+	
+	{% if queue.is_accepting_jobs and queue.is_despatching_jobs %}
+		setStatus("Queue is accepting and dispatching jobs", "success");
+	{% elif queue.is_accepting_jobs %}
+		setStatus("Queue is accepting jobs, however the queue is inactive and is not dispatching jobs at this time.", "warning");
+	{% elif queue.is_despatching_jobs %}
+		setStatus("Queue is despatching jobs, however the queue is closed and is not accepting new jobs at this time.", "warning");
+	{% else %}
+		setStatus("Queue is closed and inactive, no new jobs are being accepted or despatched at this time.", "danger");
+	{% endif %}
+	
+	function update() {
+		var jqxhr = $.getJSON( url, function(queue) {
+			if (queue.is_accepting_jobs && queue.is_despatching_jobs){
+				setStatus("Queue is accepting and dispatching jobs", "success");
+			}else if (queue.is_accepting_jobs){
+				setStatus("Queue is accepting jobs, however the queue is inactive and is not dispatching jobs at this time.", "warning");
+			}else if (queue.is_despatching_jobs) {
+				setStatus("Queue is despatching jobs, however the queue is closed and is not accepting new jobs at this time.", "warning");
+			}else{
+				setStatus("Queue is closed and inactive, no new jobs are being accepted or despatched at this time.", "danger");	
+			}
+			var statuses=[];
+			jQuery.each(queue.statuses, function(index, item) {
+				statuses.push(item.friendly);
+			});
+			$("#statusList").html(statuses.join("<br>"));
+			var attributes=[];
+			jQuery.each(queue.attributes, function(index, item){
+				attributes.push(item.friendly);
+			});
+			$("#attributeList").html(attributes.join("<br>"));
+			$("#totalJobSlots").text( queue.total_jobs + " (" + queue.total_slots + ")");
+			$("#pendingJobSlots").text(queue.num_pending_jobs + " (" + queue.num_pending_slots + ")");
+			$("#runningJobSlots").text(queue.num_running_jobs + " (" + queue.num_running_slots + ")");
+			$("#suspendedJobSlots").text(queue.num_suspended_jobs + " (" + queue.num_suspended_jobs + ")");
+			if (queue.cluster_type == "openlava"){
+				$("#userSuspendedJobSlots").text(queue.num_user_suspended_jobs + " (" + queue.num_user_suspended_slots + ")");
+				$("#systemSuspendedJobSlots").text(queue.num_system_suspended_jobs + " (" + queue.num_system_suspended_slots + ")");
+			}
+			$("#reservedSlots").text(queue.num_reserved_slots);
+			var html="";
+			jQuery.each(queue.jobs, function(index, job){
+				if (index >= 20) {
+					return false;
+				}
+				html+="<tr><td><a href='" + job.url + "'>" + job.job_id;
+				if (job.array_index > 0){
+					html += "[" + job.array_index + "]";
+				}
+				html += "</a></td>";
+				html += "<td><a href='" + job.user_url + "'>" + job.user_name + "</a></td>";
+				html += "<td>" + job.status.friendly + "</td>";
+				html += "<td>" + new Date(1000*job.submit_time) + "</td>";
+				html += "<td>";
+				if (job.start_time > 0){
+					html += new Date(1000 * job.start_time);
+				} else{
+					html +="Not yet started";
+				}
+				html += "</td>";
+				html +="<td>";
+				if (job.end_time > 0){
+					html += new Date(1000*job.end_time);
+				} else{
+					html +="Not yet finished";
+				}
+				html += "</td>";
+				html += "</tr>";
+			});
+			$("#jobs").html(html);
+			
+		}).fail(function(){
+			$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load queue information</div>');
+                        $("#failMessage").alert();
+			setTimeout(function(){
+				$("#failMessage").alert('close');
+			},15000); 
+		}).always(function() {
+			setTimeout(update, 30000);
+		});
+	}
+	update();
+	function closeQueue(){
+                $("#closeModal").modal('hide');
+                var jqxhr = $.getJSON( closeUrl, function(data) {
+			var message='';
+			var style='';
+			var close=false;
+			if (data.hasOwnProperty('status') && data.status == "OK") {
+				message="Queue close request sent successfully.";
+				style='success';
+				close=true;
+			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
+				style='danger';
+				message=data.message;
+			}else{
+				style='warning';
+				message="Strange response from server.";
+			}
+                        $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
+                        $("#closeMessage").alert();
+			if (close) {
+				setTimeout(function(){
+					$("#closeMessage").alert('close');
+			        },30000); 
+			}
+                })
+                .fail(function() {
+                        $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-warning">Unable to close queue.</div>');
+                        $("#closeMessage").alert();
+                })
+        }		
+	function openQueue(){
+                $("#openModal").modal('hide');
+                var jqxhr = $.getJSON( openUrl, function(data) {
+                       	var message='';
+			var style='';
+			var close=false;
+			if (data.hasOwnProperty('status') && data.status == "OK") {
+				message="Queue open request sent successfully.";
+				style='success';
+				close=true;
+			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
+				style='danger';
+				message=data.message;
+			}else{
+				style='warning';
+				message="Strange response from server.";
+			}
+                        $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
+                        $("#openMessage").alert();
+			if (close) {
+				setTimeout(function(){
+					$("#openMessage").alert('close');
+			        },30000); 
+			}
+                })
+                .fail(function() {
+                        $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-warning">Unable to open queue.</div>');
+                        $("#openMessage").alert();
+                })
+
+        }
+	function inactivateQueue(){
+                $("#inactivateModal").modal('hide');
+                var jqxhr = $.getJSON( inactivateUrl, function(data) {
+                       	var message='';
+			var style='';
+			var close=false;
+			if (data.hasOwnProperty('status') && data.status == "OK") {
+				message="Queue inactivate request sent successfully.";
+				style='success';
+				close=true;
+			}else if (data.hasOwnProperty('status') &&  data.status == "Fail") {
+				style='danger';
+				message=data.message;
+			}else{
+				style='warning';
+				message="Strange response from server.";
+			}
+                        $("#inactivateMessageBody").html('<div id="inactivateMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
+                        $("#inactivateMessage").alert();
+			if (close) {
+				setTimeout(function(){
+					$("#inactivateMessage").alert('close');
+			        },30000); 
+			}
+			
+                })
+                .fail(function() {
+                        $("#inactivateMessageBody").html('<div id="inactivateMessage" class="fade in alert alert-warning">Unable to inactivate queue.</div>');
+                        $("#inactivateMessage").alert();
+                })
+        }
+	function activateQueue(){
+                $("#activateModal").modal('hide');
+                var jqxhr = $.getJSON( openUrl, function(data) {
+                    	var message='';
+			var style='';
+			var close=false;
+			if (data.hasOwnProperty('status') && data.status == "OK") {
+				message="Queue activate request sent successfully.";
+				style='success';
+				close=true;
+			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
+				style='danger';
+				message=data.message;
+			}else{
+				style='warning';
+				message="Strange response from server.";
+			}
+                        $("#activateMessageBody").html('<div id="activateMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
+                        $("#activateMessage").alert();
+			if (close) {
+				setTimeout(function(){
+					$("#activateMessage").alert('close');
+			        },30000); 
+			}
+                })
+                .fail(function() {
+                        $("#activateMessageBody").html('<div id="activateMessage" class="fade in alert alert-warning">Unable to activate queue.</div>');
+                        $("#activateMessage").alert();
+                })
+        }
+</script>
+
+<div><!-- queue management -->
+	<button class="btn btn-primary btn-lg {% if user.username in queue.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#closeModal">Close</button>
+	<button class="btn btn-primary btn-lg {% if user.username in queue.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#openModal">Open</button>
+	<button class="btn btn-primary btn-lg {% if user.username in queue.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#inactivateModal">Inactivate</button>
+	<button class="btn btn-primary btn-lg {% if user.username in queue.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#activateModal">Activate</button>	
+
+	<div class="modal fade" id="closeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Close Queue?</h4>
+				</div>
+				<div class="modal-body">
+					The queue will be closed, and will no longer accept jobs.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="closeQueue(); return false;" type="button" class="btn btn-primary">Close</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+	<div class="modal fade" id="openModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Open Queue?</h4>
+				</div>
+				<div class="modal-body">
+					The queue will be opened, and will accept jobs.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="openQueue(); return false;" type="button" class="btn btn-primary">Open</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+	<div class="modal fade" id="inactivateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Inactivate Queue?</h4>
+				</div>
+				<div class="modal-body">
+					The queue will be inactivated, it will accept jobs, but they will not be dispatched.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="inactivateQueue(); return false;" type="button" class="btn btn-primary">Inactivate</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+	<div class="modal fade" id="activateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Activate Queue?</h4>
+				</div>
+				<div class="modal-body">
+					The queue will be activated, jobs in the queue will be dispatched.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button onClick="activateQueue(); return false;" type="button" class="btn btn-primary">Activate</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->                                                                                                                
+	</div>
+	
+</div>
+
+
 <h1 data-toggle="tooltip" title="The name of the queue." >Queue: {{ queue.name }}</h1>
 <p data-toggle="tooltip" title="Describes the typical use of the queue.">{{ queue.description }}</p>
 <dl class="dl-horizontal">
-	<dt>Priority</dt><dd data-toggle="tooltip" title="Defines the priority of the queue.  This determines the order in which the job queues are searched at job dispatch time: queues with higher priority values are searched first. (This is contrary to UNIX process priority ordering.)">{{ queue.priority }}</dd>
-	<dt>Nice</dt><dd data-toggle="tooltip" title="Defines the nice value at which jobs in this queue will be run.">{{ queue.nice }}</dd>
-	<dt>Allowed Users</dt><dd data-toggle="tooltip" title="List of names of users allowed to submit jobs to this queue.">{% for user in queue.allowed_users %}{{ user }} {% empty %}All users{% endfor %}</dd>
-	<dt>Host List</dt><dd data-toggle="tooltip" title="List of names of hosts to which jobs in this queue may be dispatched.">{% for h in queue.host_list %}{{ h }} {% empty %}All Hosts{% endfor %}</dd>
-	<dt>Job Limit per User</dt><dd data-toggle="tooltip" title="Per-user limit on the number of jobs that can be dispatched from this queue and executed concurrently.">{{ queue.user_job_limit }}</dd>
-	<dt>Job Limit per Processort</dt><dd data-toggle="tooltip" title="Per-processor limit on the number of jobs that can be dispatched from this queue and executed concurrently.">{{ queue.processor_job_limit }}</dd>
-	<dt>Host Specification</dt><dd data-toggle="tooltip" title="A host name or host model name.  If the queue CPULIMIT or RUNLIMIT gives a host specification, hostSpec will be that specification. Otherwise, if defaultHostSpec (see below) is not NULL, hostSpec will be defaultHostSpec. Otherwise, if DEFAULT_HOST_SPEC is defined in the lsb.params file, (see lsb.params), hostSpec will be this value. Otherwise, hostSpec will be the name of the host with the largest CPU factor in the cluster.">{{ queue.host_specification }}</dd>
-	<dt>Default Host Specification</dt><dd data-toggle="tooltip" title="The value of DEFAULT_HOST_SPEC in the Queue section for this queue in the lsb.queues file.">{{ queue.default_host_specification }}</dd>
-	<dt>Job Run Window</dt><dd data-toggle="tooltip" title="When a queue's run window is closed, no job from this queue will be dispatched. When the run window closes, any running jobs from this queue will be suspended until the run window reopens, when they will be resumed. The default is no restriction, or always open (i.e., 24 hours a day, seven days a week).  Note that this run window only applies to batch jobs;interactive jobs scheduled by the LSF Load Information Manager (LIM) are controlled by another set of run windows.">{{ queue.run_window }}</dd>
-	<dt>Job Dispatch Window</dt><dd data-toggle="tooltip" title="When a queue's dispatch window is closed, no job from this queue will be dispatched.The default is no restriction, or always open (i.e., 24 hours a day, seven days a week).">{{ queue.dispatch_window }}</dt>
-	<dt>Attributes</dt><dd data-toggle="tooltip" title="The attributes of the queue.">{% for attr in queue.queue_attributes %}{{ attr.name }} {% endfor %}</dd>
-	<dt>Status</dt><dd data-toggle="tooltip" title="The status of the queue.">{% for stat in queue.status %}{{ stat }}<br />{% endfor %}</dd>
-	<dt>Migration Threashold</dt><dd data-toggle="tooltip" title="The queue migration threshold in minutes.">{{ queue.migration_threshold_timedelta }}</dd>
-	<dt>Scheduling Delay</dt><dd data-toggle="tooltip" title="The number of seconds that a new job waits, before being scheduled.  The number of seconds that a new job waits, before being scheduled.">{{ queue.scheduling_delay_timedelta }}</dd>
-	<dt>Accept Interval</dt><dd data-toggle="tooltip" title="The number of seconds for a host to wait after dispatching a job to a host, before accepting a second job to dispatch to the same host.">{{ queue.accept_interval_timedelta }}</dd>
-	<dt>process_limit</dt><dd data-toggle="tooltip" title="An LSF resource limit used to limit the number of job slots (processors) a (parallel) job in the queue will use.  A job submitted to this queue must specify a number of processors not greater than this limit.">{{ queue.process_limit }}</dd>
-	<dt>Queue Administrators</dt><dd data-toggle="tooltip" title="A list of administrators of the queue.  The users whose names are here are allowed to operate on the jobs in the queue and on the queue itself.">{% for ad in queue.queue_admins %}{{ ad }} {% empty %}No Admins Defined{% endfor %}</dd>
-	<dt>Pre Execution Command</dt><dd data-toggle="tooltip" title="Queue's pre-exec command.  The command is executed before the real batch job is run on the execution host (or on the first host selected for a parallel batch job).">{{ queue.pre_execution_command }}</dd>
-	<dt>Post Execution Command</dt><dd data-toggle="tooltip" title="Queue's post-exec command.  The command is run when a job terminates.">{{ queue.post_execution_command }}</dd>
-	<dt>Pre Post Execution User</dt><dd data-toggle="tooltip" title="The user to execute the pre/post execution command as.">{{ queue.pre_post_username }}</dd>
-	<dt>Requeue Exit Values</dt><dd data-toggle="tooltip" title="Jobs that exit with these values are automatically requeued.">{{ queue.requeue_exit_values }}</dd>
-	<dt>Host Job Limit</dt><dd data-toggle="tooltip" title="The maximum number of job slots a host can process from this queue, including job slots of dispatched jobs which have not finished yet and reserved slots for some PEND jobs.  This limit controls the number of jobs sent to each host, regardless of a uniprocessor host or multiprocessor host. Default value for this limit is infinity.">{{ queue.host_job_limit }}</dd>
-	<dt>Resource Request</dt><dd data-toggle="tooltip" title="Resource requirement string used to determine eligible hosts for a job.">{{ queue.resource_request }}</dd>
-	<dt>Reserved Slots</dt><dd data-toggle="tooltip" title="Resource requirement string used to determine eligible hosts for a job.">{{ queue.reserved_slots }}</dd>
-	<dt>Slot Hold Time</dt><dd data-toggle="tooltip" title="The time used to hold the reserved job slots for a PEND job in this queue.">{{ queue.slot_hold_time }}</dd>
-	<dt>Resume Condition</dt><dd data-toggle="tooltip" title="Resume threshold conditions for a suspended job in this queue.">{{ queue.resume_condition }}</dd>
-	<dt>Stop Condition</dt><dd data-toggle="tooltip" title="Stop threshold conditions for a running job in this queue.">{{ queue.stop_condition }}</dd>
-	<dt>Suspend Command</dt><dd data-toggle="tooltip" title="Command configured for the SUSPEND action.">{{ queue.suspend_command }}</dd>
-	<dt>Resume Command</dt><dd data-toggle="tooltip" title="Command configured for the SUSPEND action.">{{ queue.resume_command }}</dd>
-	<dt>Terminate Command</dt><dd data-toggle="tooltip" title="Command configured for the TERMINATE action.">{{ queue.terminate_command }}</dd>
-	<dt>Job Starter Script</dt><dd data-toggle="tooltip" title="Command configured for the TERMINATE action.">{{ queue.job_starter }}</dd>
-	<dt>Checkpoint Directory</dt><dd data-toggle="tooltip" title="The directory where the checkpoint files are created.">{{ queue.checkpoint_directory }}</dd>
-	<dt>Checkpoint Period</dt><dd data-toggle="tooltip" title="The checkpoint period in minutes.">{{ queue.checkpoint_period_timedelta }}</dd>
-	<dt>Min Processor Limit</dt><dd data-toggle="tooltip" title="The minimum number of job slots (processors) that a job in the queue will use.">{{ queue.min_processor_limit }}</dd>
-	<dt>Default Processor Limit</dt><dd data-toggle="tooltip" title="The default (soft) limit on the number of job slots (processors) that a job in the queue will use.">{{ queue.default_processor_limit }}</dd>
+	<dt>Allowed Users</dt><dd>{% for user in queue.allowed_users %}{{ user }} {% empty %}All Users{% endfor %}</dd>
+	<dt>Attributes</dt><dd id="attributeList">{% for attr in queue.attributes %}{{ attr.friendly }}{% if not forloop.last %}<br />{% endif %} {% endfor %}</dd>
+	<dt>Host List</dt><dd>{% for h in queue.host_list %}{{ h }} {% empty %}All Hosts{% endfor %}</dd>
+	<dt>Nice</dt><dd>{{ queue.nice }}</dd>
+	<dt>Priority</dt><dd>{{ queue.priority }}</dd>
+	<dt>Queue Administrators</dt><dd>{% for ad in queue.admins %}{{ ad }}{% if not forloop.last %}<br />{% endif %} {% empty %}No Admins Defined{% endfor %}</dd>
+	<dt>Status</dt><dd id="statusList">{% for stat in queue.statuses %}{{ stat.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
+	{% if queue.cluster_type == "openlava" %}
+		<dt>Accept Interval</dt><dd>{{ queue.accept_interval_timedelta }}</dd>
+		<dt>Checkpoint Data Directory</dt><dd>{{ queue.checkpoint_data_directory|default:"None configured" }}</dd>
+		<dt>Checkpoint Period</dt><dd>{% if queue.checkpoint_period != -1 %}{{ queue.checkpoint_period_timedelta }}{% else %}None configured{% endif %}</dd>
+		<dt>Default Processor Limit</dt><dd>{% if queue.default_slots_per_job != -1 %}{{ queue.default_slots_per_job }}{% else %}None configured{% endif %}</dd>
+		<dt>Host Specification</dt><dd>{{ queue.host_specification|default:"None configured" }}</dd>
+		<dt>Job Dispatch Window</dt><dd>{{ queue.dispatch_window|default:"None configured" }}</dt>
+		<dt>Job Limit per User</dt><dd>{% if queue.max_jobs_per_user == 2147483647 %}Unlimited{%else %}{{ queue.max_jobs_per_user }}{% endif %}</dd>
+		<dt>Job Limit per Processor</dt><dd>{% if queue.max_jobs_per_processor = 2147483648.0 %}Unlimited{% else %}{{ queue.max_jobs_per_processor }}{% endif %}</dd>
+		<dt>Job Run Window</dt><dd>{{ queue.run_window|default:"None configured" }}</dd>
+		<dt>Job Starter Command</dt><dd>{{ queue.job_starter_command|default:"None configured" }}</dd>
+		<dt>Max Jobs Per Host</dt><dd>{% if queue.max_jobs_per_host == 2147483647 %}Unlimited{% else %}{{ queue.max_jobs_per_host }}{% endif %}</dd>
+		<dt>Max Slots Per Job</dt><dd>{% if queue.max_slots_per_job == -1 %}Unlimited{% else %}{{ queue.max_slots_per_job }}{% endif %}</dd>
+		<dt>Migration Threashold</dt><dd>{% if queue.migration_threshold == 2147483647 %}Never migrate{% else %}{{ queue.migration_threshold_timedelta }}{% endif %}</dd>
+		<dt>Min Processor Limit</dt><dd>{% if queue.min_slots_per_job == -1 %}Unlimited{% else %}{{ queue.min_slots_per_job }}{% endif %}</dd>
+		<dt>Pre Execution Command</dt><dd>{{ queue.pre_execution_command|default:"None configured" }}</dd>
+		<dt>Pre Post Execution User</dt><dd>{{ queue.pre_post_user_name|default:"None configured" }}</dd>
+		<dt>Post Execution Command</dt><dd>{{ queue.post_execution_command|default:"None configured" }}</dd>
+		<dt>Requeue Exit Values</dt><dd>{% for value in queue.requeue_exit_values %}{{value}}{% if not forloop.last %}, {% endif %}{% empty %}None configured{% endfor %}</dd>
+		<dt>Resource Requirements</dt><dd>{{ queue.resource_requirements|default:"None configured" }}</dd>
+		<dt>Resume Command</dt><dd>{{ queue.resume_action_command|default:"None configured" }}</dd>
+		<dt>Resume Condition</dt><dd>{{ queue.resume_condition|default:"None configured" }}</dd>
+		<dt>Scheduling Delay</dt><dd>{% if queue.scheduling_delay == 2147483647 %}None configured{% else %}{{ queue.scheduling_delay_timedelta }}{% endif %}</dd>
+		<dt>Slot Hold Time</dt><dd>{{ queue.slot_hold_time_timedelta }}</dd>
+		<dt>Stop Condition</dt><dd>{{ queue.stop_condition|default:"None configured" }}</dd>
+		<dt>Suspend Command</dt><dd>{{ queue.suspend_action_command|default:"None configured" }}</dd>
+		<dt>Terminate Command</dt><dd>{{ queue.terminate_action_command|default:"None configured" }}</dd>
+	{% endif %}
 </dl>
-<h1>Resource Limits</h1>
-<table class="table table-striped table-condensed">
-	<thead>
-		<tr>
-			<td>&nbsp;</td>
-			<th>CPU</th>
-			<th>File Size</th>
-			<th>Data Segment Size</th>
-			<th>Stack Size</th>
-			<th>Core Size</th>
-			<th>RSS Size</th>
-			<th>Run Limit</th>
-			<th>Process Limit</th>
-			<th>Swap Limit</th>
-			<th>Num Files</th>
-			<th>Max Open Files</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<th>Soft Limit</th>
-			<td>{{ queue.soft_resource_limits.cpu }}</td>
-			<td>{{ queue.soft_resource_limits.file_size }}</td>
-			<td>{{ queue.soft_resource_limits.data }}</td>
-			<td>{{ queue.soft_resource_limits.stack }}</td>
-			<td>{{ queue.soft_resource_limits.core }}</td>
-			<td>{{ queue.soft_resource_limits.rss }}</td>
-			<td>{{ queue.soft_resource_limits.run }}</td>
-			<td>{{ queue.soft_resource_limits.process }}</td>
-			<td>{{ queue.soft_resource_limits.swap }}</td>
-			<td>{{ queue.soft_resource_limits.nofile }}</td>
-			<td>{{ queue.soft_resource_limits.open_files }}</td>
-		</tr>
-		<tr>
-			<th>Hard Limit</th>
-			<td>{{ queue.hard_resource_limits.cpu }}</td>
-			<td>{{ queue.hard_resource_limits.file_size }}</td>
-			<td>{{ queue.hard_resource_limits.data }}</td>
-			<td>{{ queue.hard_resource_limits.stack }}</td>
-			<td>{{ queue.hard_resource_limits.core }}</td>
-			<td>{{ queue.hard_resource_limits.rss }}</td>
-			<td>{{ queue.hard_resource_limits.run }}</td>
-			<td>{{ queue.hard_resource_limits.process }}</td>
-			<td>{{ queue.hard_resource_limits.swap }}</td>
-			<td>{{ queue.hard_resource_limits.nofile }}</td>
-			<td>{{ queue.hard_resource_limits.open_files }}</td>
-		</tr>
-	</tbody>
-</table>
 
-			
 <h1>Utilization</h1>
 <table class="table table-striped table-condensed">
 	<thead>
 		<tr>
-			<th>Total Num Jobs</th>
-			<th>Num Pending Jobs</th>
-			<th>Num Running Jobs</th>
-			<th>Num System Suspended Jobs</th>
-			<th>Num User Suspended Jobs</th>
+			<th>Total Num Jobs (Slots)</th>
+			<th>Num Pending Jobs (Slots)</th>
+			<th>Num Running Jobs (Slots)</th>
+			<th>Num Suspended Jobs (Slots)</th>
+			{% if queue.cluster_type == "openlava" %}
+				<th>Num User Suspended Jobs (Slots)</th>
+				<th>Num System Suspended Jobs (Slots)</th>
+			{% endif %}
+			<th>Num Reserved Slots</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td>{{ queue.num_pending_jobs }}</td>
-			<td>{{ queue.num_running_jobs }}</td>
-			<td>{{ queue.num_system_suspended_jobs }}</td>
-			<td>{{ queue.num_user_suspended_jobs }}</td>
+			<td id="totalJobSlots">{{ queue.total_jobs }} ({{ queue.total_slots }})</td>
+			<td id="pendingJobSlots">{{ queue.num_pending_jobs }} ({{queue.num_pending_slots}})</td>
+			<td id="runningJobSlots">{{ queue.num_running_jobs }} ({{ queue.num_running_slots }})</td>
+			<td id="suspendedJobSlots">{{ queue.num_suspended_jobs }} ({{ queue.num_suspended_jobs }})</td>
+			{% if queue.cluster_type == "openlava" %}
+				<td id="userSuspendedJobSlots">{{ queue.num_user_suspended_jobs }} ({{ queue.num_user_suspended_slots }})</td>
+				<td id="systemSuspendedJobSlots">{{ queue.num_system_suspended_jobs }} ({{ queue.num_system_suspended_slots }})</td>
+			{% endif %}
+			<td id="reservedSlots">{{ queue.num_reserved_slots }}</td>
 		</tr>
 	</tbody>
 </table>
-<h1>Scheduling Thresholds</h1>
+
+<h1>Runtime Resource Limits</h1>
 <table class="table table-striped table-condensed">
-	<thead>
-		<tr>
-			<th>&nbsp;</th>
-			<th>15s Load</th>
-			<th>1m Load</th>
-			<th>15m Load</th>
-			<th>Avg CPU Utilization</th>
-			<th>Paging Rate (Pages/Sec)</th>
-			<th>Disk IO Rate (KB/Sec)</th>
-			<th>Num Users</th>
-			<th>Idle Time</th>
-			<th>Tmp Space (MB)</th>
-			<th>Free Memory (MB)</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<th>Stop Scheduling Threshold</th>
-			<td>{{ queue.stop_scheduling_load.run_queue_15s|floatformat:1 }}</td>
-			<td>{{ queue.stop_scheduling_load.run_queue_1m|floatformat:1 }}</td>
-			<td>{{ queue.stop_scheduling_load.run_queue_15m|floatformat:1 }}</td>
-			<td>{{ queue.stop_scheduling_load.cpu_utilization|floatformat:1 }}</td>
-			<td>{{ queue.stop_scheduling_load.paging_rate|floatformat:1 }}</td>
-			<td>{{ queue.stop_scheduling_load.disk_io_rate|floatformat:1 }}</td>
-			<td>{{ queue.stop_scheduling_load.login_users|floatformat:0 }}</td>
-			<td>{{ queue.stop_scheduling_load.idle_time_timedelta }}</td>
-			<td>{{ queue.stop_scheduling_load.tmp_space|floatformat:0 }}</td>
-			<td>{{ queue.stop_scheduling_load.mem_free|floatformat:0 }}</td>
-		</tr>
-		<tr>
-			<th>Stop Job Load</th>
-			<td>{{ queue.stop_job_load.run_queue_15s|floatformat:1 }}</td>
-			<td>{{ queue.stop_job_load.run_queue_1m|floatformat:1 }}</td>
-			<td>{{ queue.stop_job_load.run_queue_15m|floatformat:1 }}</td>
-			<td>{{ queue.stop_job_load.cpu_utilization|floatformat:1 }}</td>
-			<td>{{ queue.stop_job_load.paging_rate|floatformat:1 }}</td>
-			<td>{{ queue.stop_job_load.disk_io_rate|floatformat:1 }}</td>
-			<td>{{ queue.stop_job_load.login_users|floatformat:0 }}</td>
-			<td>{{ queue.stop_job_load.idle_time_timedelta }}</td>
-			<td>{{ queue.stop_job_load.tmp_space|floatformat:0 }}</td>
-			<td>{{ queue.stop_job_load.mem_free|floatformat:0 }}</td>
-		</tr>
+    <thead>
+        <tr>
+            <th>Resource</th>
+            <th>Soft Limit</th>
+            <th>Hard Limit</th>
+        </tr>
+    </thead>
+    <tbody>
+		{% for res in queue.runtime_limits %}
+        <tr>
+			<td>{{ res.name }}</td>
+			<td>{% if queue.cluster_type == "openlava" and res.soft_limit == -1 %}Unlimited{% else %} {{ res.soft_limit }}{% if res.unit %} {{ res.unit }}{% endif %}{% endif %}</td>
+			<td>{% if queue.cluster_type == "openlava" and res.hard_limit == -1 %}Unlimited{% else %} {{ res.hard_limit }}{% if res.unit %} {{ res.unit }}{% endif %}{% endif %}</td>
+        </tr>
+		{% endfor %}
 	</tbody>
 </table>
+
 <h1>Jobs</h1>
-{% include "openlavaweb/widgets/job_list.html" %}
+{% include "openlavaweb/widgets/job_list.html" with job_list=queue.jobs job_limit=20 %}
+
 <a href="{% url "olw_job_view_by_queue" queue_name=queue.name %}">View All Jobs</a>
 {% endblock %}

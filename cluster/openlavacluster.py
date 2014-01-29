@@ -30,7 +30,156 @@ def initialize():
 		else:
 			initialized_openlava=True		
 
+def raise_cluster_exception(code, message):
+	messages={
+		0:"No error",
+		1:"No matching job found",
+		2:"Job has not started yet",
+		3:"Job has already started",
+		4:"Job has already finished",
+		5:"Error 5",
+		6:"Dependency condition syntax error",
+		7:"Queue does not accept EXCLUSIVE jobs",
+		8:"Root job submission is disabled",
+		9:"Job is already being migrated",
+		10:"Job is not checkpointable",
+		11:"No output so far",
+		12:"No job Id can be used now",
+		13:"Queue only accepts interactive jobs", 
+		14:"Queue does not accept interactive jobs",
+		15:"No user is defined in the lsb.users file",
+		16:"Unknown user",
+		17:"User permission denied",
+		18:"No such queue",
+		19:"Queue name must be specified",
+		20:"Queue has been closed",
+		21:"Not activated because queue windows are closed",
+		22:"User cannot use the queue",
+		23:"Bad host name, host group name or cluster name",
+		24:"Too many processors requested",
+		25:"Reserved for future use",
+		26:"Reserved for future use",
+		27:"No user/host group defined in the system",
+		28:"No such user/host group",
+		29:"Host or host group is not used by the queue",
+		30:"Queue does not have enough per-user job slots",
+		31:"Current host is more suitable at this time",
+		32:"Checkpoint log is not found or is corrupted",
+		33:"Queue does not have enough per-processor job slots",
+		34:"Request from non-LSF host rejected",
+		35:"Bad argument",
+		36:"Bad time specification",
+		37:"Start time is later than termination time",
+		38:"Bad CPU limit specification",
+		39:"Cannot exceed queue's hard limit(s)",
+		40:"Empty job",
+		41:"Signal not supported",
+		42:"Bad job name",
+		43:"The destination queue has reached its job limit",
+		44:"Unknown event",
+		45:"Bad event format",
+		46:"End of file",
+		47:"Master batch daemon internal error",
+		48:"Slave batch daemon internal error",
+		49:"Batch library internal error",
+		50:"Failed in an LSF library call",
+		51:"System call failed",
+		52:"Cannot allocate memory",
+		53:"Batch service not registered",
+		54:"LSB_SHAREDIR not defined",
+		55:"Checkpoint system call failed",  
+		56:"Batch daemon cannot fork",
+		57:"Batch protocol error",
+		58:"XDR encode/decode error",
+		59:"Fail to bind to an appropriate port number",
+		60:"Contacting batch daemon: Communication timeout",
+		61:"Timeout on connect call to server",
+		62:"Connection refused by server",
+		63:"Server connection already exists",
+		64:"Server is not connected",
+		65:"Unable to contact execution host",
+		66:"Operation is in progress",
+		67:"User or one of user's groups does not have enough job slots",
+		68:"Job parameters cannot be changed now; non-repetitive job is running",
+		69:"Modified parameters have not been used",
+		70:"Job cannot be run more than once",
+		71:"Unknown cluster name or cluster master",
+		72:"Modified parameters are being used",
+		73:"Queue does not have enough per-host job slots",
+		74:"Mbatchd could not find the message that SBD mentions about",
+		75:"Bad resource requirement syntax",
+		76:"Not enough host(s) currently eligible",
+		77:"Error 77",
+		78:"Error 78",
+		79:"No resource defined",
+		80:"Bad resource name",
+		81:"Interactive job cannot be rerunnable",
+		82:"Input file not allowed with pseudo-terminal",
+		83:"Cannot find restarted or newly submitted job's submission host and host type",
+		84:"Error 109",
+		85:"User not in the specified user group",
+		86:"Cannot exceed queue's resource reservation",
+		87:"Bad host specification",
+		88:"Bad user group name",
+		89:"Request aborted by esub",
+		90:"Bad or invalid action specification",
+		91:"Has dependent jobs",
+		92:"Job group does not exist",
+		93:"Bad/empty job group name",
+		94:"Cannot operate on job array",
+		95:"Operation not supported for a suspended job",
+		96:"Operation not supported for a forwarded job",
+		97:"Job array index error",
+		98:"Job array index too large",
+		99:"Job array does not exist",
+		100:"Job exists",
+		101:"Cannot operate on element job",
+		102:"Bad jobId",
+		103:"Change job name is not allowed for job array",
+		104:"Child process died",
+		105:"Invoker is not in specified project group",
+		106:"No host group defined in the system",
+		107:"No user group defined in the system",
+		108:"Unknown jobid index file format",
+		109:"Source file for spooling does not exist",
+		110:"Number of failed spool hosts reached max",
+		111:"Spool copy failed for this host",
+		112:"Fork for spooling failed",
+		113:"Status of spool child is not available",
+		114:"Spool child terminated with failure",
+		115:"Unable to find a host for spooling",
+		116:"Cannot get $JOB_SPOOL_DIR for this host",
+		117:"Cannot delete spool file for this host",
+		118:"Bad user priority",
+		119:"Job priority control undefined",
+		120:"Job has already been requeued",
+		121:"Multiple first execution hosts specified",
+		122:"Host group specified as first execution host",
+		123:"Host partition specified as first execution host",
+		124:"\"Others\" specified as first execution host",
+		125:"Too few processors requested",
+		126:"Only the following parameters can be used to modify a running job: -c, -M, -W, -o, -e, -r",
+		127:"You must set LSB_JOB_CPULIMIT in lsf.conf to modify the CPU limit of a running job",
+		128:"You must set LSB_JOB_MEMLIMIT in lsf.conf to modify the memory limit of a running job",
+		129:"No error file specified before job dispatch. Error file does not exist, so error file name cannot be changed",
+		130:"The host is locked by master LIM",
+		131:"Dependent arrays do not have the same size",
+	}
+	e=ClusterException
+	if code == lsblib.LSBE_NO_JOB:
+		e=NoSuchJobError
+	elif code == lsblib.LSBE_NO_USER or code == lsblib.LSBE_BAD_USER:
+		e=NoSuchUserError
+	elif code == lsblib.LSBE_PERMISSION or code == lsblib.LSBE_QUEUE_USE:
+		e=PermissionDeniedError
+	elif code == lsblib.LSBE_BAD_QUEUE:
+		e=NoSuchQueueError
+	elif code == lsblib.LSBE_BAD_HOST:
+		e=NoSuchHostError
+	raise e("%s: %s" % (message, messages[code]), code=code)
+
 class Cluster(ClusterBase):
+	cluster_type="openlava"
 	def __init__(self):
 		initialize()
 		
@@ -44,18 +193,17 @@ class Cluster(ClusterBase):
 
 	def hosts(self):
 		'''Returns an array of hosts that are part of the cluster'''
-		raise NotImplementedError
+		return Host.get_host_list()
 
-	def queues(self, queue_name=None, host_name=None, user_name=None):
+	def queues(self):
 		'''Returns an array of queues that are part of the cluster'''
-		raise NotImplementedError
-
+		return Queue.get_queue_list()
 	
-	def jobs(self, job_id=None, job_name=None, user_name=None, host_name=None, job_state="all"):
+	def jobs(self):
 		'''Returns an array of jobs that are part of the cluster'''
-		raise NotImplementedError
+		return Job.get_job_list()	
 		
-	def resources(self, resource_name=None, host_name=None, user_name=None):
+	def resources(self):
 		'''Returns an array of resources that are part of thecluster'''
 		cluster_info=lslib.ls_info()
 		if cluster_info==None:
@@ -63,6 +211,9 @@ class Cluster(ClusterBase):
 		return [Resource(r) for r in cluster_info.resTable]
 			
 
+	def users(self):
+		return User.get_user_list()
+	
 class OpenLavaError(ClusterException):
 	pass
 
@@ -94,8 +245,12 @@ class NumericStatus(Status):
 
 	@property
 	def name(self):
-		return u"%s" % self.states[self._status]['name']
-
+		try:
+			return u"%s" % self.states[self._status]['name']
+		except KeyError:
+			return 'UNKNOWN'
+	
+		
 	@property
 	def description(self):
 		try:
@@ -112,7 +267,7 @@ class NumericStatus(Status):
 		try:
 			return u"%s" % self.states[self._status]['friendly']
 		except:
-			return u""
+			return u"Undetermined: %s" % self._status
 
 	@classmethod
 	def get_status_list(cls, mask):
@@ -465,6 +620,148 @@ class JobStatus(NumericStatus):
 
 
 class Job(JobBase):
+	@classmethod
+	def submit(cls, **kwargs):
+		options=0
+		options2=0
+		#beginTime
+		#termTime
+		#rlimits
+		fields={
+			'options':{
+				'sname':'options',
+				'options':0,
+				'options2':0,
+			},
+			'options2':{
+				'sname':'options2',
+				'options':0,
+				'options2':0,
+			},
+			'num_processors':{
+				'sname':'numProcessors',
+				'options':0,
+				'options2':0,
+			},
+			'command':{
+				'sname':'command',
+				'options':0,
+				'options2':0,
+			},
+			'job_name':{
+				'sname':'jobName',
+				'options':lsblib.SUB_JOB_NAME,
+				'options2':0,
+			},
+			'queue_name':{
+				'sname':'queue',
+				'options':lsblib.SUB_QUEUE,
+				'options2':0,
+			},
+			'requested_hosts':{
+				'sname':'askedHosts',
+				'options':lsblib.SUB_HOST,
+				'options2':0,
+			},
+			'resource_request':{
+				'sname':'resReq',
+				'options':lsblib.SUB_RES_REQ,
+				'options2':0,
+			},
+			'host_specification':{
+				'sname':'hostSpec',
+				'options':lsblib.SUB_HOST_SPEC,
+				'options2':0,
+			},
+			'dependency_conditions':{
+				'sname':'dependCond',
+				'options':lsblib.SUB_DEPEND_COND,
+				'options2':0,
+			},
+			'signal_value':{
+				'sname':'sigValue',
+				'options':lsblib.SUB_WINDOW_SIG,
+				'options2':0,
+			},
+			'input_file':{
+				'sname':'inFile',
+				'options':lsblib.SUB_IN_FILE,
+				'options2':0,
+			},
+			'output_file':{
+				'sname':'outFile',
+				'options':lsblib.SUB_OUT_FILE,
+				'options2':0,
+			},
+			'error_file':{
+				'sname':'errFile',
+				'options':lsblib.SUB_ERR_FILE,
+				'options2':0,
+			},
+			'checkpoint_period':{
+				'sname':'chkpntPeriod',
+				'options':lsblib.SUB_CHKPNT_PERIOD,
+				'options2':0,
+			},
+			'checkpoint_directory':{
+				'sname':'chkpntDir',
+				'options':lsblib.SUB_CHKPNT_DIR,
+				'options2':0,
+			},
+			'email_user':{
+				'sname':'mailUser',
+				'options':lsblib.SUB_MAIL_USER,
+				'options2':0,
+			},
+			'project_name':{
+				'sname':'projectName',
+				'options':lsblib.SUB_PROJECT_NAME,
+				'options2':0,
+			},
+			'max_num_processors':{
+				'sname':'maxNumProcessors',
+				'options':0,
+				'options2':0,
+			},
+			'login_shell':{
+				'sname':'loginShell',
+				'options':lsblib.SUB_LOGIN_SHELL,
+				'options2':0,
+			},
+			'user_priority':{
+				'sname':'userPriority',
+				'options':0,
+				'options2':lsblib.SUB2_JOB_PRIORITY,
+			},
+		}
+	
+		s=lsblib.Submit()
+		for k,v in kwargs.items():
+			if k not in fields:
+				raise JobSubmitError("Field: %s is not a valid field name" % k)
+			print "setting %s to %s" % ( fields[k]['sname'], v)
+			setattr(s, fields[k]['sname'], v)
+			print "got %s from %s" % (getattr(s, fields[k]['sname'] ), fields[k]['sname'])
+			options = options | fields[k]['options']
+			options2 = options2 | fields[k]['options2']
+		print "options: %s" % options
+		s.command=kwargs['command']
+		options=s.options | options
+		s.options=options
+		options2=s.options2 | options2
+		s.options2=options2
+		if s.maxNumProcessors < s.numProcessors:
+			s.maxNumProcessors=s.numProcessors
+		sr=lsblib.SubmitReply()
+		job_id=lsblib.lsb_submit(s,sr)
+		
+		if job_id < 0:
+			raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
+			
+		array_index=lsblib.get_array_index(job_id)
+		job_id=lsblib.get_job_id(job_id)
+		return Job(job_id=job_id, array_index=array_index)
+	
 	def json_attributes(self):
 		attribs=JobBase.json_attributes(self)
 		attribs.extend([
@@ -503,7 +800,7 @@ class Job(JobBase):
 		if job:
 			self._job_id=lsblib.get_job_id(job.jobId)
 			self._array_index=lsblib.get_array_index(job.jobId)
-			#self._update_jobinfo(job)
+			self._update_jobinfo(job)
 		elif job_id:
 			self._job_id=job_id
 			self._array_index=array_index
@@ -511,7 +808,13 @@ class Job(JobBase):
 			num_jobs=lsblib.lsb_openjobinfo(job_id=full_job_id)
 			lsblib.lsb_closejobinfo()
 			if num_jobs != 1:
-				raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
+				errno=lsblib.get_lsberrno()
+				if errno == lsblib.LSBE_NO_JOB:
+					raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
+				elif errno == 0:
+					raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
+				else:
+					raise ClusterException("%s" % lsblib.ls_sysmsg())
 		else:
 			raise ValueError("Job, or job_id required")
 		
@@ -527,7 +830,7 @@ class Job(JobBase):
 				job=lsblib.lsb_readjobinfo()
 			lsblib.lsb_closejobinfo()
 			if num_jobs != 1:
-				raise NoSuchJobError("Job: %s[%s] does not exist." % self.job_id, self.array_index)
+				raise NoSuchJobError("Job: %s[%s] does not exist." % (self.job_id, self.array_index))
 			
 		self._submission_host=job.fromHost
 		self._status=job.status
@@ -632,9 +935,13 @@ class Job(JobBase):
 		self._login_shell=job.submit.loginShell
 		self._user_priority=job.submit.userPriority
 		ld=lsblib.LoadIndexLog()
-		self._pend_reasons=lsblib.lsb_pendreason(job.numReasons, job.reasonTb, None, ld)
-		self._susp_reasons=lsblib.lsb_suspreason(job.reasons, job.subreasons, ld)
+		self._pend_reasons=" ".join(lsblib.lsb_pendreason(job.numReasons, job.reasonTb, None, ld).splitlines())
+		self._susp_reasons=" ".join(lsblib.lsb_suspreason(job.reasons, job.subreasons, ld).splitlines())
 		
+	@property
+	def admins(self):
+		return [self.user_name]
+	
 	@property
 	def begin_time(self):
 		'''Job will not start before this time'''
@@ -695,6 +1002,18 @@ class Job(JobBase):
 		self._update_jobinfo()
 		return self._input_file_name
 	
+	@property
+	def is_completed(self):
+		if self.status.name=="JOB_STAT_DONE":
+			return True
+		return False	
+
+	@property
+	def is_failed(self):
+		if self.status.name=="JOB_STAT_EXIT":
+			return True
+		return False
+		
 	@property
 	def is_pending(self):
 		if self.status.name=="JOB_STAT_PEND":
@@ -848,7 +1167,7 @@ class Job(JobBase):
 	def queue(self):
 		'''The queue object for the queue the job is currently in.'''
 		self._update_jobinfo()
-		return Queue(queue_name=self._queue_name)
+		return Queue(self._queue_name)
 	
 	def requested_hosts(self):
 		'''Array of host objects the job was submitted to'''
@@ -860,14 +1179,8 @@ class Job(JobBase):
 		rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
 		if rc == 0:
 			return rc
-		lsb_error=lslib.get_lserrno()
-		print lsb_error
-		if lsb_error == lslib.LSBE_NO_JOB:
-			raise NoSuchJobError("Job doesnt exist")
-		elif lsb_error==lslib.LSBE_PERMISSION:
-			raise PermissionError("Only job owners, and administrators can perform this action")
-		elif lsb_error != lslib.LSBE_NO_ERROR:
-			raise ClusterException("Error code: %s" % lsb_error)
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % ( self.job_id, self.array_index ))
+		
 		
 	
 	def suspend(self):
@@ -875,13 +1188,7 @@ class Job(JobBase):
 		rc=lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
 		if rc == 0:
 			return rc
-		lsb_error=lslib.get_lserrno()
-		if lsb_error == lslib.LSBE_NO_JOB:
-			raise NoSuchJobError("Job doesnt exist")
-		elif lsb_error==lslib.LSBE_PERMISSION:
-			raise PermissionError("Only job owners, and administrators can perform this action")
-		elif lsb_error != lslib.LSBE_NO_ERROR:
-			raise ClusterException("Error code: %s" % lsb_error)
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to suspend job: %s[%s]" % ( self.job_id, self.array_index ))
 	
 	def requeue(self, hold=False):
 		rq=lsblib.JobRequeue()
@@ -902,26 +1209,14 @@ class Job(JobBase):
 		rc=lsblib.lsb_requeuejob(rq)
 		if rc == 0:
 			return rc
-		lsb_error=lslib.get_lserrno()
-		if lsb_error == lslib.LSBE_NO_JOB:
-			raise NoSuchJobError("Job doesnt exist")
-		elif lsb_error==lslib.LSBE_PERMISSION:
-			raise PermissionError("Only job owners, and administrators can perform this action")
-		elif lsb_error != lslib.LSBE_NO_ERROR:
-			raise ClusterException("Error code: %s" % lsb_error)
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to requeue job: %s[%s]" % ( self.job_id, self.array_index ))
 		
 	def resume(self):
 		full_job_id=lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
 		rc=lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)
 		if rc == 0:
 			return rc
-		lsb_error=lslib.get_lserrno()
-		if lsb_error == lslib.LSBE_NO_JOB:
-			raise NoSuchJobError("Job doesnt exist")
-		elif lsb_error==lslib.LSBE_PERMISSION:
-			raise PermissionError("Only job owners, and administrators can perform this action")
-		elif lsb_error != lslib.LSBE_NO_ERROR:
-			raise ClusterException("Error code: %s" % lsb_error)
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
 		
 		
 	## Openlava Only
@@ -1033,6 +1328,46 @@ class Job(JobBase):
 
 class Host(HostBase):
 	cluster_type="openlava"
+	def open(self):
+		rc=lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
+		if rc == 0:
+			return rc
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name )
+		
+	def close(self):
+		rc=lsblib.lsb_hostcontrol(self.name, lsblib.HOST_CLOSE)
+		if rc == 0:
+			return rc
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name )
+		
+	def admins(self):
+		return ['irvined']
+	
+	def is_busy(self):
+		for s in self.statuses:
+			busy=[
+				"HOST_STAT_BUSY",
+				"HOST_STAT_FULL",
+				"HOST_STAT_LOCKED",
+				"HOST_STAT_EXCLUSIVE",
+				"HOST_STAT_LOCKED_MASTER",
+			]
+			if s.name in busy:
+				return True
+		return False
+	
+	def is_down(self):
+		for s in self.statuses:
+			if s.name in ["HOST_STAT_UNREACH", "HOST_STAT_UNAVAIL", "HOST_STAT_NO_LIM", ]:
+				return True
+		return False
+	
+	def is_closed(self):
+		for s in self.statuses:
+			if s.name in ["HOST_STAT_WIND", "HOST_STAT_DISABLED", ]:
+				return True
+		return False
+	
 	def json_attributes(self):
 		attribs=HostBase.json_attributes(self)
 		attribs.extend([
@@ -1046,6 +1381,12 @@ class Host(HostBase):
 			'has_kernel_checkpoint_copy',	
 		])
 		return attribs
+	
+	@classmethod
+	def get_host_list(cls):
+		initialize()
+		return [cls(h.host) for h in lsblib.lsb_hostinfo()]
+	
 	def __init__(self, host_name):
 		initialize()
 		self._lsb_update_time=0
@@ -1229,7 +1570,7 @@ class Host(HostBase):
 		return self._num_suspended_jobs
 
 	@property
-	def status(self):
+	def statuses(self):
 		'''Array of statuses that apply to the host'''
 		self._update_lsb_hostinfo()
 		return HostStatus.get_status_list(self._status)
@@ -1390,9 +1731,377 @@ class ExecutionHost(Host):
 		attribs.append('num_slots')
 		return attribs
 	
-class Queue:
-	def __init__(self, queue_name=None):
-			self.name=queue_name
+class QueueStatus(NumericStatus):
+	states={
+			0x01:{
+				'friendly':"Open",
+				'name':'QUEUE_STAT_OPEN',
+				'description':'The queue is open to accept newly submitted jobs.',
+				},
+			0x02:{
+				'friendly':"Active",
+				'name':'QUEUE_STAT_ACTIVE',
+				'description':'The queue is actively dispatching jobs. The queue can be inactivated and reactivated by the LSF administrator using lsb_queuecontrol. The queue will also be inactivated when its run or dispatch window is closed. In this case it cannot be reactivated manually; it will be reactivated by the LSF system when its run and dispatch windows reopen.',
+				},
+			0x04:{
+				'friendly':'Run windows open',
+				'name':'QUEUE_STAT_RUN',
+				'description':'The queue run and dispatch windows are open. The initial state of a queue at LSF boot time is open and either active or inactive, depending on its run and dispatch windows.',
+				},
+			0x08:{
+				'friendly':'No Pemission',
+				'name':'QUEUE_STAT_NOPERM',
+				'description':'Remote queue rejecting jobs.',
+				},
+			0x10:{
+				'friendly':'Remote Disconnected',
+				'name':'QUEUE_STAT_DISC',
+				'description':'Remote queue status is disconnected.',
+				},
+			0x20:{
+				'friendly':'Runwindow Closed',
+				'name':'QUEUE_STAT_RUNWIN_CLOSE',
+				'description':'Queue run windows are closed.',
+				},
+			}
 
+
+
+class QueueAttribute(NumericStatus):
+	states={
+			0x01:{
+				'friendly':"Exclusive",
+				'name':'Q_ATTRIB_EXCLUSIVE',
+				'description': "This queue accepts jobs which request exclusive execution. ",
+				},
+			0x02:{
+				'friendly':"Default Queue",
+				'name':'Q_ATTRIB_DEFAULT',
+				'description': "This queue is a default LSF queue. ",
+				},
+			0x04:{
+				'friendly':"Round Robin Scheduling Policy",
+				'name':'Q_ATTRIB_FAIRSHARE',
+				'description': "This queue uses the Round Robin scheduling policy.",
+				},
+			0x80:{
+				'friendly':'Backfill Enabled',
+				'name':'Q_ATTRIB_BACKFILL',
+				'description': "This queue uses a backfilling policy. ",
+				},
+			0x100:{
+				'friendly':"Preference Scheduling Policy",
+				'name':'Q_ATTRIB_HOST_PREFER',
+				'description': "This queue uses a host preference policy. ",
+				},
+			0x800:{
+				'friendly':"Non-Interactive only",
+				'name':'Q_ATTRIB_NO_INTERACTIVE',
+				'description': "This queue does not accept batch interactive jobs. ",
+				},
+			0x1000:{
+				'friendly':"Interactive Only",
+				'name':'Q_ATTRIB_ONLY_INTERACTIVE',
+				'description': "This queue only accepts batch interactive jobs. ",
+				},
+			0x2000:{
+				'friendly':"No host type resources",
+				'name':'Q_ATTRIB_NO_HOST_TYPE',
+				'description': "No host type related resource name specified in resource requirement. ",
+				},
+			0x4000:{
+				'friendly':"Ignores deadlines",
+				'name':'Q_ATTRIB_IGNORE_DEADLINE',
+				'description': "This queue disables deadline constrained resource scheduling. ",
+				},
+			0x8000:{
+				'friendly':"Checkpointing supported",
+				'name':'Q_ATTRIB_CHKPNT',
+				'description': "Jobs may run as chkpntable. ",
+				},
+			0x10000:{
+				'friendly':"Re-Runnable",
+				'name':'Q_ATTRIB_RERUNNABLE',
+				'description': "Jobs may run as rerunnable. ",
+				},
+			0x80000:{
+				'friendly':"Interactive First",
+				'name':'Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD',
+				'description': "Push interactive jobs in front of other jobs in queue. ",
+				},
+			}
+	
+class Queue:
+	cluster_type="openlava"
+	@classmethod
+	def get_queue_list(cls):
+		initialize()
+		return [cls(q) for q in lsblib.lsb_queueinfo()]
+		
+	def __init__(self, queue):
+		initialize()
+		if isinstance(queue,str) or isinstance(queue,unicode):
+			queue=lsblib.lsb_queueinfo(queues=[queue])
+			if queue==None or len(queue) !=1:
+				raise ValueError("Invalid Queue Name")
+			queue=queue[0]
+		if not isinstance(queue, lsblib.QueueInfoEnt):
+			raise ValueError("invalid Queue, must be string or QueueInfoEnt")
+		self.name=queue.queue
+		self.description=queue.description
+		self.priority=queue.priority
+		self.nice=queue.nice
+		self._allowed_users=queue.userList
+		self._allowed_hosts=queue.hostList
+		self.max_jobs_per_user=queue.userJobLimit
+		self.max_jobs_per_processor=queue.procJobLimit
+		self.run_windows=queue.windows
+		names=["CPU Time","File Size","Data Segment Size","Stack Size","Core Size","RSS Size","Num Files","Max Open Files","Swap Limit","Run Limit","Process Limit"]
+		units=[ None,"KB","KB","KB","KB","KB",None,None,"KB",None,None]
+		self.runtime_limits=[]
+		rlims=queue.rLimits
+		for i in range(len(rlims)):
+			self.runtime_limits.append(
+				ResourceLimit(
+					name=names[i],
+					soft_limit=rlims[i],
+					hard_limit=rlims[i],
+					unit=units[i]				
+				)
+			)
+		self.host_specification=queue.defaultHostSpec.lstrip()
+		self.attributes=QueueAttribute.get_status_list(queue.qAttrib)
+		self.statuses=QueueStatus.get_status_list(queue.qStatus)
+		self.max_slots=queue.maxJobs
+		self.total_slots=queue.numJobs
+		self.num_running_slots=queue.numRUN
+		self.num_pending_slots=queue.numPEND
+		self.num_suspended_slots=queue.numSSUSP+queue.numUSUSP
+		self.num_user_suspended_slots=queue.numUSUSP
+		self.num_system_suspended_slots=queue.numSSUSP
+		self.num_reserved_slots=queue.numRESERVE
+		self.max_jobs=queue.maxJobs
+		self.total_jobs=0
+		self.num_running_jobs=0
+		self.num_pending_jobs=0
+		self.num_suspended_jobs=0
+		self.num_user_suspended_jobs=0
+		self.num_system_suspended_jobs=0		
+		## iterate through jobs and count/sum each one.
+		for j in self.jobs():
+			self.total_jobs+=1
+			if j.status.name=="JOB_STAT_RUN":
+				self.num_running_jobs+=1
+			elif j.status.name=="JOB_STAT_SSUSP":
+				self.num_suspended_jobs+=1
+				self.num_system_suspended_jobs+=1
+			elif j.status.name=="JOB_STAT_USUSP":
+				self.num_suspended_jobs+=1
+				self.num_user_suspended_jobs+=1
+			elif j.status.name == "JOB_STAT_PEND":
+				self.num_pending_jobs+=1
+		self.pre_execution_command=queue.preCmd.lstrip()
+		self.post_execution_command=queue.postCmd.lstrip()
+		self.pre_post_user_name=queue.prepostUsername.lstrip()
+		self.admins=queue.admins.split() + ['irvined']
+		self.migration_threshold=queue.mig
+		self.migration_threshold_timedelta=datetime.timedelta(minutes=queue.mig)
+		self.scheduling_delay=queue.schedDelay
+		self.scheduling_delay_timedelta=datetime.timedelta(minutes=queue.schedDelay)
+		self.accept_interval=queue.acceptIntvl
+		self.accept_interval_timedelta=datetime.timedelta(seconds=queue.acceptIntvl)
+		self.dispatch_windows=queue.windowsD.lstrip()
+		self.max_slots_per_job=queue.procLimit
+		self.requeue_exit_values=queue.requeueEValues.split()
+		self.max_jobs_per_host=queue.hostJobLimit
+		self.resource_requirements=queue.resReq.lstrip()
+		self.slot_hold_time=queue.slotHoldTime
+		self.slot_hold_time_timedelta=datetime.timedelta(seconds=queue.slotHoldTime)
+		self.stop_condition=queue.stopCond.lstrip()
+		self.job_starter_command=queue.jobStarter.lstrip()
+		self.suspend_action_command=queue.suspendActCmd.lstrip()
+		self.resume_action_command=queue.resumeActCmd.lstrip()
+		self.terminate_action_command=queue.terminateActCmd.lstrip()
+		self.min_slots_per_job=queue.minProcLimit
+		self.default_slots_per_job=queue.defProcLimit
+		self.checkpoint_data_directory=queue.chkpntDir.lstrip()
+		self.checkpoint_period=queue.chkpntPeriod
+		self.checkpoint_period_timedelta=datetime.timedelta(minutes=queue.chkpntPeriod)
+		self.resume_condition=queue.resumeCond.lstrip()
+		self.stop_condition=queue.stopCond.lstrip()
+	
+	def is_accepting_jobs(self):
+		for state in self.statuses:
+			if state.name=="QUEUE_STAT_OPEN":
+				return True
+		return False
+	
+	def is_despatching_jobs(self):
+		for state in self.statuses:
+			if state.name=="QUEUE_STAT_ACTIVE":
+				return True
+		return False
+	
+	def close(self):
+		rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_CLOSED)
+		if rc == 0:
+			return rc
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close queue: %s" % self.name )
+	
+	def open(self):
+		rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_OPEN)
+		if rc == 0:
+			return rc
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open queue: %s" % self.name )
+	
+	def inactivate(self):
+		rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_INACTIVATE)
+		if rc == 0:
+			return rc
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to inactivate queue: %s" % self.name )
+		
+	def activate(self):
+		rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_ACTIVATE)
+		if rc == 0:
+			return rc
+		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to activate queue: %s" % self.name )
+	
+	def allowed_hosts(self, ):
+		pass
+	def allowed_users(self):
+		pass
+	
+	def jobs(self):
+		return Job.get_job_list(queue_name=self.name)
+	
 	def json_attributes(self):
-		return ['name']	
+		return [
+			'name',
+			'description',
+			'priority',
+			'nice',
+			'allowed_users',
+			'allowed_hosts',
+			'max_jobs_per_user',
+			'max_jobs_per_processor',
+			'run_windows',
+			'runtime_limits',
+			'host_specification',
+			'attributes',
+			'statuses',
+			'max_slots',
+			'total_slots',
+			'num_running_slots',
+			'num_pending_slots',
+			'num_suspended_slots',
+			'num_user_suspended_slots',
+			'num_system_suspended_slots',
+			'num_reserved_slots',
+			'max_jobs',
+			'total_jobs',
+			'num_running_jobs',
+			'num_pending_jobs',
+			'num_suspended_jobs',
+			'num_user_suspended_jobs',
+			'num_system_suspended_jobs',
+			'pre_execution_command',
+			'post_execution_command',
+			'pre_post_user_name',
+			'admins',
+			'migration_threshold',
+			'scheduling_delay',
+			'accept_interval',
+			'dispatch_windows',
+			'max_slots_per_job',
+			'requeue_exit_values',
+			'max_jobs_per_host',
+			'resource_requirements',
+			'slot_hold_time',
+			'stop_condition',
+			'job_starter_command',
+			'suspend_action_command',
+			'resume_action_command',
+			'terminate_action_command',
+			'min_slots_per_job',
+			'default_slots_per_job',
+			'checkpoint_data_directory',
+			'checkpoint_period',
+			'resume_condition',
+			'stop_condition',
+			'is_accepting_jobs',
+			'is_despatching_jobs',
+			'jobs',
+			'cluster_type',
+			]
+
+
+class User(UserBase):
+	cluster_type="openlava"
+	def __init__(self, user):
+		initialize()
+		if isinstance(user, str) or isinstance(user, unicode):
+			user=lsblib.lsb_userinfo(user_list=[user], numusers=1)
+			if user == None:
+				raise_cluster_exception(lsblib.get_lsberrno(), "Unable load user: %s[%s]" % ( self.job_id, self.array_index ))
+			if len(user) != 1:
+				raise ValueError("Invalid User")
+			user=user[0]
+		if not isinstance(user, lsblib.UserInfoEnt):
+			raise ValueError("Invalid User Object")
+		
+		self.name=user.user
+		self.max_jobs_per_processor=user.procJobLimit
+		self.max_slots=user.maxJobs
+		self.total_slots=user.numJobs
+		self.num_running_slots=user.numRUN
+		self.num_pending_slots=user.numPEND
+		self.num_suspended_slots=user.numSSUSP+user.numUSUSP
+		self.num_user_suspended_slots=user.numUSUSP
+		self.num_system_suspended_slots=user.numSSUSP
+		self.num_reserved_slots=user.numRESERVE
+		self.max_jobs=user.maxJobs
+		self.total_jobs=0
+		self.num_running_jobs=0
+		self.num_pending_jobs=0
+		self.num_suspended_jobs=0
+		self.num_user_suspended_jobs=0
+		self.num_system_suspended_jobs=0		
+		## iterate through jobs and count/sum each one.
+		for j in self.jobs():
+			self.total_jobs+=1
+			if j.status.name=="JOB_STAT_RUN":
+				self.num_running_jobs+=1
+			elif j.status.name=="JOB_STAT_SSUSP":
+				self.num_suspended_jobs+=1
+				self.num_system_suspended_jobs+=1
+			elif j.status.name=="JOB_STAT_USUSP":
+				self.num_suspended_jobs+=1
+				self.num_user_suspended_jobs+=1
+			elif j.status.name == "JOB_STAT_PEND":
+				self.num_pending_jobs+=1
+
+	def jobs(self, job_id=0, job_name="", queue="", host="", options=0):
+		'''Return jobs on this host'''
+		num_jobs=lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=self.name, queue=queue, host=host, options=options)
+		jobs=[]
+		if num_jobs<1:
+			return jobs
+		for i in range(num_jobs):
+			j=lsblib.lsb_readjobinfo()
+			jobs.append(Job(job=j))
+		lsblib.lsb_closejobinfo()
+		return jobs
+	
+	def json_attributes(self):
+		return UserBase.json_attributes(self)+[
+			'num_user_suspended_jobs',
+			'num_system_suspended_jobs',
+			'num_user_suspended_slots',
+			'num_system_suspended_slots',
+		]
+	
+	@classmethod
+	def get_user_list(cls):
+		initialize()
+		return [cls(u) for u in lsblib.lsb_userinfo()]
+	
