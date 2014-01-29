@@ -1,0 +1,154 @@
+#!/usr/bin/env python
+import sys
+import json
+import urllib2
+import cookielib
+import argparse
+import datetime
+
+
+class AuthenticationError(Exception):
+	pass
+
+class OpenLavaWebConnection(object):
+	def __init__(self, url, **kwargs):
+
+		object.__init__(self)
+
+		self.url=url
+		self.url=self.url.rstrip("/")
+
+		for k, v in kwargs.items():
+			setattr(self, k, v)
+
+		self._cookies = cookielib.LWPCookieJar()
+		handlers = [
+				urllib2.HTTPHandler(),
+				urllib2.HTTPSHandler(),
+				urllib2.HTTPCookieProcessor(self._cookies)
+				]
+
+		try:
+			handlers += self.additional_handlers
+		except AttributeError:
+			pass
+
+		self._opener = urllib2.build_opener(*handlers)
+		self._opener.addheaders = [('X-Requested-With', 'XMLHttpRequest'),('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest')]
+
+
+
+	@property
+	def authenticated(self):
+		for c in self._cookies:
+			if c.name=='sessionid':
+				return True
+		return False
+
+
+	def _open(self, request):
+		return self._opener.open(request)
+	def open(self, request):
+		if not self.authenticated:
+			self.login()
+		return self._open(request)
+
+class OpenLavaWebUPConnection(OpenLavaWebConnection):
+	def login(self):
+		data={
+				'username':self.username,
+				'password':self.password,
+				}
+		data=json.dumps(data)
+		url=self.url + "/accounts/ajax_login"
+		req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+		f=self._open(req)
+		f = urllib2.urlopen(req)
+		data= json.loads(f.read())
+		f.close()
+		if not self.authenticated:
+			raise AuthenticationError(data['description'])
+
+class ClusterError(Exception):
+	pass
+class NoSuchObjectError(ClusterError):
+	pass
+class OpenLavaObject(object):
+	def __init__(self, connection, url=None):
+		object.__init__(self)
+		self._connection=connection
+		if url:
+			self.url=self._connection.url + url
+			req = urllib2.Request(self.url,None, {'Content-Type': 'application/json'})
+			try:
+				data=self._connection.open(req).read()
+				data=json.loads(data)
+				if data['type']!="Exception":
+					for k,v in data.items():
+						setattr(self,k,v)
+				else:
+					raise ClusterError(data['message'])
+			except urllib2.HTTPError as e:
+				if e.code==404:
+					raise NoSuchObjectError
+				else:
+					raise
+
+class Host(OpenLavaObject):
+	def __init__(self, connection, host_name):
+		url="/hosts/%s" % host_name
+		OpenLavaObject.__init__(self, connection, url)
+
+	def close(self):
+		url=self.url+"/close"
+		req = urllib2.Request(url,None, {'Content-Type': 'application/json'})
+		try:
+			data=self._connection.open(req).read()
+			data=json.loads(data)
+			if data['type']=="Exception":
+					raise ClusterError(data['message'])
+			if data['status']=="OK":
+				return True
+			raise ValueError("data did not contain ok status")
+		except urllib2.HTTPError as e:
+			if e.code==404:
+				raise NoSuchObjectError
+			else:
+				raise
+
+
+	def open(self):
+		pass
+
+
+
+
+def run_hclose(args):
+	connection=OpenLavaWebUPConnection(url=args.url, username=args.username, password=args.password)
+	try:
+		h=Host(connection, args.object)
+		h.close()
+		print "Closed host: %s" % h.name
+	except ClusterError as e:
+		print >> sys.stderr, e.message
+		sys.exit(1)
+
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("url", help="URL of server")
+parser.add_argument("username", help="Username to use when connectionenticating")
+parser.add_argument("password", help="Password to use when connectionenticating")
+subparsers = parser.add_subparsers(help='sub-command help')
+hclose =subparsers.add_parser('hclose', help='hclose help')
+hclose.add_argument("object", type=str, help="object")
+
+hclose.set_defaults(func=run_hclose)
+
+args = parser.parse_args()
+args.func(args)
+
+
+
+
+
