@@ -209,7 +209,22 @@ class Cluster(ClusterBase):
 		if cluster_info==None:
 			raise OpenLavaError(lslib.ls_sysmsg())
 		return [Resource(r) for r in cluster_info.resTable]
-			
+
+	@property
+	def admins(self):
+		"""
+		Gets the cluster administrators.  Cluster administrators can perform any action on the scheduling system.  This does not imply they are actual superusers on the physical systems.
+		:returns: Array of usernames
+		:rtype: array
+		:raise: OpenLavaError on failure
+		"""
+		cluster_info=lslib.ls_clusterinfo(clusterList=[lslib.ls_getclustername()], listsize=1)
+		if cluster_info==None:
+			raise OpenLavaError(lslib.ls_sysmsg())
+		cluster_info=cluster_info[0]
+		if cluster_info.clusterName != lslib.ls_getclustername():
+			raise OpenLavaError("Cluster returned didnt match cluster name")
+		return cluster_info.admins
 
 	def users(self):
 		return User.get_user_list()
@@ -940,7 +955,7 @@ class Job(JobBase):
 		
 	@property
 	def admins(self):
-		return [self.user_name]
+		return [self.user_name] + Cluster().admins + self.queue().admins
 	
 	@property
 	def begin_time(self):
@@ -1341,7 +1356,7 @@ class Host(HostBase):
 		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name )
 		
 	def admins(self):
-		return ['irvined']
+		return Cluster().admins
 	
 	def is_busy(self):
 		for s in self.statuses:
@@ -1903,7 +1918,7 @@ class Queue:
 		self.pre_execution_command=queue.preCmd.lstrip()
 		self.post_execution_command=queue.postCmd.lstrip()
 		self.pre_post_user_name=queue.prepostUsername.lstrip()
-		self.admins=queue.admins.split() + ['irvined']
+		self.admins=queue.admins.split()+Cluster().admins
 		self.migration_threshold=queue.mig
 		self.migration_threshold_timedelta=datetime.timedelta(minutes=queue.mig)
 		self.scheduling_delay=queue.schedDelay

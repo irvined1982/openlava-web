@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Openlava Web documentation build configuration file, created by
-# sphinx-quickstart on Fri Jan 24 18:36:08 2014.
+# Openlava Web Interface documentation build configuration file, created by
+# sphinx-quickstart on Wed Feb  5 15:40:43 2014.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Openlava Web'
+project = u'Openlava Web Interface'
 copyright = u'2014, David Irvine'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +164,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'OpenlavaWebdoc'
+htmlhelp_basename = 'OpenlavaWebInterfacedoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -183,7 +183,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'OpenlavaWeb.tex', u'Openlava Web Documentation',
+  ('index', 'OpenlavaWebInterface.tex', u'Openlava Web Interface Documentation',
    u'David Irvine', 'manual'),
 ]
 
@@ -213,7 +213,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'openlavaweb', u'Openlava Web Documentation',
+    ('index', 'openlavawebinterface', u'Openlava Web Interface Documentation',
      [u'David Irvine'], 1)
 ]
 
@@ -227,8 +227,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'OpenlavaWeb', u'Openlava Web Documentation',
-   u'David Irvine', 'OpenlavaWeb', 'One line description of project.',
+  ('index', 'OpenlavaWebInterface', u'Openlava Web Interface Documentation',
+   u'David Irvine', 'OpenlavaWebInterface', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -245,7 +245,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Openlava Web'
+epub_title = u'Openlava Web Interface'
 epub_author = u'David Irvine'
 epub_publisher = u'David Irvine'
 epub_copyright = u'2014, David Irvine'

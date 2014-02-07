@@ -56,9 +56,19 @@ class ClusterBase:
 	def resources(self, resource_name=None, host_name=None, user_name=None):
 		raise NotImplementedError
 
+	@property
+	def admins(self):
+		'''Get a list of cluster administators.  The usernames listed are superusers on the scheduling system and can perform any action to jobs, queues, nodes etc.
+		:return: List of user names that are super users on the cluster
+		:rtype: array
+		'''
+		raise NotImplementedError
+
+
 	def json_attributes(self):
 		return [
 			'cluster_type',
+			'admins',
 			'name',
 			'master',
 			'hosts',
@@ -71,6 +81,7 @@ class JobBase:
 	def json_attributes(self):
 		return [
 			'cluster_type',
+			'admins',
 			'job_id',
 			'array_index',
 			'begin_time',
@@ -122,6 +133,10 @@ class JobBase:
 		return self._array_index
 	
 	@property
+	def admins(self):
+		raise NotImplementedError
+
+	@property
 	def begin_time_datetime_local(self):
 		'''Datetime object for begin time deadline'''
 		return datetime.datetime.fromtimestamp(self.begin_time)
@@ -163,6 +178,11 @@ class JobBase:
 
 
 	## The following must be implemented by each class
+	@property 
+	def admins(self):
+		'''Users who can manage this job'''
+		raise NotImplementedError
+
 	@property
 	def begin_time(self):
 		'''Job will not start before this time'''
