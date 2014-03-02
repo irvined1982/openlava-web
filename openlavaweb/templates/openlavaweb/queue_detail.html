@@ -314,6 +314,7 @@
 	<dt>Priority</dt><dd>{{ queue.priority }}</dd>
 	<dt>Queue Administrators</dt><dd>{% for ad in queue.admins %}{{ ad }}{% if not forloop.last %}<br />{% endif %} {% empty %}No Admins Defined{% endfor %}</dd>
 	<dt>Status</dt><dd id="statusList">{% for stat in queue.statuses %}{{ stat.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
+	<dt>Admins</dt><dd>{% for admin in queue.admins %}{{ admin }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
 	{% if queue.cluster_type == "openlava" %}
 		<dt>Accept Interval</dt><dd>{{ queue.accept_interval_timedelta }}</dd>
 		<dt>Checkpoint Data Directory</dt><dd>{{ queue.checkpoint_data_directory|default:"None configured" }}</dd>

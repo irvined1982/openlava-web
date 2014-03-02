@@ -341,6 +341,7 @@
 	<dt>Execution Hosts</dt><dd id="executionHosts">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }}</a> {% empty %}Not executing{% endfor %}</dd>
 	<dt>Job Name</dt><dd>{{ job.name }}</dd>
 	<dt>Job Priority</dt><dd id="priority">{{ job.priority }}</dd>
+	<dt>Job Admins</dt><dd>{% for admin in job.admins %}{{ admin }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
 	<dt>Submission Time</dt><dd>{{ job.submit_time_datetime_local }}</dd>
 	<dt>Reservation Time</dt><dd id="reservationTime">{% if job.reservation_time > 0 %}{{ job.reservation_time_datetime_local }}{% else %}Not Specified{% endif %}</dd>
 	<dt>Start Time</dt><dd id="startTime">{% if job.start_time > 0 %}{{ job.start_time_datetime_local}}{% else %}Not yet started{% endif %}</dd>

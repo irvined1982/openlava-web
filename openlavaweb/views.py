@@ -232,7 +232,7 @@ def execute_queue_activate(request, queue, queue_name):
 def host_view(request,host_name):
 	try:
 		host=Host(host_name)
-	except ValueError:
+	except NoSuchHostError:
 		raise Http404 ("Host not found")
 
 	if request.is_ajax() or request.GET.get("json",None):
@@ -673,8 +673,15 @@ def job_view(request,job_id, array_index=0):
 	
 
 
-def job_list(request, job_id=0, queue_name="", host_name="", user_name="all"):
-	job_list=Job.get_job_list()
+def job_list(request, job_id=0):
+	user_name=request.GET.get('user_name', 'all')
+	queue_name=request.GET.get('queue_name',"")
+	host_name=request.GET.get('host_name', "")
+	job_state=request.GET.get('job_state','ACT')
+	job_name=request.GET.get('job_name',"")
+
+
+	job_list=Job.get_job_list(user_name=user_name, queue_name=queue_name, host_name=host_name, job_state=job_state, job_name=job_name)
 	
 	if request.is_ajax() or request.GET.get("json",None):
 		return HttpResponse(json.dumps(job_list, sort_keys=True, indent=3, cls=ClusterEncoder),content_type='application/json')

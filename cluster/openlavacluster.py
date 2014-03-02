@@ -800,10 +800,25 @@ class Job(JobBase):
 		return attribs
 	
 	@classmethod
-	def get_job_list(cls, job_id=0, array_index=0, queue_name="", host_name="", user_name="all"):
+	def get_job_list(cls, job_id=0, array_index=0, queue_name="", host_name="", user_name="all", job_state="ACT", job_name=""):
 		initialize()
+		if job_state == 'ACT':
+			job_state = lsblib.CUR_JOB
+		elif job_state == "ALL":
+			job_state = lsblib.ALL_JOB
+		elif job_state == "EXIT":
+			job_state = lsblib.DONE_JOB
+		elif job_state == "PEND":
+			job_state = lsblib.PEND_JOB
+		elif job_state == "RUN":
+			job_state = lsblib.RUN_JOB
+		elif job_state == "SUSP":
+			job_state = lsblib.SUSP_JOB
+		else:
+			job_state = lsblib.ALL_JOB
+
 		real_job_id=lsblib.create_job_id(job_id=0, array_index=array_index)
-		num_jobs=lsblib.lsb_openjobinfo(job_id=real_job_id, user=user_name, queue=queue_name, host=host_name)
+		num_jobs=lsblib.lsb_openjobinfo(job_id=real_job_id, user=user_name, queue=queue_name, host=host_name, job_name=job_name, options=job_state)
 		jl= [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
 		lsblib.lsb_closejobinfo()
 		return jl
@@ -820,7 +835,7 @@ class Job(JobBase):
 			self._job_id=job_id
 			self._array_index=array_index
 			full_job_id=lsblib.create_job_id(job_id, array_index)
-			num_jobs=lsblib.lsb_openjobinfo(job_id=full_job_id)
+			num_jobs=lsblib.lsb_openjobinfo(job_id=full_job_id, options=lsblib.ALL_JOB)
 			lsblib.lsb_closejobinfo()
 			if num_jobs != 1:
 				errno=lsblib.get_lsberrno()
@@ -955,7 +970,7 @@ class Job(JobBase):
 		
 	@property
 	def admins(self):
-		return [self.user_name] + Cluster().admins + self.queue().admins
+		return [self.user_name] + self.queue().admins
 	
 	@property
 	def begin_time(self):
@@ -1394,6 +1409,8 @@ class Host(HostBase):
 			'num_system_suspended_jobs',
 			'num_system_suspended_slots',
 			'has_kernel_checkpoint_copy',	
+			'max_slots_per_user',
+			'run_windows',
 		])
 		return attribs
 	
@@ -1428,6 +1445,7 @@ class Host(HostBase):
 		self._max_tmp = host.maxTmp
 		self._num_disks=host.nDisks
 		self._is_server=host.isServer
+		self._run_windows=host.windows
 		resource_names=host.resources
 		self._resources=[]
 		c=Cluster()
@@ -1459,6 +1477,7 @@ class Host(HostBase):
 		self._num_suspended_jobs=0
 		self._num_user_suspended_jobs=0
 		self._num_system_suspended_jobs=0
+		self._max_slots_per_user=host.userJobLimit
 		
 		if (host.attr & lsblib.H_ATTR_CHKPNTABLE) != 0:
 			self._has_checkpoint_support=True
@@ -1585,6 +1604,12 @@ class Host(HostBase):
 		return self._num_suspended_jobs
 
 	@property
+	def run_windows(self):
+		'''Run Windows'''
+		self._update_lsb_hostinfo()
+		return self._run_windows
+
+	@property
 	def statuses(self):
 		'''Array of statuses that apply to the host'''
 		self._update_lsb_hostinfo()
@@ -1651,6 +1676,13 @@ class Host(HostBase):
 		self._update_lsb_hostinfo()
 		return self._has_kernel_checkpoint_support
 
+	@property
+	def max_slots_per_user(self):
+		'''Returns the maximum slots that a user can occupy on the host'''
+		self._update_lsb_hostinfo()
+		return self._max_slots_per_user
+
+
 
 
 	def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
@@ -1672,6 +1704,7 @@ class Host(HostBase):
 
 		indexes={
 			'names':["15s Load","1m Load","15m Load","Avg CPU Utilization","Paging Rate (Pages/Sec)","Disk IO Rate (MB/Sec)","Num Users","Idle Time","Tmp Space (MB)","Free Swap (MB)","Free Memory (MB)"],
+			'short_names':['r15s','r1m','r15m','ut','pg','io','ls','it','tmp','swp','mem'],
 			'values':[]
 		}
 		
@@ -1869,7 +1902,9 @@ class Queue:
 		self._allowed_users=queue.userList
 		self._allowed_hosts=queue.hostList
 		self.max_jobs_per_user=queue.userJobLimit
+		self.max_slots_per_user=queue.userJobLimit
 		self.max_jobs_per_processor=queue.procJobLimit
+		self.max_slots_per_processor=queue.procJobLimit
 		self.run_windows=queue.windows
 		names=["CPU Time","File Size","Data Segment Size","Stack Size","Core Size","RSS Size","Num Files","Max Open Files","Swap Limit","Run Limit","Process Limit"]
 		units=[ None,"KB","KB","KB","KB","KB",None,None,"KB",None,None]
@@ -1929,6 +1964,7 @@ class Queue:
 		self.max_slots_per_job=queue.procLimit
 		self.requeue_exit_values=queue.requeueEValues.split()
 		self.max_jobs_per_host=queue.hostJobLimit
+		self.max_slots_per_host=queue.hostJobLimit
 		self.resource_requirements=queue.resReq.lstrip()
 		self.slot_hold_time=queue.slotHoldTime
 		self.slot_hold_time_timedelta=datetime.timedelta(seconds=queue.slotHoldTime)
@@ -1998,7 +2034,9 @@ class Queue:
 			'allowed_users',
 			'allowed_hosts',
 			'max_jobs_per_user',
+			'max_slots_per_user',
 			'max_jobs_per_processor',
+			'max_slots_per_processor',
 			'run_windows',
 			'runtime_limits',
 			'host_specification',
@@ -2030,6 +2068,7 @@ class Queue:
 			'max_slots_per_job',
 			'requeue_exit_values',
 			'max_jobs_per_host',
+			'max_slots_per_host',
 			'resource_requirements',
 			'slot_hold_time',
 			'stop_condition',

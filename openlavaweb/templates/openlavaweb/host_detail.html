@@ -251,6 +251,7 @@
 	<dt>Checkpoint Support</dt><dd>{% if host.has_checkpoint_support %}Yes{% else %}No{% endif %}</dd>
 	<dt>Kernel Checkpoint Copy Support</dt><dd>{% if host.has_kernel_checkpoint_support %}Yes{% else %}No{% endif %}</dd>
 	{% endif %}
+	<dt>Admins</dt><dd>{% for admin in host.admins %}{{ admin }}{% if not forloop.last %}<br />{% endif %}{% endfor%}</dd>
 	<dt>Max Processors</dt><dd>{{ host.max_processors }} Processors</dd>
 	<dt>Max Ram</dt><dd>{{ host.max_ram }}MB</dd>
 	<dt>Max Swap</dt><dd>{{ host.max_swap }}MB</dd>
