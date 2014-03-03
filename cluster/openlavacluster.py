@@ -1359,14 +1359,12 @@ class Job(JobBase):
 class Host(HostBase):
 	cluster_type="openlava"
 	def open(self):
-        """Opens the host"""
 		rc=lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
 		if rc == 0:
 			return rc
 		raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name )
 		
 	def close(self):
-        """Closes the host"""
 		rc=lsblib.lsb_hostcontrol(self.name, lsblib.HOST_CLOSE)
 		if rc == 0:
 			return rc
@@ -1996,7 +1994,6 @@ class Queue:
 		return False
 	
 	def close(self):
-        """Closes the queue"""
 		rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_CLOSED)
 		if rc == 0:
 			return rc

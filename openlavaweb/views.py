@@ -733,30 +733,36 @@ def ajax_login(request):
 	return HttpResponse(json.dumps(res), content_type="application/json")
 
 @login_required
+@csrf_exempt
 def job_submit(request):
-	if request.method == 'POST':
-		form = JobSubmitForm(request.POST)
-		if form.is_valid():
-			# submit the job
-			kwargs=form._get_args()
-			q = MPQueue()
-			p = MPProcess(target=execute_job_submit, kwargs={'queue':q,'request':request, 'args':kwargs})
-			p.start()
-			p.join()
-			rc=q.get(False)
-			try:
-				if isinstance(rc,Exception):
-					raise rc
-				else:		
-					return rc
-			except ClusterException as e:
-				if request.is_ajax() or request.GET.get("json",None):
-					return HttpResponse(e.to_json(), content_type='application/json')
-				else:
-					return render(request, 'openlavaweb/exception.html',{'exception':e})
+	kwargs=None
+	if request.is_ajax() or request.GET.get("json",None):
+		kwargs=json.loads(request.body)
 	else:
-		form = JobSubmitForm()
-	return render( request, 'openlavaweb/job_submit.html', {'form':form})
+		if request.method == 'POST':
+			form = JobSubmitForm(request.POST)
+			if form.is_valid():
+				# submit the job
+				kwargs=form._get_args()
+		else:
+			form = JobSubmitForm()
+		return render( request, 'openlavaweb/job_submit.html', {'form':form})
+
+	q = MPQueue()
+	p = MPProcess(target=execute_job_submit, kwargs={'queue':q,'request':request, 'args':kwargs})
+	p.start()
+	p.join()
+	rc=q.get(False)
+	try:
+		if isinstance(rc,Exception):
+			raise rc
+		else:
+			return rc
+	except ClusterException as e:
+		if request.is_ajax() or request.GET.get("json",None):
+			return HttpResponse(e.to_json(), content_type='application/json')
+		else:
+			return render(request, 'openlavaweb/exception.html',{'exception':e})
 
 def execute_job_submit(request, queue, args):
 	try:
