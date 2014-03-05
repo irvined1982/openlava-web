@@ -12,21 +12,21 @@ Openlava Web is written in Python and uses Django as the web framework and is li
 
 Users can perform actions such as killing, suspending and submitting new jobs to the cluster. Administrators can perform administrative tasks such as closing and opening hosts or queues. All actions can be done both via the web interface or programatically.
 
+There is a python library (olwclient) that can interact with the remote server and some example command line tools that demonstrate the remote job management capabilities.
+
 Demo
 ====
 
 You can view the online demo `here <https://openlava.ay60dxg.com/>`_.  Please note, you will need to accept the self-signed certificate.
 
-Contents:
----------
+Contents
+========
 
 .. toctree::
    :maxdepth: 4
    
    about
    installation
-   openlavaweb
-   cluster
    olwclient
    commands
 

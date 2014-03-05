@@ -398,5 +398,5 @@
 <h1>Jobs</h1>
 {% include "openlavaweb/widgets/job_list.html" with job_list=queue.jobs job_limit=20 %}
 
-<a href="{% url "olw_job_view_by_queue" queue_name=queue.name %}">View All Jobs</a>
+<a href="{% url "olw_job_list" %}?queue_name={{ queue.name }}">View All Jobs</a>
 {% endblock %}
