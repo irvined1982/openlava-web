@@ -15,7 +15,7 @@ Users can perform actions such as killing, suspending and submitting new jobs to
 There is a python library (olwclient) that can interact with the remote server and some example command line tools that demonstrate the remote job management capabilities.
 
 .. image:: stack.png
-    width 400
+    :width: 500px
 
 Demo
 ====

@@ -15,6 +15,7 @@ Navigate through lists of queues to see an overview of host utilization. Select 
 
 .. image:: images/HostList.png
 
+
 See detailed information about a queue, including its configuration and utilization.
 
 .. image:: images/ResumeJob.png
