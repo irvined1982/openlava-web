@@ -29,6 +29,7 @@ Contents
    :maxdepth: 4
    
    about
+   screenshots
    installation
    olwclient
    commands
