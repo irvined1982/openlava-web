@@ -27,7 +27,8 @@ Contents:
    installation
    openlavaweb
    cluster
-
+   olwclient
+   commands
 
 
 Indices and tables
