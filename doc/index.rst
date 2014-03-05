@@ -3,6 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
+Contents
+========
+
+.. toctree::
+   :maxdepth: 4
+   
+   about
+   screenshots
+   installation
+   olwclient
+   commands
+
 Openlava Web documentation
 ==========================
 
@@ -22,18 +35,6 @@ Demo
 ====
 
 You can view the online demo `here <https://openlava.ay60dxg.com/>`_.  Please note, you will need to accept the self-signed certificate.
-
-Contents
-========
-
-.. toctree::
-   :maxdepth: 4
-   
-   about
-   screenshots
-   installation
-   olwclient
-   commands
 
 
 Indices and tables
