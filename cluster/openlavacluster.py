@@ -1994,6 +1994,7 @@ class Queue:
 		return False
 	
 	def close(self):
+        """Closes the queue"""
 		rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_CLOSED)
 		if rc == 0:
 			return rc
