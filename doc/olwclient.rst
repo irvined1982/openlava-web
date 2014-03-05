@@ -1,4 +1,4 @@
-olwclient Package
+Client Packages
 =================
 
 :mod:`olwclient` Package

@@ -1,5 +1,5 @@
-Installation
-============
+Web Server Installation
+=======================
 
 Openlava-Web is a django application. It is installed and configured just like any other Django application would be. The following steps are required to install Openlava-Web.
 
@@ -52,12 +52,20 @@ Install the Openlava python bindings.::
     $ cd openlava-python/openlava/
     $ python setup.py install
 
-Install Openlava-Web
+Download Openlava-Web
 --------------------
 
 Use git to checkout `Openlava-Web <https://github.com/irvined1982/openlava-web>`_.::
 
     $ git clone https://github.com/irvined1982/openlava-web.git
+    $ git submodule update --init --recursive
+
+Install Openlava-Web
+--------------------
+
+Use setuptools to install the module.::
+
+    $ sudo python setup.py install
 
 Activate Openlava-Web
 ---------------------
@@ -77,5 +85,21 @@ Configure the URLs for Openlava-Web. Open urls.py in your django project, and in
 
 You can now view open lava web by visiting your web server.
 
+Client Tools Installation
+=========================
 
-::
+Download Openlava-Web
+--------------------
+
+Use git to checkout `Openlava-Web <https://github.com/irvined1982/openlava-web>`_.::
+
+    $ git clone https://github.com/irvined1982/openlava-web.git
+    $ git submodule update --init --recursive
+
+Install Openlava-Web
+--------------------
+
+Enter the client-tools directory and use setuptools to install the module.::
+
+    $ cd client-tools
+    $ sudo python setup.py install
