@@ -32,6 +32,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from cluster import ClusterException
 from cluster.openlavacluster import Cluster, Host, Job, Queue, User
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 
 
@@ -696,6 +697,10 @@ def job_list(request, job_id=0):
     return render(request, 'openlavaweb/job_list.html', {"job_list": job_list, })
 
 
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return HttpResponse(json.dumps({'cookie': get_token(request)}), content_type="application/json")
+
 def system_view(request):
     cluster = Cluster()
     if request.is_ajax() or request.GET.get("json", None):
@@ -704,8 +709,7 @@ def system_view(request):
 
     return render(request, 'openlavaweb/system_view.html', {'cluster': cluster})
 
-from django.views.decorators.csrf import ensure_csrf_cookie
-@ensure_csrf_cookie
+
 @csrf_exempt
 def ajax_login(request):
     try:
@@ -734,9 +738,7 @@ def ajax_login(request):
         }
     return HttpResponse(json.dumps(res), content_type="application/json")
 
-
 @login_required
-@csrf_exempt
 def job_submit(request):
     kwargs = None
     if request.is_ajax() or request.GET.get("json", None):
