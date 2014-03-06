@@ -9,17 +9,16 @@ Contents
 
 .. toctree::
    :maxdepth: 4
-   
-   about
+
    screenshots
    installation
    olwclient
    commands
 
-Openlava Web documentation
-==========================
+About
+=====
 
-Openlava Web is a REST based web interface to the `Openlava scheduling system <http://www.openlava.org>`_. Openlava Web provides both HTML and JSON interfaces allowing users to view information on jobs, queues, hosts, and other components of the scheduling environment.
+Openlava Web is a web interface to the `Openlava scheduling system <http://www.openlava.org>`_. Openlava Web provides both HTML and a RESTful API allowing users to view information on jobs, queues, hosts, and other components of the scheduling environment.
 
 Openlava Web is written in Python and uses Django as the web framework and is licensed under the GNU Public License.
 
