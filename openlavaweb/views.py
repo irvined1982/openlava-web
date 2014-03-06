@@ -704,7 +704,8 @@ def system_view(request):
 
     return render(request, 'openlavaweb/system_view.html', {'cluster': cluster})
 
-
+from django.views.decorators.csrf import ensure_csrf_cookie
+@ensure_csrf_cookie
 @csrf_exempt
 def ajax_login(request):
     try:
@@ -721,7 +722,6 @@ def ajax_login(request):
                 'status': "OK",
                 'description': "Success"
             }
-            get_token(request)
         else:
             res = {
                 'status': 'Fail',
