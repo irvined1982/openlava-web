@@ -8,5 +8,5 @@ In addition to the web interface, there is a python library (olwclient) that can
 
 You can view the online demo `here <https://openlava.ay60dxg.com/>`_.  Please note, you will need to accept the self-signed certificate.
 
-You can view the documentation `here <http://ay60dxg.com/openlava-web`_.
+You can view the documentation `here <http://ay60dxg.com/openlava-web>`_.
 
