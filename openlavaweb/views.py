@@ -639,11 +639,12 @@ def job_error(request, job_id, array_index=0):
         if isinstance(path, Exception):
             raise path
 
-        if path:
+        if path and os.path.exists(path):
             f=open(path,'r')
             return HttpResponse(f, mimetype="text/plain")
         else:
             return HttpResponse("Not Available", mimetype=="text/plain")
+
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
             return HttpResponse(e.to_json(), content_type='application/json')
@@ -672,7 +673,7 @@ def job_output(request, job_id, array_index=0):
 
         if isinstance(path, Exception):
             raise path
-        if path:
+        if path and os.path.exists(path):
             f=open(path,'r')
             return HttpResponse(f, mimetype="text/plain")
         else:
