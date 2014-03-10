@@ -22,6 +22,7 @@ import sys
 import datetime
 from multiprocessing import Process as MPProcess
 from multiprocessing import Queue as MPQueue
+
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
@@ -610,7 +611,9 @@ def execute_get_output_path(queue, job_id, array_index):
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
         job = Job(job_id=job_id, array_index=array_index)
-        queue.put(job.get_output_path())
+        path=job.get_output_path()
+        if path:
+            queue.put(path)
     except Exception as e:
         queue.put(e)
 
@@ -628,7 +631,11 @@ def job_output(request, job_id, array_index=0):
         p = MPProcess(target=execute_get_output_path, kwargs=kwargs)
         p.start()
         p.join()
-        path = q.get(False)
+        try:
+            path = q.get(False)
+        except MPQueue.Empty:
+            path=None
+            
         if isinstance(path, Exception):
             raise path
         if path:
