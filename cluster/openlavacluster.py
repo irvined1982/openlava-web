@@ -1265,7 +1265,7 @@ class Job(JobBase):
 
     def get_output_buffer(self):
         full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        path = lsblib.lsb_peek(full_job_id)
+        path = lsblib.lsb_peekjob(full_job_id)
         if path:
             return open(path, mode='r')
         else:
