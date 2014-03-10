@@ -375,6 +375,7 @@ def user_view(request, user_name):
     return render(request, 'openlavaweb/user_detail.html', {"oluser": user, 'job_list': job_list}, )
 
 
+
 @login_required
 def job_kill(request, job_id, array_index=0):
     job_id = int(job_id)
@@ -653,6 +654,22 @@ class ClusterEncoder(json.JSONEncoder):
             d[name] = value
         return d
 
+
+def job_output(request, job_id, array_index=0):
+    job_id=int(job_id)
+    array_index=int(array_index)
+    try:
+        job=Job(job_id=job_id, array_index=array_index)
+        f=job.get_output_buffer()
+        if f:
+            return HttpResponse(f, mimetype="text/plain")
+        else:
+            return HttpResponse("Not available", mimetype="text/plain")
+    except ClusterException as e:
+        if request.is_ajax() or request.GET.get("json", None):
+            return HttpResponse(e.to_json(), content_type='application/json')
+        else:
+            return render(request, 'openlavaweb/exception.html', {'exception': e})
 
 def job_view(request, job_id, array_index=0):
     job_id = int(job_id)
