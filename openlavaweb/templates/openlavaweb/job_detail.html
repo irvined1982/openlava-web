@@ -333,6 +333,10 @@
 	<dt>Job ID</dt><dd>{{ job.job_id }}</dd>
 	<dt>Array Index ID</dt><dd>{{ job.array_index }}</dd>
 	<dt>Status</dt>	<dd id="status">{{ job.status.friendly }}: {{ job.status.description }}</dd>
+    {% if job.status.friendly == "JOB_STAT_RUN" %}
+    <dt>Standard Output</dt><dd id="output"><a href='{% url "olw_job_output" job.job_id job.array_index %}'>View Standard Output</a></dd>
+    <dt>Standard Error</dt><dd id="error"><a href='{% url "olw_job_error" job.job_id job.array_index %}'>View Standard Error</a></dd>
+    {% endif %}
 	<dt>Username</dt><dd><a href='{% url "olw_user_view" job.user_name %}'>{{ job.user_name }}</a></dd>
 	<dt>Process ID</dt><dd id="pid">{% if job.process_id > 0 %}{{ job.process_id }}{% else %}Not Available{% endif %}</dd>
 	<dt>CPU Time Consumed</dt><dd id="cpuTimeConsumed">{{ job.cpu_time_timedelta }}</dd>

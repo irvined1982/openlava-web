@@ -617,6 +617,34 @@ def execute_get_output_path(queue, job_id, array_index):
     except Exception as e:
         queue.put(e)
 
+def job_error(request, job_id, array_index=0):
+    job_id = int(job_id)
+    array_index = int(array_index)
+    try:
+        q = MPQueue()
+        kwargs = {
+            'job_id': job_id,
+            'array_index': array_index,
+            'request': request,
+            'queue': q,
+        }
+        p = MPProcess(target=execute_get_output_path, kwargs=kwargs)
+        p.start()
+        p.join()
+        try:
+            path = q.get(False) + ".err"
+        except MPQueue.Empty:
+            path=None
+
+        if isinstance(path, Exception):
+            raise path
+        if path:
+            f=open(path,'r')
+            return HttpResponse(f, mimetype="text/plain")
+        else:
+            return HttpResponse("Not Available", mimetype=="text/plain")
+
+
 def job_output(request, job_id, array_index=0):
     job_id = int(job_id)
     array_index = int(array_index)
@@ -632,10 +660,10 @@ def job_output(request, job_id, array_index=0):
         p.start()
         p.join()
         try:
-            path = q.get(False)
+            path = q.get(False) + ".out"
         except MPQueue.Empty:
             path=None
-            
+
         if isinstance(path, Exception):
             raise path
         if path:
