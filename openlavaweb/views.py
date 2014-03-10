@@ -606,7 +606,7 @@ def execute_job_requeue(request, queue, job_id, array_index, hold):
     except Exception as e:
         queue.put(e)
 
-def execute_get_output_path(queue, job_id, array_index):
+def execute_get_output_path(request, queue, job_id, array_index):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
@@ -661,7 +661,7 @@ def job_output(request, job_id, array_index=0):
         p.join()
         try:
             path = q.get(False) + ".out"
-        except MPQueue.Empty:
+        except:
             path=None
 
         if isinstance(path, Exception):
@@ -670,7 +670,7 @@ def job_output(request, job_id, array_index=0):
             f=open(path,'r')
             return HttpResponse(f, mimetype="text/plain")
         else:
-            return HttpResponse("Not Available", mimetype=="text/plain")
+            return HttpResponse("Not Available", mimetype="text/plain")
 
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
