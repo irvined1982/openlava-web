@@ -1263,13 +1263,10 @@ class Job(JobBase):
         raise_cluster_exception(lsblib.get_lsberrno(),
                                 "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
 
-    def get_output_buffer(self):
+    def get_output_path(self):
         full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        path = lsblib.lsb_peekjob(full_job_id)
-        if path:
-            return open(path, mode='r')
-        else:
-            return None
+        return lsblib.lsb_peekjob(full_job_id)
+
 
     ## Openlava Only
     @property

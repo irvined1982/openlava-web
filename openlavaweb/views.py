@@ -605,6 +605,44 @@ def execute_job_requeue(request, queue, job_id, array_index, hold):
     except Exception as e:
         queue.put(e)
 
+def execute_get_output_path(queue, job_id, array_index):
+    try:
+        user_id = pwd.getpwnam(request.user.username).pw_uid
+        os.setuid(user_id)
+        job = Job(job_id=job_id, array_index=array_index)
+        queue.put(job.get_output_path())
+    except Exception as e:
+        queue.put(e)
+
+def job_output(request, job_id, array_index=0):
+    job_id = int(job_id)
+    array_index = int(array_index)
+    try:
+        q = MPQueue()
+        kwargs = {
+            'job_id': job_id,
+            'array_index': array_index,
+            'request': request,
+            'queue': q,
+        }
+        p = MPProcess(target=execute_get_output_path, kwargs=kwargs)
+        p.start()
+        p.join()
+        path = q.get(False)
+        if isinstance(path, Exception):
+            raise path
+        if path:
+            f=open(path,'r')
+            return HttpResponse(f, mimetype="text/plain")
+        else:
+            return HttpResponse("Not Available", mimetype=="text/plain")
+
+    except ClusterException as e:
+        if request.is_ajax() or request.GET.get("json", None):
+            return HttpResponse(e.to_json(), content_type='application/json')
+        else:
+            return render(request, 'openlavaweb/exception.html', {'exception': e})
+
 
 class ClusterEncoder(json.JSONEncoder):
     def check(self, obj):
@@ -655,21 +693,6 @@ class ClusterEncoder(json.JSONEncoder):
         return d
 
 
-def job_output(request, job_id, array_index=0):
-    job_id=int(job_id)
-    array_index=int(array_index)
-    try:
-        job=Job(job_id=job_id, array_index=array_index)
-        f=job.get_output_buffer()
-        if f:
-            return HttpResponse(f, mimetype="text/plain")
-        else:
-            return HttpResponse("Not available", mimetype="text/plain")
-    except ClusterException as e:
-        if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
-        else:
-            return render(request, 'openlavaweb/exception.html', {'exception': e})
 
 def job_view(request, job_id, array_index=0):
     job_id = int(job_id)
