@@ -849,9 +849,9 @@ def system_overview_slots(request):
 
     for job in cluster.jobs():
         try:
-            states[job.status.friendly] += job.num_processors
+            states[job.status.friendly] += job.requested_slots
         except KeyError:
-            states[job.status.friendly] = job.num_processors
+            states[job.status.friendly] = job.requested_slots
 
     nvstates=[]
     for k,v in states.iteritems():
