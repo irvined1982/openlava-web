@@ -4,3 +4,6 @@
 [submodule "client-tools"]
 	path = client-tools
 	url = https://github.com/irvined1982/olweb-clients
+[submodule "openlavaweb/static/openlavaweb/nvd3"]
+	path = openlavaweb/static/openlavaweb/nvd3
+	url = https://github.com/novus/nvd3.git
