@@ -7,3 +7,6 @@
 [submodule "openlavaweb/static/openlavaweb/nvd3"]
 	path = openlavaweb/static/openlavaweb/nvd3
 	url = https://github.com/novus/nvd3.git
+[submodule "openlavaweb/static/openlavaweb/d3"]
+	path = openlavaweb/static/openlavaweb/d3
+	url = https://github.com/mbostock/d3.git
