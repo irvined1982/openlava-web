@@ -746,7 +746,11 @@ def job_view(request, job_id, array_index=0):
             return HttpResponse(e.to_json(), content_type='application/json')
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
-
+    except NoSuchJobError as e:
+        if request.is_ajax() or request.GET.get("json", None):
+            return HttpResponse(e.to_json(), content_type='application/json')
+        else:
+            return render(request, 'openlavaweb/exception.html', {'exception': e})
     if request.is_ajax() or request.GET.get("json", None):
         return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
                             content_type="application/json")
