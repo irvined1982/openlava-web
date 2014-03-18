@@ -797,6 +797,70 @@ def system_view(request):
     return render(request, 'openlavaweb/system_view.html', {'cluster': cluster})
 
 
+def system_overview_hosts(request):
+    cluster=Cluster()
+    states={
+        'Down': 0,
+        'Full': 0,
+        'In Use': 0,
+        'Empty': 0,
+        'Closed': 0,
+    }
+    for host in cluster.hosts():
+        if not host.is_server:
+            continue
+        if host.is_down():
+            states['Down'] += 1
+        elif host.is_busy():
+            states['Full'] += 1
+        elif host.is_closed():
+            states['Closed'] += 1
+        elif len(host.jobs()) > 0:
+            states['In Use'] += 1
+        else:
+            states['Empty'] += 1
+
+    nvstates=[]
+    for k,v in states.iteritems():
+        nvstates.append(
+            {'label':k, 'value': v}
+        )
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+
+def system_overview_jobs(request):
+    cluster=Cluster()
+    states={}
+
+    for job in cluster.jobs():
+        try:
+            states[job.status.friendly] += 1
+        except KeyError:
+            states[job.status.friendly] = 1
+    nvstates=[]
+    for k,v in states.iteritems():
+        nvstates.append(
+            {'label':k, 'value': v}
+        )
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+
+def system_overview_slots(request):
+    cluster=Cluster()
+    states={}
+
+    for job in cluster.jobs():
+        try:
+            states[job.status.friendly] += job.num_processors
+        except KeyError:
+            states[job.status.friendly] = job.num_processors
+
+    nvstates=[]
+    for k,v in states.iteritems():
+        nvstates.append(
+            {'label':k, 'value': v}
+        )
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+
+
 @csrf_exempt
 def ajax_login(request):
     try:
