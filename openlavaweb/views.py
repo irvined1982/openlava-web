@@ -741,6 +741,12 @@ def job_view(request, job_id, array_index=0):
     array_index = int(array_index)
     try:
         job = Job(job_id=job_id, array_index=array_index)
+        if request.is_ajax() or request.GET.get("json", None):
+            return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
+                            content_type="application/json")
+        else:
+            return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
+
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
             return HttpResponse(e.to_json(), content_type='application/json')
@@ -751,11 +757,6 @@ def job_view(request, job_id, array_index=0):
             return HttpResponse(e.to_json(), content_type='application/json')
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
-    if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
-                            content_type="application/json")
-    else:
-        return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
 
 
 def job_list(request, job_id=0):
