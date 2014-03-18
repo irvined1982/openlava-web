@@ -870,7 +870,7 @@ class Job(JobBase):
 
         full_job_id = lsblib.create_job_id(self.job_id, self.array_index)
         if job == None:
-            num_jobs = lsblib.lsb_openjobinfo(job_id=full_job_id)
+            num_jobs = lsblib.lsb_openjobinfo(job_id=full_job_id, options=lsblib.ALL_JOB)
             if num_jobs == 1:
                 job = lsblib.lsb_readjobinfo()
             lsblib.lsb_closejobinfo()
