@@ -7,7 +7,14 @@
 	<dt>Master Host:</dt><dd>{{ cluster.master.name }}</dd>
 	<dt>Admins:</dt><dd>{% for admin in cluster.admins %}{{ admin }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
 </dl>
-<div id="hostChart"><svg width="300px"></svg></div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 id="hostChart"><svg width="300px"></svg></div>
+        <div class="col-md-4">.col-md-4</div>
+        <div class="col-md-4">.col-md-4</div>
+    </div>
+</div>
+
 
 <script>
 d3.json("{% url "olw_system_overview_hosts" %}",function(error,data){
