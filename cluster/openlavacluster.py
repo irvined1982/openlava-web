@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014 David Irvine
 #
-# This file is part of python-cluster
+# This file is part of openlava-web
 #
 # python-cluster is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
