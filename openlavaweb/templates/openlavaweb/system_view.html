@@ -48,7 +48,7 @@ function update_alerts(){
             $("#hostsClosedMessage").alert();
         }else{
             // Remove the label
-            $("#hostsDownMessageBody").empty();
+            $("#hostsClosedMessageBody").empty();
         }
     }).always(function(){
         setTimeout(update_alerts, 30000);
