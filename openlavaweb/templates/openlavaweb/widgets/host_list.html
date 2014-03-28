@@ -30,7 +30,7 @@
                     host.statuses.forEach( function(s){
                     stats += s.friendly;
                 });
-                $("#host_" + host.host_name + "_statuses").html("<br />".join(stats));
+                $("#host_" + host.host_name + "_statuses").html(stats.join("<br />"));
                 $("#host_" + host.host_name + "_total").text(host.total_jobs + ' (' + host.total_slots + ')' );
                 $("#host_" + host.host_name + "_running").text(host.num_running_jobs + ' (' + host.num_running_slots + ')');
                 $("#host_" + host.host_name + "_suspended").text(host.num_suspended_jobs + ' (' + host.num_suspended_slots + ')');
