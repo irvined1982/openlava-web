@@ -1,6 +1,8 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
 <div id="failMessageBody"></div>
+<div id="hostsDownMessageBody"></div>
+<div id="hostsClosedMessageBody"></div>
 
 <h1>{{ cluster.name }}</h1>
 <dl class="dl-horizontal">
@@ -18,8 +20,41 @@
 
 
 <script>
-$.getJSON("{% url "olw_system_overview_hosts" %}")
-
+function update_alerts(){
+    $.getJSON("{% url "olw_system_overview_hosts" %}", function(data){
+        var total = 0;
+        var down = 0;
+        var closed = 0;
+        var empty = 0;
+        data.forEach(function(entry){
+            if (entry.label =="Down"){
+                down += value;
+            }
+            if (entry.label == "Closed"){
+                closed += value;
+            }
+            total += value;
+        });
+        if ( down/total > 0.25 ){
+            // Show alert
+            $("#hostsDownMessageBody").html('<div id="hostsDownMessage" class="fade in alert alert-danger">Warning! A large number of hosts are unavailable</div>');
+            $("#hostsDownMessage").alert();
+        }else{
+            // Remove the label
+            $("#hostsDownMessageBody").empty();
+        }
+        if ( closed/total > 0.25 ){
+            // Show alert
+            $("#hostsClosedMessageBody").html('<div id="hostsClosedMessage" class="fade in alert alert-danger">Warning! A large number of hosts are closed</div>');
+            $("#hostsClosedMessage").alert();
+        }else{
+            // Remove the label
+            $("#hostsDownMessageBody").empty();
+        }
+    }).always(function(){
+        setTimeout(update_alerts, 30000);
+    });
+}
 
 function update_chart(chart, selector, url){
     var jqxhr = $.getJSON( url, function(data) {
@@ -62,6 +97,7 @@ function add_standard_pie(url, selector){
 add_standard_pie("{% url "olw_system_overview_slots" %}","#slotUtilChart svg");
 add_standard_pie("{% url "olw_system_overview_jobs" %}","#jobUtilChart svg");
 add_standard_pie("{% url "olw_system_overview_hosts" %}",'#hostChart svg');
+update_alerts();
 
 
 </script>
