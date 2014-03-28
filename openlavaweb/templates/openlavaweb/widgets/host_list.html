@@ -28,7 +28,7 @@
             data.forEach(function(host){
                 var stats=[];
                     host.statuses.forEach( function(s){
-                    stats += s.friendly;
+                    stats.push( s.friendly );
                 });
                 $("#host_" + host.host_name + "_statuses").html(stats.join("<br />"));
                 $("#host_" + host.host_name + "_total").text(host.total_jobs + ' (' + host.total_slots + ')' );
