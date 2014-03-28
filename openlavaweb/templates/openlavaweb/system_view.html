@@ -25,15 +25,14 @@ function update_alerts(){
         var total = 0;
         var down = 0;
         var closed = 0;
-        var empty = 0;
         data.forEach(function(entry){
             if (entry.label =="Down"){
-                down += value;
+                down += entry.value;
             }
             if (entry.label == "Closed"){
-                closed += value;
+                closed += entry.value;
             }
-            total += value;
+            total += entry.value;
         });
         if ( down/total > 0.25 ){
             // Show alert
