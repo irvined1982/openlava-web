@@ -27,7 +27,7 @@ def initialize():
     global initialized_openlava
     if initialized_openlava == False:
         if lsblib.lsb_init("Openlava Cluster Interface") != 0:
-            raise ClusterInterfaceError(lslib.ls_sysmsg)
+            raise OpenLavaError(lslib.ls_sysmsg)
         else:
             initialized_openlava = True
 
@@ -1900,14 +1900,17 @@ class Queue:
     @classmethod
     def get_queue_list(cls):
         initialize()
-        return [cls(q) for q in lsblib.lsb_queueinfo()]
+        qs = lsblib.lsb_queueinfo()
+        if qs is None:
+            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of queues")
+        return [cls(q) for q in qs]
 
     def __init__(self, queue):
         initialize()
         if isinstance(queue, str) or isinstance(queue, unicode):
             queue = lsblib.lsb_queueinfo(queues=[queue])
             if queue == None or len(queue) != 1:
-                raise ValueError("Invalid Queue Name")
+                raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get load queue: %s" % queue)
             queue = queue[0]
         if not isinstance(queue, lsblib.QueueInfoEnt):
             raise ValueError("invalid Queue, must be string or QueueInfoEnt")
@@ -2178,5 +2181,9 @@ class User(UserBase):
     @classmethod
     def get_user_list(cls):
         initialize()
-        return [cls(u) for u in lsblib.lsb_userinfo()]
+        us=lsblib.lsb_userinfo()
+        if us is None:
+            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of users")
+
+        return [cls(u) for u in us]
 	

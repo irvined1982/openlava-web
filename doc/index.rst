@@ -13,6 +13,7 @@ Contents
    screenshots
    installation
    olwclient
+   api
    commands
 
 About

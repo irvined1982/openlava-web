@@ -1,6 +1,7 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-	
+<div id="failMessageBody"></div>
+
 <h1>{{ cluster.name }}</h1>
 <dl class="dl-horizontal">
 	<dt>Cluster Name:</dt><dd>{{ cluster.name }}</dd>
@@ -17,30 +18,44 @@
 
 
 <script>
+$.getJSON("{% url "olw_system_overview_hosts" %}")
 
-function add_standard_pie(url, selector){
-	d3.json(url,function(error,data){
-		var chart;
-   		nv.addGraph(function() {
-        	chart = nv.models.pieChart()
-        	//.margin({top: 30, right: 20, bottom: 50, left: 175})
-        	.showLabels(true)     //Display pie labels
-        	.labelThreshold(.05)  //Configure the minimum slice size for labels to show up
-        	.labelType("percent") //Configure what type of data to show in the label. Can be "key", "value" or "percent"
-        	.donut(true)          //Turn on Donut mode. Makes pie chart look tasty!
-        	.donutRatio(0.35)     //Configure how big you want the donut hole size to be.
-        	.x(function(d) { return d.label })
-        	.y(function(d) { return d.value })
-        	;
-	
-	        d3.select(selector)
+
+function update_chart(chart, selector, url){
+    var jqxhr = $.getJSON( url, function(data) {
+            d3.select(selector)
 	        .datum(data)
 	        .transition().duration(500)
 	        .call(chart);
-	
-	        nv.utils.windowResize(chart.update);
-	
-	        return chart;
+	    }).fail(function(){
+            $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load cluster load information</div>');
+            $("#failMessage").alert();
+			setTimeout(function(){
+			    $("#failMessage").alert('close');
+			},15000);
+	    }).always(function() {
+	        setTimeout(function(){
+	            update_chart(chart, selector, url);
+	        }, 30000);
+	    });
+	}
+
+
+function add_standard_pie(url, selector){
+	nv.addGraph(function() {
+   	    var chart;
+       	chart = nv.models.pieChart()
+       	//.margin({top: 30, right: 20, bottom: 50, left: 175})
+       	.showLabels(true)     //Display pie labels
+       	.labelThreshold(.05)  //Configure the minimum slice size for labels to show up
+       	.labelType("percent") //Configure what type of data to show in the label. Can be "key", "value" or "percent"
+       	.donut(true)          //Turn on Donut mode. Makes pie chart look tasty!
+       	.donutRatio(0.35)     //Configure how big you want the donut hole size to be.
+       	.x(function(d) { return d.label })
+       	.y(function(d) { return d.value })
+       	;
+	    nv.utils.windowResize(chart.update);
+	    update_chart(chart, selector, url);
     	});
 	});
 }
@@ -48,6 +63,8 @@ function add_standard_pie(url, selector){
 add_standard_pie("{% url "olw_system_overview_slots" %}","#slotUtilChart svg");
 add_standard_pie("{% url "olw_system_overview_jobs" %}","#jobUtilChart svg");
 add_standard_pie("{% url "olw_system_overview_hosts" %}",'#hostChart svg');
+
+
 </script>
 
 
