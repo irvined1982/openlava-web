@@ -35,13 +35,17 @@
                 queue.statuses.forEach( function(s){
                     stats += s.friendly;
                 });
+                var st=stats.join("<br />");
+
                 var attribs=[];
                 queue.attributes.forEach( function(a){
                     attribs += a.friendly;
                 });
+                var at=attribs.join("<br />");
 
-                $("#queue_" + queue.name + "_statuses").html(stats.join("<br />"));
-                $("#queue_" + queue.name + "_attributes").html(attribs.join("<br />"));
+                $("#queue_" + queue.name + "_statuses").html(st);
+                $("#queue_" + queue.name + "_attributes").html(at);
+                
                 $("#queue_" + queue.name + "_total").text(queue.total_jobs + ' (' + queue.total_slots + ')' );
                 $("#queue_" + queue.name + "_pending").text(queue.num_pending_jobs + ' (' + queue.num_pending_slots + ')' );
                 $("#queue_" + queue.name + "_running").text(queue.num_running_jobs + ' (' + queue.num_running_slots + ')');
