@@ -1436,7 +1436,10 @@ class Host(HostBase):
     @classmethod
     def get_host_list(cls):
         initialize()
-        return [cls(h.host) for h in lsblib.lsb_hostinfo()]
+        hs = lsblib.lsb_hostinfo()
+        if hs is None:
+            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of hosts")
+        return [cls(h.host) for h in hs]
 
     def __init__(self, host_name):
         initialize()
