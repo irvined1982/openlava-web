@@ -12,14 +12,29 @@
 		<tbody>
   			{% for user in user_list %}
 			<tr>
-				<td><a href='{% url 'olw_user_view' user.name %}'>{{ user.name }}</a></td>
-				<td>{{ user.total_jobs }} ({{ user.total_slots }})</td>
-				<td>{{ user.num_pending_jobs }} ({{user.num_pending_slots}})</td>
-				<td>{{ user.num_running_jobs }} ({{ user.num_running_slots }})</td>
-				<td>{{ user.num_suspended_jobs }} ({{ user.num_suspended_jobs }})</td>
+				<td><a href="{% url 'olw_user_view' user.name %}">{{ user.name }}</a></td>
+				<td id="user_{{ user.name }}_total">{{ user.total_jobs }} ({{ user.total_slots }})</td>
+				<td id="user_{{ user.name }}_pending">{{ user.num_pending_jobs }} ({{user.num_pending_slots}})</td>
+				<td id="user_{{ user.name }}_running">{{ user.num_running_jobs }} ({{ user.num_running_slots }})</td>
+				<td id="user_{{ user.name }}_suspended">{{ user.num_suspended_jobs }} ({{ user.num_suspended_jobs }})</td>
 			</tr>
 			{% empty %}
 			<tr><td colspan="5">No Users</td></tr>
 			{% endfor %}
 		</tbody>
 	</table>
+<script>
+    function update_user_list(){
+        $.getJSON( "{% url "olw_user_list" %}", function(data) {
+            data.forEach(function(user){
+                $("#user_" + user.name + "_total").text(user.total_jobs + ' (' + user.total_slots + ')' );
+                $("#user_" + user.name + "_pending").text(user.num_pending_jobs + ' (' + user.num_pending_slots + ')' );
+                $("#user_" + user.name + "_running").text(user.num_running_jobs + ' (' + user.num_running_slots + ')');
+                $("#user_" + user.name + "_suspended").text(user.num_suspended_jobs + ' (' + user.num_suspended_slots + ')');
+            });
+        }).always(function(){
+            setTimeout(update_user_list, 30000);
+        });
+    }
+    update_user_list();
+</script>

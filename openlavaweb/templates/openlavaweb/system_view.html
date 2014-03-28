@@ -36,7 +36,7 @@ function update_alerts(){
         });
         if ( down/total > 0.25 ){
             // Show alert
-            $("#hostsDownMessageBody").html('<div id="hostsDownMessage" class="fade in alert alert-danger">Warning! A large number of hosts are unavailable</div>');
+            $("#hostsDownMessageBody").html('<div id="hostsDownMessage" class="fade in alert alert-danger"><b>Warning!</b> A large number of hosts are unavailable</div>');
             $("#hostsDownMessage").alert();
         }else{
             // Remove the label
@@ -44,7 +44,7 @@ function update_alerts(){
         }
         if ( closed/total > 0.25 ){
             // Show alert
-            $("#hostsClosedMessageBody").html('<div id="hostsClosedMessage" class="fade in alert alert-danger">Warning! A large number of hosts are closed</div>');
+            $("#hostsClosedMessageBody").html('<div id="hostsClosedMessage" class="fade in alert alert-danger"><b>Warning!</b> A large number of hosts are closed</div>');
             $("#hostsClosedMessage").alert();
         }else{
             // Remove the label

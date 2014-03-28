@@ -12,13 +12,32 @@
   			{% for host in host_list %}
 			<tr>
 				<td><a href='{% url 'olw_host_view' host.host_name %}'>{{ host.host_name }}</a></td>
-				<td>{% for status in host.statuses %}{{ status.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
-				<td>{{ host.total_jobs }} ({{ host.total_slots }})</td>
-				<td>{{ host.num_running_jobs }} ({{ host.num_running_slots }})</td>
-				<td>{{ host.num_suspended_jobs }} ({{ host.num_suspended_jobs }})</td>
+				<td id="user_{{ host.host_name }}_statuses">{% for status in host.statuses %}{{ status.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
+				<td id="user_{{ host.host_name }}_total">{{ host.total_jobs }} ({{ host.total_slots }})</td>
+				<td id="user_{{ host.host_name }}_running">{{ host.num_running_jobs }} ({{ host.num_running_slots }})</td>
+				<td id="user_{{ host.host_name }}_suspended">{{ host.num_suspended_jobs }} ({{ host.num_suspended_jobs }})</td>
 			</tr>
 			{% empty %}
 			<tr><td colspan="5">No Hosts.</td></tr>
 			{% endfor %}
 		</tbody>
 	</table>
+<script>
+    function update_host_list(){
+        $.getJSON( "{% url "olw_host_list" %}", function(data) {
+            data.forEach(function(host){
+                var stats=[];
+                    host.statuses.forEach( function(s){
+                    stats += s.friendly;
+                });
+                $("#host_" + host.host_name + "_statuses").html("<br />".join(stats));
+                $("#host_" + host.host_name + "_total").text(host.total_jobs + ' (' + host.total_slots + ')' );
+                $("#host_" + host.host_name + "_running").text(host.num_running_jobs + ' (' + host.num_running_slots + ')');
+                $("#host_" + host.host_name + "_suspended").text(host.num_suspended_jobs + ' (' + host.num_suspended_slots + ')');
+            });
+        }).always(function(){
+            setTimeout(update_host_list, 30000);
+        });
+    }
+    update_host_list();
+</script>
