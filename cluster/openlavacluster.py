@@ -2189,4 +2189,3 @@ class User(UserBase):
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of users")
 
         return [cls(u) for u in us]
-	
