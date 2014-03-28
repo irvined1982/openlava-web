@@ -56,8 +56,7 @@ function add_standard_pie(url, selector){
        	;
 	    nv.utils.windowResize(chart.update);
 	    update_chart(chart, selector, url);
-    	});
-	});
+    });
 }
 
 add_standard_pie("{% url "olw_system_overview_slots" %}","#slotUtilChart svg");
