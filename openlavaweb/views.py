@@ -908,9 +908,12 @@ def job_submit(request, form_class="JobSubmitForm"):
             if form.is_valid():
                 # submit the job
                 kwargs = form._get_args()
+            else:
+                return render(request, 'openlavaweb/job_submit.html', {'form': form})
         else:
             form = form_class()
-        return render(request, 'openlavaweb/job_submit.html', {'form': form})
+            return render(request, 'openlavaweb/job_submit.html', {'form': form})
+
 
     q = MPQueue()
     p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'args': kwargs, 'submit_form':form})
