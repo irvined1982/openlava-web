@@ -1100,5 +1100,5 @@ class TrinityJobSubmitForm(OLWSubmit):
     full_cleanup=forms.BooleanField(required=False, initial=False, help_text="only retain the Trinity fasta file, rename as ${output_dir}.Trinity.fasta")
     min_kmer_cov=forms.IntegerField(min_value=1, initial=1)
     inchworm_cpu=forms.ChoiceField(initial=6, choices=[(x,x) for x in range(1,6)], help_text="Number of CPUs to use for Inchworm, defaults to the number of CPUs specified for the job, or 6, whichever is lower" )
-    no_run_inchworm=forms.BooleanField(required=False, False, help_text="Stop after running jellyfish, before inchworm.")
+    no_run_inchworm=forms.BooleanField(required=False, initial=False, help_text="Stop after running jellyfish, before inchworm.")
 
