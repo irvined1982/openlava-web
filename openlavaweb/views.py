@@ -890,12 +890,12 @@ def ajax_login(request):
     return HttpResponse(json.dumps(res), content_type="application/json")
 
 @login_required
-def job_submit(request):
+def job_submit(request, form_class="JobSubmitForm"):
     kwargs = None
-    form_class=request.GET.get("form", "JobSubmitForm")
     for cls in OLWSubmit.__subclasses__():
         if form_class == cls.__name__:
             form_class = cls
+            break
     if not issubclass(form_class, OLWSubmit):
         raise ValueError
 
