@@ -931,7 +931,22 @@ def execute_job_submit(request, queue, args):
         queue.put(e)
 
 
-class JobSubmitForm(forms.Form):
+
+class OLWSubmit(forms.Form):
+    """Openlava job submission form"""
+    name="basesubmit"
+    friendly_name="Base Submit"
+    def _get_args(selfs):
+        """Return all arguments for job submission"""
+        raise NotImplemented()
+
+    def _post_submit(self, job):
+        """Called after the job has been submitted, Job is the newly submitted job."""
+        return None
+    
+class JobSubmitForm(OLWSubmit):
+    friendly_name = "Generic Job"
+    name="generic"
     from openlava import lsblib
 
     def _get_args(self):
