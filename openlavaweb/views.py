@@ -18,7 +18,7 @@
 import json
 import os
 import pwd
-import sys
+
 import datetime
 from multiprocessing import Process as MPProcess
 from multiprocessing import Queue as MPQueue
@@ -892,16 +892,23 @@ def ajax_login(request):
 @login_required
 def job_submit(request):
     kwargs = None
+    form_class=request.GET.get("form", "JobSubmitForm")
+
     if request.is_ajax() or request.GET.get("json", None):
         kwargs = json.loads(request.body)
     else:
+            for cls in OLWSubmit.__class__.__subclasses__():
+                if form_class == cls.__name__:
+                    form_class = cls
+            if not issubclass(form_class, OLWSubmit):
+                raise ValueError
         if request.method == 'POST':
-            form = JobSubmitForm(request.POST)
+            form = form_class(request.POST)
             if form.is_valid():
                 # submit the job
                 kwargs = form._get_args()
         else:
-            form = JobSubmitForm()
+            form = form_class()
         return render(request, 'openlavaweb/job_submit.html', {'form': form})
 
     q = MPQueue()
@@ -921,11 +928,13 @@ def job_submit(request):
             return render(request, 'openlavaweb/exception.html', {'exception': e})
 
 
-def execute_job_submit(request, queue, args):
+def execute_job_submit(request, queue, args, submit_form):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
+        submit_form._pre_submit()
         job = Job.submit(**args)
+        submit_form._post_submit(job)
         queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index])))
     except Exception as e:
         queue.put(e)
@@ -940,13 +949,17 @@ class OLWSubmit(forms.Form):
         """Return all arguments for job submission"""
         raise NotImplemented()
 
+    def _pre_submit(self):
+        """Called before the job is submitted, run as the user who is submitting the job."""
+        return None
+
     def _post_submit(self, job):
         """Called after the job has been submitted, Job is the newly submitted job."""
         return None
-    
+
+
 class JobSubmitForm(OLWSubmit):
     friendly_name = "Generic Job"
-    name="generic"
     from openlava import lsblib
 
     def _get_args(self):
@@ -1015,3 +1028,44 @@ class JobSubmitForm(OLWSubmit):
     max_num_processors = forms.IntegerField(required=False)
     login_shell = forms.CharField(128, required=False)
     user_priority = forms.IntegerField(required=False)
+
+
+
+class SimpleJobSubmitForm(OLWSubmit):
+    friendly_name = "Simple Job"
+
+    def _get_args(self):
+        kwargs = {}
+        for field, value in self.cleaned_data.items():
+            if field in ['options', 'options2']:
+                continue
+            if value:
+                kwargs[field] = value
+        return kwargs
+
+    num_processors = forms.IntegerField(initial=1)
+    command = forms.CharField(widget=forms.Textarea, max_length=512)
+    queues = [(u'', u'Default')]
+    for q in Queue.get_queue_list():
+        queues.append([q.name, q.name])
+    queue_name = forms.ChoiceField(choices=queues, required=False)
+
+class TrinityJobSubmitForm(OLWSubmit):
+    friendly_name = "Trinity Job"
+
+    def _get_args(self):
+        kwargs = {}
+        for field, value in self.cleaned_data.items():
+            if field in ['options', 'options2']:
+                continue
+            if value:
+                kwargs[field] = value
+        return kwargs
+
+    num_processors = forms.IntegerField(initial=1)
+    command = forms.CharField(widget=forms.Textarea, max_length=512)
+    queues = [(u'', u'Default')]
+    for q in Queue.get_queue_list():
+        queues.append([q.name, q.name])
+    queue_name = forms.ChoiceField(choices=queues, required=False)
+
