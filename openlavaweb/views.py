@@ -893,15 +893,15 @@ def ajax_login(request):
 def job_submit(request):
     kwargs = None
     form_class=request.GET.get("form", "JobSubmitForm")
+    for cls in OLWSubmit.__class__.__subclasses__():
+        if form_class == cls.__name__:
+            form_class = cls
+    if not issubclass(form_class, OLWSubmit):
+        raise ValueError
 
     if request.is_ajax() or request.GET.get("json", None):
         kwargs = json.loads(request.body)
     else:
-            for cls in OLWSubmit.__class__.__subclasses__():
-                if form_class == cls.__name__:
-                    form_class = cls
-            if not issubclass(form_class, OLWSubmit):
-                raise ValueError
         if request.method == 'POST':
             form = form_class(request.POST)
             if form.is_valid():
