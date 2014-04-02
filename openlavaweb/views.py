@@ -1078,7 +1078,7 @@ class TrinityJobSubmitForm(OLWSubmit):
 
         command += " --left /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.left.fq"
         command += " --right /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.right.fq"
-
+        command += " --CPU %s" % self.cleaned_data['num_processors']
         kwargs['command'] = command
         return kwargs
 
