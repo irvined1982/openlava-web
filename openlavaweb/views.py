@@ -1082,10 +1082,10 @@ class TrinityJobSubmitForm(OLWSubmit):
         kwargs['command'] = command
         return kwargs
 
-    num_processors = forms.IntegerField(min_value=1, max_value=6, choices=[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], initial=1)
+    num_processors = forms.CharField(choices=[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], initial=1)
     job_name = forms.CharField(max_length=512, required=False)
     seqType = forms.CharField(choices=[('fa', 'fa'), ('fq', 'fq')], help_text="Type of reads.")
-    JM=forms.IntegerField(min_value=1, max_value=32, choices=[(x,x) for x in range(1,32)], help_text="Amount of GB of system memory to use for k-mer counting by jellyfish.")
+    JM=forms.CharField(choices=[(x,x) for x in range(1,32)], help_text="Amount of GB of system memory to use for k-mer counting by jellyfish.")
     SS_lib_type = forms.CharField(choices=[('RF','RF'), ('FR','FR'), ('F','F'), ('R', 'R')], help_text="Strand-specific RNA-Seq read orientation. if paired: RF or FR if single: F or R.  (dUTP method = RF)")
     min_contig_length= forms.IntegerField(min_value=1, default=200, help_text="Minimum assembled contig length to report.")
     jaccard_clip=forms.BooleanField(default=False, help_text="Set if you have paired reads and you expect high gene density with UTR overlap (use FASTQ input file format for reads).  (Note: jaccard_clip is an expensive operation, so avoid using it unless necessary due to finding excessive fusion transcripts w/o it.)")
@@ -1093,6 +1093,6 @@ class TrinityJobSubmitForm(OLWSubmit):
     no_cleanup=forms.BooleanField(default=False, help_text="Retain all intermediate input files.")
     full_cleanup=forms.BooleanField(default=False, help_text="only retain the Trinity fasta file, rename as ${output_dir}.Trinity.fasta")
     min_kmer_cov=forms.IntegerField(min_value=1, default=1)
-    inchworm_cpu=forms.IntegerField(min_value=1, max_value=6, default=6, choices=[(x,x) for x in range(6)], help_text="Number of CPUs to use for Inchworm, defaults to the number of CPUs specified for the job, or 6, whichever is lower" )
+    inchworm_cpu=forms.CharField(default=6, choices=[(x,x) for x in range(6)], help_text="Number of CPUs to use for Inchworm, defaults to the number of CPUs specified for the job, or 6, whichever is lower" )
     no_run_inchworm=forms.BooleanField(default=False, help_text="Stop after running jellyfish, before inchworm.")
 
