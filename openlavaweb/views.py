@@ -892,6 +892,7 @@ def ajax_login(request):
 @login_required
 def job_submit(request, form_class="JobSubmitForm"):
     kwargs = None
+    form=None
     for cls in OLWSubmit.__subclasses__():
         if form_class == cls.__name__:
             form_class = cls
@@ -912,7 +913,7 @@ def job_submit(request, form_class="JobSubmitForm"):
         return render(request, 'openlavaweb/job_submit.html', {'form': form})
 
     q = MPQueue()
-    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'args': kwargs})
+    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'args': kwargs, 'submit_form':form})
     p.start()
     p.join()
     rc = q.get(False)
@@ -955,10 +956,12 @@ class OLWSubmit(forms.Form):
 
     def _pre_submit(self):
         """Called before the job is submitted, run as the user who is submitting the job."""
+        print "Pre Submit"
         return None
 
     def _post_submit(self, job):
         """Called after the job has been submitted, Job is the newly submitted job."""
+        print "Post Submit"
         return None
 
 
