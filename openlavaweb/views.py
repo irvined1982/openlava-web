@@ -893,7 +893,7 @@ def ajax_login(request):
 def job_submit(request):
     kwargs = None
     form_class=request.GET.get("form", "JobSubmitForm")
-    for cls in OLWSubmit.__class__.__subclasses__():
+    for cls in OLWSubmit.__subclasses__():
         if form_class == cls.__name__:
             form_class = cls
     if not issubclass(form_class, OLWSubmit):
@@ -1055,17 +1055,44 @@ class TrinityJobSubmitForm(OLWSubmit):
 
     def _get_args(self):
         kwargs = {}
-        for field, value in self.cleaned_data.items():
-            if field in ['options', 'options2']:
-                continue
-            if value:
-                kwargs[field] = value
+        for f in ['num_processors', 'job_name']:
+            kwargs[f]=self.cleaned_data[f]
+
+        command="/home/irvined/trinityrnaseq_r20131110/Trinity.pl"
+        command += " --seqType %s" % self.cleaned_data['seqType']
+        command += " --JM %sG" % self.cleaned_data['JM']
+        command += " --SS_lib_type %s" % self.cleaned_data['SS_lib_type']
+        command += " --min_contig_length %s" % self.cleaned_data['min_contig_length']
+        if self.cleaned_data['jaccard_clip']:
+            command += " --jaccard_clip"
+        if self.cleaned_data['prep']:
+            command += " --prep"
+        if self.cleaned_data['no_cleanup']:
+            command += " --no_cleanup"
+        if self.cleaned_data['full_cleanup']:
+            command += " --full_cleanup"
+        command += " --min_kmer_cov %s" % self.cleaned_data['min_kmer_cov']
+        command += " --inchworm_cpu %s" % self.cleaned_data['inchworm_cpu']
+        if self.cleaned_data['no_run_inchworm']:
+            command += " --no_run_inchworm"
+
+        command += " --left /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.left.fq"
+        command += " --right /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.right.fq"
+
+        kwargs['command'] = command
         return kwargs
 
-    num_processors = forms.IntegerField(initial=1)
-    command = forms.CharField(widget=forms.Textarea, max_length=512)
-    queues = [(u'', u'Default')]
-    for q in Queue.get_queue_list():
-        queues.append([q.name, q.name])
-    queue_name = forms.ChoiceField(choices=queues, required=False)
+    num_processors = forms.IntegerField(min_value=1, max_value=6, choices=[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], initial=1)
+    job_name = forms.CharField(max_length=512, required=False)
+    seqType = forms.CharField(choices=[('fa', 'fa'), ('fq', 'fq')], help_text="Type of reads.")
+    JM=forms.IntegerField(min_value=1, max_value=32, choices=[(x,x) for x in range(1,32)], help_text="Amount of GB of system memory to use for k-mer counting by jellyfish.")
+    SS_lib_type = forms.CharField(choices=[('RF','RF'), ('FR','FR'), ('F','F'), ('R', 'R')], help_text="Strand-specific RNA-Seq read orientation. if paired: RF or FR if single: F or R.  (dUTP method = RF)")
+    min_contig_length= forms.IntegerField(min_value=1, default=200, help_text="Minimum assembled contig length to report.")
+    jaccard_clip=forms.BooleanField(default=False, help_text="Set if you have paired reads and you expect high gene density with UTR overlap (use FASTQ input file format for reads).  (Note: jaccard_clip is an expensive operation, so avoid using it unless necessary due to finding excessive fusion transcripts w/o it.)")
+    prep = forms.BooleanField(default=False, help_text="Only prepare files (high I/O usage) and stop before kmer counting.")
+    no_cleanup=forms.BooleanField(default=False, help_text="Retain all intermediate input files.")
+    full_cleanup=forms.BooleanField(default=False, help_text="only retain the Trinity fasta file, rename as ${output_dir}.Trinity.fasta")
+    min_kmer_cov=forms.IntegerField(min_value=1, default=1)
+    inchworm_cpu=forms.IntegerField(min_value=1, max_value=6, default=6, choices=[(x,x) for x in range(6)], help_text="Number of CPUs to use for Inchworm, defaults to the number of CPUs specified for the job, or 6, whichever is lower" )
+    no_run_inchworm=forms.BooleanField(default=False, help_text="Stop after running jellyfish, before inchworm.")
 
