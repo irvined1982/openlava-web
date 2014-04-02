@@ -945,6 +945,10 @@ class OLWSubmit(forms.Form):
     """Openlava job submission form"""
     name="basesubmit"
     friendly_name="Base Submit"
+
+    def get_name(self):
+        return self.__class__.__name__
+
     def _get_args(selfs):
         """Return all arguments for job submission"""
         raise NotImplemented()
