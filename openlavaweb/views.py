@@ -1080,6 +1080,8 @@ class TrinityJobSubmitForm(OLWSubmit):
         command += " --right /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.right.fq"
         command += " --CPU %s" % self.cleaned_data['num_processors']
         kwargs['command'] = command
+        print "KWWWAAARRRRGS"
+        print kwargs
         return kwargs
 
     num_processors = forms.ChoiceField(choices=[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], initial=1)
