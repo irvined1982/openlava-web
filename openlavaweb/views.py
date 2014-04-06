@@ -1119,7 +1119,7 @@ class TrinityJobSubmitForm(OLWSubmit):
     no_run_inchworm=forms.BooleanField(required=False, initial=False, help_text="Stop after running jellyfish, before inchworm.")
 
 
-def submit_form_context(self, request):
+def submit_form_context(request):
     clses=[]
     for cls in OLWSubmit.__subclasses__():
         clses.append({
