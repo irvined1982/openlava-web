@@ -36,6 +36,7 @@ from cluster.openlavacluster import Cluster, Host, Job, Queue, User
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 from openlava import lsblib
+from django.conf import settings
 
 def queue_list(request):
     queue_list = Queue.get_queue_list()
@@ -1080,7 +1081,11 @@ class TrinityJobSubmitForm(OLWSubmit):
         kwargs = {}
         for f in ['num_processors', 'job_name']:
             kwargs[f]=self.cleaned_data[f]
-        command="/home/irvined/trinityrnaseq_r20131110/Trinity.pl"
+        try:
+            command = settings.TRINITY_COMMAND
+        except:
+            command = "Trinity.pl"
+
         command += " --seqType %s" % self.cleaned_data['seqType']
         command += " --JM %sG" % self.cleaned_data['JM']
         command += " --SS_lib_type %s" % self.cleaned_data['SS_lib_type']
