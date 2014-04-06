@@ -35,7 +35,7 @@ from cluster import ClusterException
 from cluster.openlavacluster import Cluster, Host, Job, Queue, User
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
-
+from openlava import lsblib
 
 def queue_list(request):
     queue_list = Queue.get_queue_list()
@@ -891,8 +891,8 @@ def ajax_login(request):
 
 @login_required
 def job_submit(request, form_class="JobSubmitForm"):
-    kwargs = None
-    form=None
+    ajax_args = None
+    form = None
     for cls in OLWSubmit.__subclasses__():
         if form_class == cls.__name__:
             form_class = cls
@@ -901,22 +901,25 @@ def job_submit(request, form_class="JobSubmitForm"):
         raise ValueError
 
     if request.is_ajax() or request.GET.get("json", None):
-        kwargs = json.loads(request.body)
+        # configure form and arguments for ajax submission
+        ajax_args = json.loads(request.body)
+        form = form_class()
     else:
+        # configure form an arguments for normal submission
         if request.method == 'POST':
             form = form_class(request.POST)
-            if form.is_valid():
-                # submit the job
-                kwargs = form._get_args()
-            else:
+            # IF the form is not valid, then return the rendered form.
+            if not form.is_valid():
                 return render(request, 'openlavaweb/job_submit.html', {'form': form})
         else:
+            # The form wasn't submitted yet, so render the form.
             form = form_class()
             return render(request, 'openlavaweb/job_submit.html', {'form': form})
 
 
+    # Process the actual form.
     q = MPQueue()
-    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'args': kwargs, 'submit_form':form})
+    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
     p.start()
     p.join()
     rc = q.get(False)
@@ -932,14 +935,11 @@ def job_submit(request, form_class="JobSubmitForm"):
             return render(request, 'openlavaweb/exception.html', {'exception': e})
 
 
-def execute_job_submit(request, queue, args, submit_form):
+def execute_job_submit(request, queue, ajax_args, submit_form):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
-        submit_form._pre_submit()
-        job = Job.submit(**args)
-        submit_form._post_submit(job)
-        queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index])))
+        queue.put(submit_form.submit(ajax_args))
     except Exception as e:
         queue.put(e)
 
@@ -949,28 +949,41 @@ class OLWSubmit(forms.Form):
     """Openlava job submission form"""
     name="basesubmit"
     friendly_name="Base Submit"
+    # If this needs to be treated as a formset, set to true so the
+    # template knows to iterate through each form etc.
+    is_formset=False
 
     def get_name(self):
         return self.__class__.__name__
 
+    def submit(self, ajax_args = None):
+        kwargs = None
+        if ajax_args:
+            kwargs = ajax_args
+        else:
+            kwargs = self._get_kwargs()
+        self._pre_submit()
+        job = Job.submit(**kwargs)
+        self._post_submit(job)
+        return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
+
     def _get_args(selfs):
-        """Return all arguments for job submission"""
+        """Return all arguments for job submission.  For normal simple web submission forms, this is all that is needed
+        simply parse the form data and return a dict which will be passed to Job.submit()"""
         raise NotImplemented()
 
     def _pre_submit(self):
         """Called before the job is submitted, run as the user who is submitting the job."""
-        print "Pre Submit"
         return None
 
     def _post_submit(self, job):
         """Called after the job has been submitted, Job is the newly submitted job."""
-        print "Post Submit"
         return None
 
 
 class JobSubmitForm(OLWSubmit):
     friendly_name = "Generic Job"
-    from openlava import lsblib
+
 
     def _get_args(self):
         kwargs = {}
@@ -1067,7 +1080,6 @@ class TrinityJobSubmitForm(OLWSubmit):
         kwargs = {}
         for f in ['num_processors', 'job_name']:
             kwargs[f]=self.cleaned_data[f]
-
         command="/home/irvined/trinityrnaseq_r20131110/Trinity.pl"
         command += " --seqType %s" % self.cleaned_data['seqType']
         command += " --JM %sG" % self.cleaned_data['JM']
@@ -1090,8 +1102,6 @@ class TrinityJobSubmitForm(OLWSubmit):
         command += " --right /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.right.fq"
         command += " --CPU %s" % self.cleaned_data['num_processors']
         kwargs['command'] = command
-        print "KWWWAAARRRRGS"
-        print kwargs
         return kwargs
 
     num_processors = forms.ChoiceField(choices=[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], initial=1)
@@ -1108,3 +1118,12 @@ class TrinityJobSubmitForm(OLWSubmit):
     inchworm_cpu=forms.ChoiceField(initial=6, choices=[(x,x) for x in range(1,6)], help_text="Number of CPUs to use for Inchworm, defaults to the number of CPUs specified for the job, or 6, whichever is lower" )
     no_run_inchworm=forms.BooleanField(required=False, initial=False, help_text="Stop after running jellyfish, before inchworm.")
 
+
+def submit_form_context(self, request):
+    clses=[]
+    for cls in OLWSubmit.__subclasses__():
+        clses.append({
+            'url':reverse("olw_job_submit_class", args=[cls.__name__]),
+            'name':cls.friendly_name,
+        })
+    return {'submit_form_classes': clses}

@@ -38,9 +38,9 @@
                        </a>
                        <ul class="dropdown-menu">
                            <li><a href="{% url 'olw_job_submit' %}">Default</a></li>
-                           <li><a href="{% url 'olw_job_submit' %}?form=JobSubmitForm">Generic Job</a></li>
-                           <li><a href="{% url 'olw_job_submit' %}?form=SimpleJobSubmitForm">Simple Job</a></li>
-                           <li><a href="{% url 'olw_job_submit' %}?form=TrinityJobSubmitForm">Trinity Job</a></li>
+                           {% for class in submit_form_classes %}
+                                <li><a href="{{ cls.url }}">{{ cls.name }}</a></li>
+                           {% endfor %}
                        </ul>
                    </li>
                {% endif %}
