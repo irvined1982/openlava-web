@@ -961,7 +961,7 @@ class OLWSubmit(forms.Form):
         if ajax_args:
             kwargs = ajax_args
         else:
-            kwargs = self._get_kwargs()
+            kwargs = self._get_args()
         self._pre_submit()
         job = Job.submit(**kwargs)
         self._post_submit(job)
