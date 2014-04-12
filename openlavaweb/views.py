@@ -1054,7 +1054,6 @@ class JobSubmitForm(OLWSubmit):
     user_priority = forms.IntegerField(required=False)
 
 
-
 class SimpleJobSubmitForm(OLWSubmit):
     friendly_name = "Simple Job"
 
@@ -1074,54 +1073,45 @@ class SimpleJobSubmitForm(OLWSubmit):
         queues.append([q.name, q.name])
     queue_name = forms.ChoiceField(choices=queues, required=False)
 
-class TrinityJobSubmitForm(OLWSubmit):
-    friendly_name = "Trinity Job"
+class ConsumeResourcesJob(OLWSubmit):
+    friendly_name = "Consume Resources"
+
+    job_name = forms.CharField(max_length=512, required=False)
+    num_processors = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1, help_text="How many processors to execute on")
+    run_time = forms.ChoiceField(initial=120, help_text="How many seconds to execute for")
+
+    consume_cpu = forms.BooleanField(required=False, initial=True, help_text="Burn CPU cycles.")
+    consume_network = forms.BooleanField(required=False, initial=False, help_text="Send MPI messages. (Experimental)")
+    consume_disk = forms.BooleanField(required=False, initial=False, help_text="Read and write data to storage.")
 
     def _get_args(self):
         kwargs = {}
+
         for f in ['num_processors', 'job_name']:
-            kwargs[f]=self.cleaned_data[f]
+            kwargs[f] = self.cleaned_data[f]
         try:
-            command = settings.TRINITY_COMMAND
+            mpi_command = settings.MPIRUN_COMMAND
         except:
-            command = "Trinity.pl"
+            mpi_command = "mpirun"
 
-        command += " --seqType %s" % self.cleaned_data['seqType']
-        command += " --JM %sG" % self.cleaned_data['JM']
-        command += " --SS_lib_type %s" % self.cleaned_data['SS_lib_type']
-        command += " --min_contig_length %s" % self.cleaned_data['min_contig_length']
-        if self.cleaned_data['jaccard_clip']:
-            command += " --jaccard_clip"
-        if self.cleaned_data['prep']:
-            command += " --prep"
-        if self.cleaned_data['no_cleanup']:
-            command += " --no_cleanup"
-        if self.cleaned_data['full_cleanup']:
-            command += " --full_cleanup"
-        command += " --min_kmer_cov %s" % self.cleaned_data['min_kmer_cov']
-        command += " --inchworm_cpu %s" % self.cleaned_data['inchworm_cpu']
-        if self.cleaned_data['no_run_inchworm']:
-            command += " --no_run_inchworm"
+        try:
+            command = settings.CONSUME_RESOURCES_COMMAND
+        except:
+            command = "consumeResources.py"
 
-        command += " --left /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.left.fq"
-        command += " --right /home/irvined/trinityrnaseq_r20131110/sample_data/test_Trinity_Assembly/reads.right.fq"
-        command += " --CPU %s" % self.cleaned_data['num_processors']
+        if self.cleander_data['consume_cpu']:
+            command += " -c"
+        if self.cleaned_data['consume_network']:
+            command += " -n"
+        if self.cleaned_data['consume_disk']:
+            command += " -d"
+
+        command += self.cleaned_data['run_time']
+
+        command = mpi_command + " " + command
         kwargs['command'] = command
-        return kwargs
 
-    num_processors = forms.ChoiceField(choices=[(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)], initial=1)
-    job_name = forms.CharField(max_length=512, required=False)
-    seqType = forms.ChoiceField(choices=[('fa', 'fa'), ('fq', 'fq')], help_text="Type of reads.")
-    JM=forms.ChoiceField(choices=[(x,x) for x in range(1,32)], help_text="Amount of GB of system memory to use for k-mer counting by jellyfish.")
-    SS_lib_type = forms.ChoiceField(choices=[('RF','RF'), ('FR','FR'), ('F','F'), ('R', 'R')], help_text="Strand-specific RNA-Seq read orientation. if paired: RF or FR if single: F or R.  (dUTP method = RF)")
-    min_contig_length= forms.IntegerField(min_value=1, initial=200, help_text="Minimum assembled contig length to report.")
-    jaccard_clip=forms.BooleanField(required=False, initial=False, help_text="Set if you have paired reads and you expect high gene density with UTR overlap (use FASTQ input file format for reads).  (Note: jaccard_clip is an expensive operation, so avoid using it unless necessary due to finding excessive fusion transcripts w/o it.)")
-    prep = forms.BooleanField(required=False, initial=False, help_text="Only prepare files (high I/O usage) and stop before kmer counting.")
-    no_cleanup=forms.BooleanField(required=False, initial=False, help_text="Retain all intermediate input files.")
-    full_cleanup=forms.BooleanField(required=False, initial=False, help_text="only retain the Trinity fasta file, rename as ${output_dir}.Trinity.fasta")
-    min_kmer_cov=forms.IntegerField(min_value=1, initial=1)
-    inchworm_cpu=forms.ChoiceField(initial=6, choices=[(x,x) for x in range(1,6)], help_text="Number of CPUs to use for Inchworm, defaults to the number of CPUs specified for the job, or 6, whichever is lower" )
-    no_run_inchworm=forms.BooleanField(required=False, initial=False, help_text="Stop after running jellyfish, before inchworm.")
+        return kwargs
 
 
 def submit_form_context(request):
