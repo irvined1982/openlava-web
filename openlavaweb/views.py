@@ -1102,7 +1102,7 @@ class ConsumeResourcesJob(OLWSubmit):
         kwargs['num_processors'] = self.cleaned_data['num_processors']
         kwargs['queue_name'] = self.cleaned_data['queue_name']
         kwargs['job_name'] = self.cleaned_data['job_name']
-        
+
         try:
             mpi_command = settings.MPIRUN_COMMAND
         except:
@@ -1120,7 +1120,7 @@ class ConsumeResourcesJob(OLWSubmit):
         if self.cleaned_data['consume_disk']:
             command += " -d"
 
-        command += str(self.cleaned_data['run_time'])
+        command += " " + str(self.cleaned_data['run_time'])
 
         command = mpi_command + " " + command
         kwargs['command'] = command
