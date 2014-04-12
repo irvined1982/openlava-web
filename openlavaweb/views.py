@@ -1073,6 +1073,10 @@ class SimpleJobSubmitForm(OLWSubmit):
         queues.append([q.name, q.name])
     queue_name = forms.ChoiceField(choices=queues, required=False)
 
+
+
+
+
 class ConsumeResourcesJob(OLWSubmit):
     friendly_name = "Consume Resources"
 
@@ -1084,6 +1088,11 @@ class ConsumeResourcesJob(OLWSubmit):
     consume_network = forms.BooleanField(required=False, initial=False, help_text="Send MPI messages. (Experimental)")
     consume_disk = forms.BooleanField(required=False, initial=False, help_text="Read and write data to storage.")
 
+    queues = [(u'', u'Default')]
+    for q in Queue.get_queue_list():
+        queues.append([q.name, q.name])
+    queue_name = forms.ChoiceField(choices=queues, required=False)
+
     def _get_args(self):
         kwargs = {}
 
@@ -1091,7 +1100,7 @@ class ConsumeResourcesJob(OLWSubmit):
             kwargs['job_name'] = self.cleaned_data['job_name']
 
         kwargs['num_processors'] = self.cleaned_data['num_processors']
-
+        kwargs['queue_name'] = self.cleaned_data['queue_name']
 
         try:
             mpi_command = settings.MPIRUN_COMMAND
