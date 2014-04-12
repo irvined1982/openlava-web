@@ -1084,6 +1084,7 @@ class ConsumeResourcesJob(OLWSubmit):
     num_processors = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1, help_text="How many processors to execute on")
     run_time = forms.IntegerField(min_value=1, initial=120, help_text="How many seconds to execute for")
 
+    memory_size = forms.IntegerField(min_value=1, initial=128, help_text="How many MB to consume")
     consume_cpu = forms.BooleanField(required=False, initial=True, help_text="Burn CPU cycles.")
     consume_network = forms.BooleanField(required=False, initial=False, help_text="Send MPI messages. (Experimental)")
     consume_disk = forms.BooleanField(required=False, initial=False, help_text="Read and write data to storage.")
@@ -1120,6 +1121,8 @@ class ConsumeResourcesJob(OLWSubmit):
         if self.cleaned_data['consume_disk']:
             command += " -d"
 
+        command += " -m "
+        command += self.cleaned_data['memory_size']
         command += " " + str(self.cleaned_data['run_time'])
 
         command = mpi_command + " " + command
