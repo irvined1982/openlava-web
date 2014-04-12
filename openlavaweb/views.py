@@ -1101,7 +1101,8 @@ class ConsumeResourcesJob(OLWSubmit):
 
         kwargs['num_processors'] = self.cleaned_data['num_processors']
         kwargs['queue_name'] = self.cleaned_data['queue_name']
-
+        kwargs['job_name'] = self.cleaned_data['job_name']
+        
         try:
             mpi_command = settings.MPIRUN_COMMAND
         except:
