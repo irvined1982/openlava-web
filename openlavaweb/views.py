@@ -1087,8 +1087,12 @@ class ConsumeResourcesJob(OLWSubmit):
     def _get_args(self):
         kwargs = {}
 
-        for f in ['num_processors', 'job_name']:
-            kwargs[f] = self.cleaned_data[f]
+        if len(self.cleaned_data['job_name']) > 0:
+            kwargs['job_name'] = self.cleaned_data['job_name']
+
+        kwargs['num_processors'] = self.cleaned_data['num_processors']
+
+
         try:
             mpi_command = settings.MPIRUN_COMMAND
         except:
