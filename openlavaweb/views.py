@@ -1106,7 +1106,7 @@ class ConsumeResourcesJob(OLWSubmit):
         if self.cleaned_data['consume_disk']:
             command += " -d"
 
-        command += self.cleaned_data['run_time']
+        command += str(self.cleaned_data['run_time'])
 
         command = mpi_command + " " + command
         kwargs['command'] = command
