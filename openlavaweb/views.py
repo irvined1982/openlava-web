@@ -1099,7 +1099,7 @@ class ConsumeResourcesJob(OLWSubmit):
         except:
             command = "consumeResources.py"
 
-        if self.cleander_data['consume_cpu']:
+        if self.cleaned_data['consume_cpu']:
             command += " -c"
         if self.cleaned_data['consume_network']:
             command += " -n"
