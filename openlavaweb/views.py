@@ -1122,7 +1122,7 @@ class ConsumeResourcesJob(OLWSubmit):
             command += " -d"
 
         command += " -m "
-        command += self.cleaned_data['memory_size']
+        command += str(self.cleaned_data['memory_size'])
         command += " " + str(self.cleaned_data['run_time'])
 
         command = mpi_command + " " + command
