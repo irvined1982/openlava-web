@@ -1078,7 +1078,7 @@ class ConsumeResourcesJob(OLWSubmit):
 
     job_name = forms.CharField(max_length=512, required=False)
     num_processors = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1, help_text="How many processors to execute on")
-    run_time = forms.ChoiceField(initial=120, help_text="How many seconds to execute for")
+    run_time = forms.IntegerField(min_value=1, initial=120, help_text="How many seconds to execute for")
 
     consume_cpu = forms.BooleanField(required=False, initial=True, help_text="Burn CPU cycles.")
     consume_network = forms.BooleanField(required=False, initial=False, help_text="Send MPI messages. (Experimental)")
