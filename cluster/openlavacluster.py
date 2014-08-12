@@ -876,7 +876,7 @@ class Job(JobBase):
             lsblib.lsb_closejobinfo()
             if num_jobs != 1:
                 raise NoSuchJobError("Job: %s[%s] does not exist." % (self.job_id, self.array_index))
-
+        self._exit_status = job.exitStatus
         self._submission_host = job.fromHost
         self._status = job.status
         self._user_name = job.user
@@ -1051,6 +1051,15 @@ class Job(JobBase):
         if self.status.name == "JOB_STAT_DONE":
             return True
         return False
+
+    @property
+
+    def was_killed(self):
+        if self.status.name == "JOB_STAT_EXIT" and self._exit_status == 130:
+            return True
+        else:
+            return False
+
 
     @property
     def is_failed(self):

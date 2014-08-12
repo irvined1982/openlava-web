@@ -124,6 +124,7 @@ class JobBase:
             'is_running',
             'is_suspended',
             'is_failed',
+            'was_killed',
             'is_completed',
         ]
 
