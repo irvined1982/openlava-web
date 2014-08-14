@@ -968,11 +968,7 @@ class OLWSubmit(forms.Form):
         self._post_submit(job)
         if isinstance(job, Job):
             return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
-        return job
-        if ajax_args:
-            return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
-                            content_type="application/json")
-
+        
 
 
     def _get_args(selfs):
