@@ -196,19 +196,19 @@ class Cluster(ClusterBase):
         return Host(lslib.ls_getmastername())
 
     def hosts(self):
-        '''Returns an array of hosts that are part of the cluster'''
+        """Returns an array of hosts that are part of the cluster"""
         return Host.get_host_list()
 
     def queues(self):
-        '''Returns an array of queues that are part of the cluster'''
+        """Returns an array of queues that are part of the cluster"""
         return Queue.get_queue_list()
 
     def jobs(self):
-        '''Returns an array of jobs that are part of the cluster'''
+        """Returns an array of jobs that are part of the cluster"""
         return Job.get_job_list()
 
     def resources(self):
-        '''Returns an array of resources that are part of thecluster'''
+        """Returns an array of resources that are part of thecluster"""
         cluster_info = lslib.ls_info()
         if cluster_info == None:
             raise OpenLavaError(lslib.ls_sysmsg())
@@ -988,61 +988,61 @@ class Job(JobBase):
 
     @property
     def begin_time(self):
-        '''Job will not start before this time'''
+        """Job will not start before this time"""
         self._update_jobinfo()
         return self._begin_time
 
     @property
     def command(self):
-        '''Command to execute'''
+        """Command to execute"""
         self._update_jobinfo()
         return self._command
 
     @property
     def consumed_resources(self):
-        '''Array of resource usage information'''
+        """Array of resource usage information"""
         self._update_jobinfo()
         return self._consumed_resources
 
     @property
     def cpu_time(self):
-        '''CPU Time in seconds that the job has consumed'''
+        """CPU Time in seconds that the job has consumed"""
         self._update_jobinfo()
         return self._cpu_time
 
     @property
     def dependency_condition(self):
-        '''Job dependency information'''
+        """Job dependency information"""
         self._update_jobinfo()
         return self._dependency_condition
 
     @property
     def email_user(self):
-        '''User supplied email address to send notifications to'''
+        """User supplied email address to send notifications to"""
         self._update_jobinfo()
         return self._email_user
 
     @property
     def end_time(self):
-        '''Time the job ended in seconds since epoch UTC'''
+        """Time the job ended in seconds since epoch UTC"""
         self._update_jobinfo()
         return self._end_time
 
     @property
     def error_file_name(self):
-        '''Path to the error file'''
+        """Path to the error file"""
         self._update_jobinfo()
         return self._error_file_name
 
     @property
     def execution_hosts(self):
-        '''List of hosts that job is running on'''
+        """List of hosts that job is running on"""
         self._update_jobinfo()
         return [ExecutionHost(hn) for hn in self._execution_hosts]
 
     @property
     def input_file_name(self):
-        '''Path to the input file'''
+        """Path to the input file"""
         self._update_jobinfo()
         return self._input_file_name
 
@@ -1086,73 +1086,73 @@ class Job(JobBase):
 
     @property
     def max_requested_slots(self):
-        '''The maximum number of job slots that could be used by the job'''
+        """The maximum number of job slots that could be used by the job"""
         self._update_jobinfo()
         return self._max_requested_slots
 
     @property
     def name(self):
-        '''User or system given name of the job'''
+        """User or system given name of the job"""
         self._update_jobinfo()
         return self._name
 
     @property
     def options(self):
-        '''List of options that apply to the job'''
+        """List of options that apply to the job"""
         self._update_jobinfo()
         return self._options
 
     @property
     def output_file_name(self):
-        '''Path to the output file'''
+        """Path to the output file"""
         self._update_jobinfo()
         return self._output_file_name
 
     @property
     def pending_reasons(self):
-        '''Text string explainging why the job is pending'''
+        """Text string explainging why the job is pending"""
         self._update_jobinfo()
         return self._pend_reasons
 
     @property
     def predicted_start_time(self):
-        '''Predicted start time of the job'''
+        """Predicted start time of the job"""
         self._update_jobinfo()
         return self._predicted_start_time
 
     @property
     def priority(self):
-        '''Actual priority of the job'''
+        """Actual priority of the job"""
         self._update_jobinfo()
         return self._priority
 
     @property
     def process_id(self):
-        '''Process id of the job'''
+        """Process id of the job"""
         self._update_jobinfo()
         return self._process_id
 
     @property
     def processes(self):
-        '''Array of processes started by the job'''
+        """Array of processes started by the job"""
         self._update_jobinfo()
         return self._processes
 
     @property
     def project_names(self):
-        '''Array of project names that the job was submitted with'''
+        """Array of project names that the job was submitted with"""
         self._update_jobinfo()
         return self._project_names
 
     @property
     def requested_resources(self):
-        '''Resources requested by the job'''
+        """Resources requested by the job"""
         self._update_jobinfo()
         return self._requested_resources
 
     @property
     def requested_slots(self):
-        '''The number of job slots requested by the job'''
+        """The number of job slots requested by the job"""
         self._update_jobinfo()
         return self._requested_slots
 
@@ -1163,31 +1163,34 @@ class Job(JobBase):
 
     @property
     def runtime_limits(self):
-        '''Array of run time limits imposed on the job'''
+        """Array of run time limits imposed on the job"""
         self._update_jobinfo()
         return self._runtime_limits
 
     @property
     def start_time(self):
-        '''start time of the job in seconds since epoch UTC'''
+        """start time of the job in seconds since epoch UTC"""
         self._update_jobinfo()
         return self._start_time
 
     @property
     def status(self):
-        '''Status of the job'''
+        """Status of the job"""
         self._update_jobinfo()
-        return JobStatus(self._status)
+        status = self._status
+        if status | lsblib.JOB_STAT_DONE: # If its done, its done.
+            status = 0x40
+        return JobStatus(status)
 
     @property
     def submission_host(self):
-        '''Host job was submitted from'''
+        """Host job was submitted from"""
         self._update_jobinfo()
         return Host(self._submission_host)
 
     @property
     def submit_time(self):
-        '''Submit time in seconds since epoch'''
+        """Submit time in seconds since epoch"""
         self._update_jobinfo()
         return self._submit_time
 
@@ -1198,30 +1201,30 @@ class Job(JobBase):
 
     @property
     def termination_time(self):
-        '''Termination deadline - the job will finish before or on this time'''
+        """Termination deadline - the job will finish before or on this time"""
         self._update_jobinfo()
         return self._termination_time
 
     @property
     def user_name(self):
-        '''User name of the job owner'''
+        """User name of the job owner"""
         self._update_jobinfo()
         return self._user_name
 
     @property
     def user_priority(self):
-        '''User given priority of the job'''
+        """User given priority of the job"""
         self._update_jobinfo()
         return self._user_priority
 
 
     def queue(self):
-        '''The queue object for the queue the job is currently in.'''
+        """The queue object for the queue the job is currently in."""
         self._update_jobinfo()
         return Queue(self._queue_name)
 
     def requested_hosts(self):
-        '''Array of host objects the job was submitted to'''
+        """Array of host objects the job was submitted to"""
         self._update_jobinfo()
         return [Host(hn) for hn in self._requested_hosts]
 
@@ -1279,78 +1282,78 @@ class Job(JobBase):
     ## Openlava Only
     @property
     def checkpoint_directory(self):
-        '''Directory to store checkpoint data'''
+        """Directory to store checkpoint data"""
         self._update_jobinfo()
         return self._checkpoint_directory
 
     @property
     def checkpoint_period(self):
-        '''Number of seconds between sending checkpoint signals'''
+        """Number of seconds between sending checkpoint signals"""
         self._update_jobinfo()
         return self._checkpoint_period
 
     @property
     def checkpoint_period_timedelta(self):
-        '''Timedelta object for checkpointing period'''
+        """Timedelta object for checkpointing period"""
         return datetime.timedelta(seconds=self.checkpoint_period)
 
     @property
     def cpu_factor(self):
-        '''CPU Factor of execution host'''
+        """CPU Factor of execution host"""
         self._update_jobinfo()
         return self._cpu_factor
 
     @property
     def cwd(self):
-        '''Current Working Directory of the job'''
+        """Current Working Directory of the job"""
         self._update_jobinfo()
         return self._cwd
 
     @property
     def execution_cwd(self):
-        '''Current working directory on the execution host'''
+        """Current working directory on the execution host"""
         self._update_jobinfo()
         return self._execution_cwd
 
     @property
     def execution_home_directory(self):
-        '''Home directory on execution host'''
+        """Home directory on execution host"""
         self._update_jobinfo()
         return self._execution_home_directory
 
     @property
     def execution_user_id(self):
-        '''User ID on execution host'''
+        """User ID on execution host"""
         self._update_jobinfo()
         return self._execution_user_id
 
     @property
     def execution_user_name(self):
-        '''User name on execution host'''
+        """User name on execution host"""
         self._update_jobinfo()
         return self._execution_user_name
 
     @property
     def host_specification(self):
-        '''Host specification'''
+        """Host specification"""
         self._update_jobinfo()
         return self._host_specification
 
     @property
     def login_shell(self):
-        '''Login shell of the user'''
+        """Login shell of the user"""
         self._update_jobinfo()
         return self._login_shell
 
     @property
     def parent_group(self):
-        '''Parent job group'''
+        """Parent job group"""
         self._update_jobinfo()
         return self._parent_group
 
     @property
     def pre_execution_command(self):
-        '''User supplied Pre Exec Command'''
+        """User supplied Pre Exec Command"""
         self._update_jobinfo()
         return self._pre_execution_command
 
@@ -1365,19 +1368,19 @@ class Job(JobBase):
 
     @property
     def service_port(self):
-        '''NIOS Port of the job'''
+        """NIOS Port of the job"""
         self._update_jobinfo()
         return self._service_port
 
     @property
     def submit_home_directory(self):
-        '''Home directory on the submit host'''
+        """Home directory on the submit host"""
         self._update_jobinfo()
         return self._submit_home_directory
 
     @property
     def termination_signal(self):
-        '''Signal to send when job exceeds termination deadline'''
+        """Signal to send when job exceeds termination deadline"""
         self._update_jobinfo()
         return self._termination_signal
 
@@ -1546,115 +1549,115 @@ class Host(HostBase):
 
     @property
     def has_checkpoint_support(self):
-        '''True if the host supports checkpointing'''
+        """True if the host supports checkpointing"""
         self._update_lsb_hostinfo()
         return self._has_checkpoint_support
 
     @property
     def host_model(self):
-        '''String containing model information'''
+        """String containing model information"""
         return self._model
 
     @property
     def host_type(self):
-        '''String containing host type information'''
+        """String containing host type information"""
         return lslib.ls_gethosttype(self.name)
 
 
     @property
     def resources(self):
-        '''Array of resources available'''
+        """Array of resources available"""
         self._update_hostinfo()
         return self._resources
 
     @property
     def max_jobs(self):
-        '''Returns the maximum number of jobs that may execute on this host'''
+        """Returns the maximum number of jobs that may execute on this host"""
         self._update_lsb_hostinfo()
         return self._max_jobs
 
     @property
     def max_processors(self):
-        '''Maximum number of processors available on the host'''
+        """Maximum number of processors available on the host"""
         self._update_hostinfo()
         return self._max_processors
 
     @property
     def max_ram(self):
-        '''Max Ram'''
+        """Max Ram"""
         self._update_hostinfo()
         return self._max_ram
 
     @property
     def max_slots(self):
-        '''Returns the maximum number of scheduling slots that may be consumed on this host'''
+        """Returns the maximum number of scheduling slots that may be consumed on this host"""
         self._update_lsb_hostinfo()
         return self._max_slots
 
 
     @property
     def max_swap(self):
-        '''Max swap space'''
+        """Max swap space"""
         self._update_hostinfo()
         return self._max_swap
 
     @property
     def max_tmp(self):
-        '''Max tmp space'''
+        """Max tmp space"""
         self._update_hostinfo()
         return self._max_tmp
 
     @property
     def num_reserved_slots(self):
-        '''Returns the number of scheduling slots that are reserved'''
+        """Returns the number of scheduling slots that are reserved"""
         self._update_lsb_hostinfo()
         return self._num_reserved_slots
 
     @property
     def num_running_jobs(self):
-        '''Returns the nuber of jobs that are executing on the host'''
+        """Returns the nuber of jobs that are executing on the host"""
         self._update_lsb_hostinfo()
         return self._num_running_jobs
 
     @property
     def num_running_slots(self):
-        '''Returns the total number of scheduling slots that are consumed on this host'''
+        """Returns the total number of scheduling slots that are consumed on this host"""
         self._update_lsb_hostinfo()
         return self._num_running_slots
 
     @property
     def num_suspended_jobs(self):
-        '''Returns the number of jobs that are suspended on this host'''
+        """Returns the number of jobs that are suspended on this host"""
         self._update_lsb_hostinfo()
         return self._num_suspended_jobs
 
     @property
     def num_suspended_slots(self):
-        '''Returns the number of scheduling slots that are suspended on this host'''
+        """Returns the number of scheduling slots that are suspended on this host"""
         self._update_lsb_hostinfo()
         return self._num_suspended_jobs
 
     @property
     def run_windows(self):
-        '''Run Windows'''
+        """Run Windows"""
         self._update_lsb_hostinfo()
         return self._run_windows
 
     @property
     def statuses(self):
-        '''Array of statuses that apply to the host'''
+        """Array of statuses that apply to the host"""
         self._update_lsb_hostinfo()
         return HostStatus.get_status_list(self._status)
 
     @property
     def total_jobs(self):
-        '''Returns the total number of jobs that are running on this host, including suspended jobs.'''
+        """Returns the total number of jobs that are running on this host, including suspended jobs."""
         self._update_lsb_hostinfo()
         return self._total_jobs
 
     @property
     def total_slots(self):
-        '''Returns the total number of slots that are consumed on this host, including those from  suspended jobs.'''
+        """Returns the total number of slots that are consumed on this host, including those from  suspended jobs."""
         self._update_lsb_hostinfo()
         return self._total_slots
 
@@ -1663,60 +1666,60 @@ class Host(HostBase):
 
     @property
     def cpu_factor(self):
-        '''Openlava Specific - returns the CPU factor of the host'''
+        """Openlava Specific - returns the CPU factor of the host"""
         return lslib.ls_gethostfactor(self.name)
 
     @property
     def is_server(self):
-        '''True if host is an openlava server (as opposed to submission host)'''
+        """True if host is an openlava server (as opposed to submission host)"""
         self._update_hostinfo()
         return self._is_server
 
     @property
     def num_disks(self):
-        '''Openlava specific: Returns the number of physical disks installed in the machine'''
+        """Openlava specific: Returns the number of physical disks installed in the machine"""
         self._update_hostinfo()
         return self._num_disks
 
     @property
     def num_user_suspended_jobs(self):
-        '''Returns the number of jobs that have been suspended by the user on this host'''
+        """Returns the number of jobs that have been suspended by the user on this host"""
         self._update_lsb_hostinfo()
         return self._num_user_suspended_jobs
 
     @property
     def num_user_suspended_slots(self):
-        '''Returns the number of scheduling slots that have been suspended by the user on this host'''
+        """Returns the number of scheduling slots that have been suspended by the user on this host"""
         self._update_lsb_hostinfo()
         return self._num_user_suspended_slots
 
     @property
     def num_system_suspended_jobs(self):
-        '''Returns the number of jobs that have been suspended by the system on this host'''
+        """Returns the number of jobs that have been suspended by the system on this host"""
         self._update_lsb_hostinfo()
         return self._num_system_suspended_jobs
 
     @property
     def num_system_suspended_slots(self):
-        '''Returns the number of scheduling slots that have been suspended by the system on this host'''
+        """Returns the number of scheduling slots that have been suspended by the system on this host"""
         self._update_lsb_hostinfo()
         return self._num_system_suspended_slots
 
     @property
     def has_kernel_checkpoint_copy(self):
-        '''Returns true if the host supports kernel checkpointing'''
+        """Returns true if the host supports kernel checkpointing"""
         self._update_lsb_hostinfo()
         return self._has_kernel_checkpoint_support
 
     @property
     def max_slots_per_user(self):
-        '''Returns the maximum slots that a user can occupy on the host'''
+        """Returns the maximum slots that a user can occupy on the host"""
         self._update_lsb_hostinfo()
         return self._max_slots_per_user
 
 
     def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
-        '''Return jobs on this host'''
+        """Return jobs on this host"""
         num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=user, queue=queue, host=self.host_name,
                                           options=options)
         jobs = []
@@ -1730,7 +1733,7 @@ class Host(HostBase):
         return jobs
 
     def load_information(self):
-        '''Return load information on the host'''
+        """Return load information on the host"""
         self._update_lsb_hostinfo()
 
         indexes = {
@@ -2169,7 +2172,7 @@ class User(UserBase):
                 self.num_pending_jobs += 1
 
     def jobs(self, job_id=0, job_name="", queue="", host="", options=0):
-        '''Return jobs on this host'''
+        """Return jobs on this host"""
         num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=self.name, queue=queue, host=host,
                                           options=options)
         jobs = []
