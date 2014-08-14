@@ -787,8 +787,18 @@ class Job(JobBase):
 
         array_index = lsblib.get_array_index(job_id)
         job_id = lsblib.get_job_id(job_id)
-        return Job(job_id=job_id, array_index=array_index)
-
+        try:
+            return Job(job_id=job_id, array_index=array_index)
+        except:
+            num_jobs = lsblib.lsb_openjobinfo(6236, options=lsblib.JOBID_ONLY|lsblib.ALL_JOB)
+            jobs = []
+            for i in range(num_jobs):
+                j=lsblib.lsb_readjobinfo()
+                job_id = lsblib.get_job_id(j.jobId)
+                array_index = lsblib.get_array_index(j.jobId)
+                jobs.append(Job(job_id=job_id, array_index=array_index))
+            lsblib.lsb_closejobinfo()
+            return jobs
     def json_attributes(self):
         attribs = JobBase.json_attributes(self)
         attribs.extend([

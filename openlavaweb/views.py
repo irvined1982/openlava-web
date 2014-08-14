@@ -966,7 +966,14 @@ class OLWSubmit(forms.Form):
         self._pre_submit()
         job = Job.submit(**kwargs)
         self._post_submit(job)
-        return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
+        if isinstance(job, Job):
+            return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
+        if ajax_args:
+            return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
+                            content_type="application/json")
+        else:
+            return HttpResponseRedirect(reverse("olw_job_view_array", args=[job[0].job_id, job[0].array_index]))
+        
 
     def _get_args(selfs):
         """Return all arguments for job submission.  For normal simple web submission forms, this is all that is needed
