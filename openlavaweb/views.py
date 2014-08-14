@@ -967,7 +967,7 @@ class OLWSubmit(forms.Form):
         job = Job.submit(**kwargs)
         self._post_submit(job)
         return job
-        
+
         if isinstance(job, Job):
             return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
 
