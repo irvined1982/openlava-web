@@ -1178,7 +1178,7 @@ class Job(JobBase):
         """Status of the job"""
         self._update_jobinfo()
         status = self._status
-        if status | lsblib.JOB_STAT_DONE: # If its done, its done.
+        if status & lsblib.JOB_STAT_DONE: # If its done, its done.
             status = 0x40
         return JobStatus(status)
 
