@@ -791,10 +791,10 @@ class Job(JobBase):
             return Job(job_id=job_id, array_index=array_index)
         except:
             try:
-                num_jobs = lsblib.lsb_openjobinfo(6236, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
+                num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
                 jobs = []
                 for i in range(num_jobs):
-                    j=lsblib.lsb_readjobinfo()
+                    j = lsblib.lsb_readjobinfo()
                     job_id = lsblib.get_job_id(j.jobId)
                     array_index = lsblib.get_array_index(j.jobId)
                     jobs.append(Job(job_id=job_id, array_index=array_index))
