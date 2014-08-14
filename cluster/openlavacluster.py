@@ -1053,7 +1053,6 @@ class Job(JobBase):
         return False
 
     @property
-
     def was_killed(self):
         if self.status.name == "JOB_STAT_EXIT" and self._exit_status == 130:
             return True
