@@ -1534,7 +1534,7 @@ class Job(JobBase):
 
 
     def _update_jobinfo(self, job=None):
-        if (int(time.time()) - self._last_update_time) < 60:
+        if (int(time.time()) - self._last_update_time) > 60:
             return
         self._last_update_time = int(time.time())
 
