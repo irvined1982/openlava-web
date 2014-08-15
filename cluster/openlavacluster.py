@@ -1400,7 +1400,7 @@ class Job(JobBase):
         """
         Creates a new instance of the job class.
 
-       >>> # Print all jobs and their status.
+        >>> # Print all jobs and their status.
         >>> from cluster.openlavacluster import Job
         >>> for job in Job.get_job_list(job_state="ALL"):
         ...     print "Job: %d[%d] is: %s" % ( job.job_id, job.array_index, job.status)
@@ -1534,9 +1534,10 @@ class Job(JobBase):
 
 
     def _update_jobinfo(self, job=None):
-        if (int(time.time()) - self._last_update_time) > 60:
+        if (int(time.time()) - self._last_update_time) < 60:
             return
         self._last_update_time = int(time.time())
+        print "updating job"
 
         full_job_id = lsblib.create_job_id(self.job_id, self.array_index)
         if job == None:
