@@ -967,17 +967,17 @@ class OLWSubmit(forms.Form):
         try:
             job = Job.submit(**kwargs)
             self._post_submit(job)
+        
+            if isinstance(job, Job):
+                return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
+            print job
+            if ajax_args:
+                return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
+                                content_type='application/json')
+            else:
+                return HttpResponseRedirect(reverse("olw_job_view_array", args=[job[0].job_id, job[0].array_index]))
         except Exception as e:
             return e
-        if isinstance(job, Job):
-            return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
-        print job
-        if ajax_args:
-            return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
-                            content_type='application/json')
-        else:
-            return HttpResponseRedirect(reverse("olw_job_view_array", args=[job[0].job_id, job[0].array_index]))
-
 
 
     def _get_args(selfs):
