@@ -791,7 +791,7 @@ class Job(JobBase):
         print num_jobs
         print "Openned"
         lsblib.lsb_readjobinfo()
-
+        print "read 1"
         jobs = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
 
         print "Read"
