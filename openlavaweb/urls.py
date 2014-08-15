@@ -37,7 +37,7 @@ urlpatterns = patterns('',
 
                        # Job list views.
                        url(r'^jobs/(?P<job_id>\d+)/$', 'openlavaweb.views.get_job_list', name="olw_job_list"),
-                       url(r'^jobs/$', 'openlavaweb.views.job_list', name="olw_job_list"),
+                       url(r'^jobs/$', 'openlavaweb.views.get_job_list', name="olw_job_list"),
 
                        url(r'^job/submit$', 'openlavaweb.views.job_submit', name="olw_job_submit"),
                        url(r'^job/submit/(?P<form_class>.+)$', 'openlavaweb.views.job_submit', name="olw_job_submit_class"),
