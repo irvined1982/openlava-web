@@ -147,6 +147,7 @@ class JobBase:
         }
         for field in simple_fields:
             d[field] = getattr(self, field)
+        print "to_dict"
         return d
 
     def json_attributes(self):

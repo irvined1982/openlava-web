@@ -709,7 +709,7 @@ def job_output(request, job_id, array_index=0):
 
 class ClusterEncoder(json.JSONEncoder):
     def check(self, obj):
-        print("Check Called")
+
         if isinstance(obj, Host):
             return {
                 'type': "Host",
@@ -736,7 +736,7 @@ class ClusterEncoder(json.JSONEncoder):
                 'name': obj.name,
                 'url': reverse("olw_queue_view", args=[obj.name]),
             }
-        print("Check Complete")
+
         return obj
 
     def default(self, obj):
@@ -744,8 +744,8 @@ class ClusterEncoder(json.JSONEncoder):
             return obj.to_dict()
         except AttributeError:
             pass
+        print "to_dict failed: %s, parsing" % obj
         
-        print("Parsing: %s" % obj)
         if isinstance(obj, datetime.timedelta):
             return obj.total_seconds()
 
