@@ -682,7 +682,7 @@ class Job(JobBase):
         :return: list of user names
 
         """
-        return [self.user_name] + self.queue().admins
+        return [self.user_name] + self.queue.admins
 
     @property
     def begin_time(self):
