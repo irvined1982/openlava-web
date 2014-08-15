@@ -793,7 +793,7 @@ class Job(JobBase):
         lsblib.lsb_closejobinfo()
         print "Closed"
         if len(jobs) == 1:
-            return jobs[1]
+            return jobs[0]
         return jobs
 
 
