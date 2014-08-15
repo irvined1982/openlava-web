@@ -1110,7 +1110,7 @@ class JobSubmitForm(OLWSubmit):
     ]
     options = forms.MultipleChoiceField(choices=opts, required=False)
     options2 = forms.MultipleChoiceField(choices=opts2, required=False)
-    num_processors = forms.IntegerField(initial=1)
+    requested_slots = forms.IntegerField(initial=1)
     command = forms.CharField(widget=forms.Textarea, max_length=512)
     job_name = forms.CharField(max_length=512, required=False)
     queues = [(u'', u'Default')]
@@ -1135,7 +1135,7 @@ class JobSubmitForm(OLWSubmit):
     checkpoint_directory = forms.CharField(max_length=512, required=False)
     email_user = forms.EmailField(required=False)
     project_name = forms.CharField(max_length=128, required=False)
-    max_num_processors = forms.IntegerField(required=False)
+    max_requested_slots = forms.IntegerField(required=False)
     login_shell = forms.CharField(128, required=False)
     user_priority = forms.IntegerField(required=False)
 
@@ -1152,7 +1152,7 @@ class SimpleJobSubmitForm(OLWSubmit):
                 kwargs[field] = value
         return kwargs
 
-    num_processors = forms.IntegerField(initial=1)
+    requested_slots = forms.IntegerField(initial=1)
     command = forms.CharField(widget=forms.Textarea, max_length=512)
     queues = [(u'', u'Default')]
     for q in Queue.get_queue_list():
@@ -1167,7 +1167,7 @@ class ConsumeResourcesJob(OLWSubmit):
     friendly_name = "Consume Resources"
 
     job_name = forms.CharField(max_length=512, required=False)
-    num_processors = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1, help_text="How many processors to execute on")
+    requested_slots = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1, help_text="How many processors to execute on")
     run_time = forms.IntegerField(min_value=1, initial=120, help_text="How many seconds to execute for")
 
     memory_size = forms.IntegerField(min_value=1, initial=128, help_text="How many MB to consume")
@@ -1186,7 +1186,7 @@ class ConsumeResourcesJob(OLWSubmit):
         if len(self.cleaned_data['job_name']) > 0:
             kwargs['job_name'] = self.cleaned_data['job_name']
 
-        kwargs['num_processors'] = self.cleaned_data['num_processors']
+        kwargs['requested_slots'] = self.cleaned_data['requested_slots']
         kwargs['queue_name'] = self.cleaned_data['queue_name']
         kwargs['job_name'] = self.cleaned_data['job_name']
 
