@@ -788,6 +788,8 @@ class Job(JobBase):
         job_id = lsblib.get_job_id(job_id)
 
         num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
+        print "Openned"
+        
         jobs = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
 
         lsblib.lsb_closejobinfo()
