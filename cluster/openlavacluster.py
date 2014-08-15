@@ -790,8 +790,6 @@ class Job(JobBase):
             if job.job_id == job_id:
                 jobs.append(job)
 
-        if len(jobs) == 1:
-            return jobs[0]
         return jobs
 
 

@@ -949,7 +949,7 @@ def execute_job_submit(request, queue, ajax_args, submit_form):
 
 
 class OLWSubmit(forms.Form):
-    """Openlava job submission form"""
+    """Openlava job submission form, redirects the user to the first job, or if ajax, dumps all jobs"""
     name="basesubmit"
     friendly_name="Base Submit"
     # If this needs to be treated as a formset, set to true so the
@@ -969,18 +969,14 @@ class OLWSubmit(forms.Form):
         self._pre_submit()
 
         try:
-            job = Job.submit(**kwargs)
+            jobs = Job.submit(**kwargs)
 
-            self._post_submit(job)
+            self._post_submit(jobs)
 
-            if isinstance(job, Job):
-
-                return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
             if ajax_args:
-                return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
+                return HttpResponse(json.dumps(jobs, sort_keys=True, indent=3, cls=ClusterEncoder),
                                 content_type='application/json')
-            else:
-                return HttpResponseRedirect(reverse("olw_job_view_array", args=[job[0].job_id, job[0].array_index]))
+            return HttpResponseRedirect(reverse("olw_job_view_array", args=[jobs[0].job_id, jobs[0].array_index]))
         except Exception as e:
             return e
 
