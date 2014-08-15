@@ -787,14 +787,19 @@ class Job(JobBase):
 
         array_index = lsblib.get_array_index(job_id)
         job_id = lsblib.get_job_id(job_id)
+        print "Job submitted"
         try:
+            print "Returning single job object"
             return Job(job_id=job_id, array_index=array_index)
         except:
+            print "Didnt return signle job after all"
             try:
                 num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
+                print "Num Jobs: ", num_jobs
                 jobs = []
                 for i in range(num_jobs):
                     j = lsblib.lsb_readjobinfo()
+                    print "Job Job Job"
                     job_id = lsblib.get_job_id(j.jobId)
                     array_index = lsblib.get_array_index(j.jobId)
                     jobs.append(Job(job_id=job_id, array_index=array_index))

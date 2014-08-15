@@ -969,12 +969,16 @@ class OLWSubmit(forms.Form):
             kwargs = ajax_args
         else:
             kwargs = self._get_args()
+        print "PRE_SUB"
         self._pre_submit()
+        print "POST PRE SUB"
         try:
             job = Job.submit(**kwargs)
+            print "PRE POST SUB"
             self._post_submit(job)
-
+            print "POST POST SUB"
             if isinstance(job, Job):
+                print "IS job, returning REDIRECT"
                 return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
             print job
             if ajax_args:
