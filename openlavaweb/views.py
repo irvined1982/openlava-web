@@ -925,6 +925,7 @@ def job_submit(request, form_class="JobSubmitForm"):
     # p.join()
     # rc = q.get(False)
     rc = form.submit(ajax_args)
+    print rc
     try:
 
         if isinstance(rc, Exception):
