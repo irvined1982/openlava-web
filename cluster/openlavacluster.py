@@ -1706,6 +1706,7 @@ class Job(JobBase):
             a single element.
         :rtype: list
         """
+        initialize()
         options = 0
         options2 = 0
         # beginTime
