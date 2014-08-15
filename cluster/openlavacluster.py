@@ -1534,10 +1534,12 @@ class Job(JobBase):
 
 
     def _update_jobinfo(self, job=None):
+        age=int(time.time()) - self._last_update_time
+        print age
         if (int(time.time()) - self._last_update_time) < 60:
             return
         self._last_update_time = int(time.time())
-        print "updating job %s" % self._job_id
+        print "updating job %s[%s]" % ( self._job_id, self._array_index)
 
         full_job_id = lsblib.create_job_id(self.job_id, self.array_index)
         if job == None:
