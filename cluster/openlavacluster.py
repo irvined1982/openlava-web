@@ -1537,7 +1537,7 @@ class Job(JobBase):
         if (int(time.time()) - self._last_update_time) < 60:
             return
         self._last_update_time = int(time.time())
-        print "updating job"
+        print "updating job %s" % self._job_id
 
         full_job_id = lsblib.create_job_id(self.job_id, self.array_index)
         if job == None:
