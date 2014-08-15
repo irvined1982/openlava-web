@@ -781,33 +781,26 @@ class Job(JobBase):
             s.maxNumProcessors = s.numProcessors
         sr = lsblib.SubmitReply()
         job_id = lsblib.lsb_submit(s, sr)
-
+        print "Job submitted"
         if job_id < 0:
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
 
-        array_index = lsblib.get_array_index(job_id)
         job_id = lsblib.get_job_id(job_id)
-        print "Job submitted"
-        try:
-            print "Returning single job object"
-            return Job(job_id=job_id, array_index=array_index)
-        except:
-            print "Didnt return signle job after all"
-            try:
-                num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
-                print "Num Jobs: ", num_jobs
-                jobs = []
-                for i in range(num_jobs):
-                    j = lsblib.lsb_readjobinfo()
-                    print "Job Job Job"
-                    job_id = lsblib.get_job_id(j.jobId)
-                    array_index = lsblib.get_array_index(j.jobId)
-                    jobs.append(Job(job_id=job_id, array_index=array_index))
-                lsblib.lsb_closejobinfo()
-                return jobs
-            except Exception as e:
-                return e
 
+        num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
+
+        jobs = []
+        for i in range(num_jobs):
+            j = lsblib.lsb_readjobinfo()
+            print "Job Job Job"
+            job_id = lsblib.get_job_id(j.jobId)
+            array_index = lsblib.get_array_index(j.jobId)
+            jobs.append(Job(job_id=job_id, array_index=array_index))
+        lsblib.lsb_closejobinfo()
+        if len(jobs) == 1:
+            return jobs[1]
+        return jobs
+        
 
     def json_attributes(self):
         attribs = JobBase.json_attributes(self)
