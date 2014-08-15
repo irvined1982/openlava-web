@@ -788,18 +788,8 @@ class Job(JobBase):
         job_id = lsblib.get_job_id(job_id)
 
         num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
+        jobs = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
 
-        jobs = []
-        for i in range(num_jobs):
-            j = lsblib.lsb_readjobinfo()
-            print "Job Job Job"
-            job_id = lsblib.get_job_id(j.jobId)
-            array_index = lsblib.get_array_index(j.jobId)
-            print "got array index"
-            print "Appending Job"
-            jobs.append(Job(job_id=job_id, array_index=array_index))
-            print "Appended Job"
-        print "Closing"
         lsblib.lsb_closejobinfo()
         print "Closed"
         if len(jobs) == 1:
