@@ -52,7 +52,7 @@ def create_js_success(data=None, message=""):
         'data': data,
         'message': message,
     }
-    return HttpResponse(json.dumps(data, sort_keys=True, indent=3, cls=ClusterEncoder),
+    return HttpResponse(json.dumps(data, cls=ClusterEncoder),
                             content_type='application/json')
 
 
