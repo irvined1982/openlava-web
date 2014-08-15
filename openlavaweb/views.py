@@ -15,10 +15,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Openlava Web. If not, see <http://www.gnu.org/licenses/>.
-import ujson as json
+import json
 import os
 import pwd
-import logging
+
 
 import datetime
 from multiprocessing import Process as MPProcess
@@ -958,6 +958,7 @@ def get_job_list(request, job_id=0):
                                     job_name=job_name)
 
     if request.is_ajax() or request.GET.get("json", None):
+        print "creating response"
         return create_js_success(data=job_list)
 
     paginator = Paginator(job_list, 50)

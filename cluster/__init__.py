@@ -80,6 +80,9 @@ class ClusterBase:
 
 
 class JobBase:
+    def to_dict(self):
+        d={}
+
     def json_attributes(self):
         return [
             'cluster_type',
