@@ -1814,12 +1814,80 @@ class Job(JobBase):
     @classmethod
     def get_job_list(cls, job_id=0, array_index=0, queue_name="", host_name="", user_name="all", job_state="ACT",
                      job_name=""):
+        """
+        Returns a list of jobs that match the specified criteria.
+
+        Example::
+
+        >>> # Print all jobs and their status.
+        >>> from cluster.openlavacluster import Job
+        >>> for job in Job.get_job_list(job_state="ALL"):
+        ...     print "Job: %d[%d] is: %s" % ( job.job_id, job.array_index, job.status)
+        ...
+        Job: 6259[9] is: Running
+        Job: 6259[10] is: Running
+        Job: 6296[1] is: Pending
+        Job: 6296[2] is: Pending
+        Job: 6296[3] is: Pending
+
+        
+
+        :param job_id:
+            The numeric Job ID, if this is specified, then queue_name, host_name, user_name, and job_state are
+            ignored.
+
+        :param array_index:
+            The array index of the job.  If array_index is -1, then all array tasks from the corresponding job ID are
+            returned.  If array_index is not zero, then a job_id must also be specified.
+
+        :param queue_name:
+            The name of the queue.  If specified, implies that job_id and array_index are set to default.  Only returns
+            jobs that are submitted into the named queue.
+
+        :param host_name:
+            The name of the host.  If specified, implies that job_id and array_index are set to default.  Only returns
+            jobs that are executing on the specified host.
+
+        :param user_name:
+            The name of the user.  If specified, implies that job_id and array_index are set to default.  Only returns
+            jobs that are owned by the specified user.
+
+        :param job_state:
+            Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
+            jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+            "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
+            currently suspended.
+
+        :param job_name:
+            Only return jobs that are named job_name.
+
+        :return: Array of Job objects.
+        :rtype: list
+
+        """
+        if array_index != 0 and job_id == 0:
+            raise ValueError("If specifying an array_index, job_id must also be specified.")
+
         initialize()
+
+
+        # Handle a job search for array jobs
+        if array_index == -1:
+            job_list=[]
+            num_jobs = lsblib.lsb_openjobinfo(options=lsblib.ALL_JOB)
+            for i in range(num_jobs):
+                j=Job(job=lsblib.lsb_readjobinfo())
+                if j.job_id == job_id:
+                    job_list.append(j)
+            return job_list
+
         if job_state == 'ACT':
             job_state = lsblib.CUR_JOB
         elif job_state == "ALL":
             job_state = lsblib.ALL_JOB
         elif job_state == "EXIT":
+            job_state = lsblib.EXIT_JOB
+        elif job_state == "DONE":
             job_state = lsblib.DONE_JOB
         elif job_state == "PEND":
             job_state = lsblib.PEND_JOB
