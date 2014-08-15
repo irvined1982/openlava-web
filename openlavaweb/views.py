@@ -709,7 +709,7 @@ def job_output(request, job_id, array_index=0):
 
 class ClusterEncoder(json.JSONEncoder):
     def check(self, obj):
-        logging.debug("Check Called")
+        print("Check Called")
         if isinstance(obj, Host):
             return {
                 'type': "Host",
@@ -736,11 +736,11 @@ class ClusterEncoder(json.JSONEncoder):
                 'name': obj.name,
                 'url': reverse("olw_queue_view", args=[obj.name]),
             }
-        logging.debug("Check Complete")
+        print("Check Complete")
         return obj
 
     def default(self, obj):
-        logging.debug("Parsing: %s" % obj)
+        print("Parsing: %s" % obj)
         if isinstance(obj, datetime.timedelta):
             return obj.total_seconds()
 
