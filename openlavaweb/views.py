@@ -919,15 +919,11 @@ def job_submit(request, form_class="JobSubmitForm"):
 
 
     # Process the actual form.
-    # q = MPQueue()
-    # p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
-    # p.start()
-    # p.join()
-    # rc = q.get(False)
-
-    print "PRE"
-    rc = form.submit(ajax_args)
-    print "POST"
+    q = MPQueue()
+    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
+    p.start()
+    p.join()
+    rc = q.get(False)
 
     try:
 
@@ -969,18 +965,17 @@ class OLWSubmit(forms.Form):
             kwargs = ajax_args
         else:
             kwargs = self._get_args()
-        print "PRE_SUB"
+
         self._pre_submit()
-        print "POST PRE SUB"
+
         try:
             job = Job.submit(**kwargs)
-            print "PRE POST SUB"
+
             self._post_submit(job)
-            print "POST POST SUB"
+
             if isinstance(job, Job):
-                print "IS job, returning REDIRECT"
+
                 return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
-            print job
             if ajax_args:
                 return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
                                 content_type='application/json')
@@ -988,7 +983,6 @@ class OLWSubmit(forms.Form):
                 return HttpResponseRedirect(reverse("olw_job_view_array", args=[job[0].job_id, job[0].array_index]))
         except Exception as e:
             return e
-
 
     def _get_args(selfs):
         """Return all arguments for job submission.  For normal simple web submission forms, this is all that is needed
