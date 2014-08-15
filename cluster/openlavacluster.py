@@ -1654,6 +1654,58 @@ class Job(JobBase):
 
     @classmethod
     def submit(cls, **kwargs):
+        """
+        Submits a job into the cluster.
+
+        :param options:
+            Numeric value to pass to the options of the scheduler.
+        :param options2:
+            Numeric value to pass to the options2 field of the scheduler.
+        :param requested_slots:
+            The number of slots to use (Minimum value.) Default is 1.
+        :param command:
+            The command to execute
+        :param job_name:
+            The name of the job.  If none, then no name is used.
+        :param queue_name:
+            The name of the queue to submit the job into, if none, the default queue is used.
+        :param requested_hosts
+            A string containing the list of hosts separated by a space that the user wishes the job to run on.
+        :param resource_request
+            A string containing the resource request criteria.
+        :param host_specification
+            A string defining the host specification that must be used
+        :param dependency_conditions
+            A string defining the dependency conditions
+        :param signal_value
+            The signal value to send to the job when its termination deadline is reached.
+        :param input_file
+            Job input file to use.
+        :param output_file
+            Job output file to use.
+        :param error_file
+            Job error file to use.
+        :param checkpoint_period
+            Number of seconds in between checkpoint operations
+        :param checkpoint_directory
+            Directory to store checkpoint data
+        :param email_user
+            Email address to send job updates to.
+        :param project_name
+            Name of project to submit to
+        :param max_requested_slots
+            Max number of slots to use
+        :param login_shell
+            Login shell to use
+        :param user_priority
+            User given priority for the job.
+
+        :return:
+            List of Job objects.  If the job was an array job, then the list will contain multiple elements with the
+            same job id, but different array_indexes, if the job was not an array job, then the list will contain only
+            a single element.
+        :rtype: list
+        """
         options = 0
         options2 = 0
         # beginTime
@@ -1670,7 +1722,7 @@ class Job(JobBase):
                 'options': 0,
                 'options2': 0,
             },
-            'num_processors': {
+            'requested_slots': {
                 'sname': 'numProcessors',
                 'options': 0,
                 'options2': 0,
@@ -1750,7 +1802,7 @@ class Job(JobBase):
                 'options': lsblib.SUB_PROJECT_NAME,
                 'options2': 0,
             },
-            'max_num_processors': {
+            'max_requested_slots': {
                 'sname': 'maxNumProcessors',
                 'options': 0,
                 'options2': 0,
@@ -1771,12 +1823,10 @@ class Job(JobBase):
         for k, v in kwargs.items():
             if k not in fields:
                 raise JobSubmitError("Field: %s is not a valid field name" % k)
-            print "setting %s to %s" % ( fields[k]['sname'], v)
             setattr(s, fields[k]['sname'], v)
-            print "got %s from %s" % (getattr(s, fields[k]['sname']), fields[k]['sname'])
             options = options | fields[k]['options']
             options2 = options2 | fields[k]['options2']
-        print "options: %s" % options
+
         s.command = kwargs['command']
         options = s.options | options
         s.options = options
@@ -1786,16 +1836,10 @@ class Job(JobBase):
             s.maxNumProcessors = s.numProcessors
         sr = lsblib.SubmitReply()
         job_id = lsblib.lsb_submit(s, sr)
-        print "Job submitted"
+
         if job_id < 0:
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
-        jobs=[]
-        job_id = lsblib.get_job_id(job_id)
-        for job in Job.get_job_list():
-            if job.job_id == job_id:
-                jobs.append(job)
-
-        return jobs
+        return Job.get_job_list(job_id=job_id, array_index=-1)
 
 
     def json_attributes(self):
