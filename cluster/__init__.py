@@ -81,10 +81,7 @@ class ClusterBase:
 
 class JobBase:
     def to_dict(self):
-        d={}
-
-    def json_attributes(self):
-        return [
+        simple_fields=[
             'cluster_type',
             'admins',
             'job_id',
@@ -97,7 +94,6 @@ class JobBase:
             'email_user',
             'end_time',
             'error_file_name',
-            'execution_hosts',
             'input_file_name',
             'max_requested_slots',
             'name',
@@ -115,14 +111,81 @@ class JobBase:
             'runtime_limits',
             'start_time',
             'status',
-            'submission_host',
             'submit_time',
             'suspension_reasons',
             'termination_time',
             'user_name',
             'user_priority',
-            'queue',
-            'requested_hosts',
+            'is_pending',
+            'is_running',
+            'is_suspended',
+            'is_failed',
+            'was_killed',
+            'is_completed',
+        ]
+        d={
+            'queue':{
+                'type': "Queue",
+                'name': self._queue_name,
+            },
+            'requested_hosts':[
+                {
+                'type': "Host",
+                'name': hn,
+                } for hn in self._requested_hosts
+            ],
+            'submission_host':{
+                'type': "Host",
+                'name': self._submission_host,
+            },
+            'execution_hosts':[
+                {
+                'type': "Host",
+                'name': hn,
+                } for hn in self._execution_hosts
+            ],
+        }
+        for field in simple_fields:
+            d[field] = getattr(self, field)
+        return d
+
+    def json_attributes(self):
+        raise NotImplemented
+        return [
+            'cluster_type',
+            'admins',
+            'job_id',
+            'array_index',
+            'begin_time',
+            'command',
+            'consumed_resources',
+            'cpu_time',
+            'dependency_condition',
+            'email_user',
+            'end_time',
+            'error_file_name',
+            'input_file_name',
+            'max_requested_slots',
+            'name',
+            'options',
+            'output_file_name',
+            'pending_reasons',
+            'predicted_start_time',
+            'priority',
+            'process_id',
+            'processes',
+            'project_names',
+            'requested_resources',
+            'requested_slots',
+            'reservation_time',
+            'runtime_limits',
+            'start_time',
+            'status',
+            'submit_time',
+            'suspension_reasons',
+            'termination_time',
+            'user_name',
+            'user_priority',
             'is_pending',
             'is_running',
             'is_suspended',

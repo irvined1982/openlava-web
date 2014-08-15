@@ -1160,7 +1160,7 @@ class Job(JobBase):
 
     @property
     def queue(self):
-        """The queue object that this job is currently in.  This may have been modified by the scheduling system, or an
+        """The queue ob ject that this job is currently in.  This may have been modified by the scheduling system, or an
         administrator.
 
         :return: Queue object that the job is in.
