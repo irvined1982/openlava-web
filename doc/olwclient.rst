@@ -1,11 +1,27 @@
-Client API Documentation
-========================
+API Documentation
+=================
+
+JOB
+---
+
+Local
+^^^^^
+
+.. autoclass:: cluster.openlavacluster.Job
+
+Client
+^^^^^^
+
+.. autoclass:: olwclient.Job
+
+JavaScript
+^^^^^^^^^^
+
+.. js:class:: Job(url, job_id, array_index)
+
+    :param url: URL of the openlava web server
+    :param job_id: The job_id to load
+    :param array_index: The array index to load
 
 
-:mod:`olwclient` Package
-------------------------
 
-.. automodule:: olwclient
-    :members:
-    :undoc-members:
-    :show-inheritance:
