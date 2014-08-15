@@ -924,13 +924,11 @@ def job_submit(request, form_class="JobSubmitForm"):
     # p.start()
     # p.join()
     # rc = q.get(False)
+
     print "PRE"
-    try:
-        rc = form.submit(ajax_args)
-    except Exception as e:
-        print e
+    rc = form.submit(ajax_args)
     print "POST"
-    print rc
+
     try:
 
         if isinstance(rc, Exception):
