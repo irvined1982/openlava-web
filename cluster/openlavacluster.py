@@ -795,12 +795,17 @@ class Job(JobBase):
             print "Job Job Job"
             job_id = lsblib.get_job_id(j.jobId)
             array_index = lsblib.get_array_index(j.jobId)
+            print "got array index"
+            print "Appending Job"
             jobs.append(Job(job_id=job_id, array_index=array_index))
+            print "Appended Job"
+        print "Closing"
         lsblib.lsb_closejobinfo()
+        print "Closed"
         if len(jobs) == 1:
             return jobs[1]
         return jobs
-        
+
 
     def json_attributes(self):
         attribs = JobBase.json_attributes(self)
