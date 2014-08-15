@@ -924,7 +924,9 @@ def job_submit(request, form_class="JobSubmitForm"):
     # p.start()
     # p.join()
     # rc = q.get(False)
+    print "PRE"
     rc = form.submit(ajax_args)
+    print "POST"
     print rc
     try:
 
