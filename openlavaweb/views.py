@@ -919,12 +919,14 @@ def job_submit(request, form_class="JobSubmitForm"):
 
 
     # Process the actual form.
-    q = MPQueue()
-    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
-    p.start()
-    p.join()
-    rc = q.get(False)
+    # q = MPQueue()
+    # p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
+    # p.start()
+    # p.join()
+    # rc = q.get(False)
+    rc = execute_job_submit(queue=q,request=request, ajax_args=ajax_args, submit_form=form)
     try:
+        
         if isinstance(rc, Exception):
             raise rc
         else:
@@ -967,7 +969,7 @@ class OLWSubmit(forms.Form):
         try:
             job = Job.submit(**kwargs)
             self._post_submit(job)
-        
+
             if isinstance(job, Job):
                 return HttpResponseRedirect(reverse("olw_job_view_array", args=[job.job_id, job.array_index]))
             print job
