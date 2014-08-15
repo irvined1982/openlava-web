@@ -34,12 +34,17 @@ urlpatterns = patterns('',
                        url(r'^queues/(?P<queue_name>.+?)/activate$', 'openlavaweb.views.queue_activate',
                            name="olw_queue_activate"),
                        url(r'^queues/(.+?)$', 'openlavaweb.views.queue_view', name="olw_queue_view"),
-                       url(r'^jobs/(?P<job_id>\d+)/$', 'openlavaweb.views.job_list', name="olw_job_list"),
+
+                       # Job list views.
+                       url(r'^jobs/(?P<job_id>\d+)/$', 'openlavaweb.views.get_job_list', name="olw_job_list"),
                        url(r'^jobs/$', 'openlavaweb.views.job_list', name="olw_job_list"),
+
                        url(r'^job/submit$', 'openlavaweb.views.job_submit', name="olw_job_submit"),
                        url(r'^job/submit/(?P<form_class>.+)$', 'openlavaweb.views.job_submit', name="olw_job_submit_class"),
-                       url(r'^job/(\d+)$', 'openlavaweb.views.job_view', name="olw_job_view"),
+
+                       # Primary Job View Page.
                        url(r'^job/(\d+)/(\d+)$', 'openlavaweb.views.job_view', name="olw_job_view_array"),
+
                        url(r'^job/(\d+)/(\d+)/output$', 'openlavaweb.views.job_output', name="olw_job_output"),
                        url(r'^job/(\d+)/(\d+)/error$', 'openlavaweb.views.job_error', name="olw_job_error"),
                        url(r'^job/(\d+)/(\d+)/kill$', 'openlavaweb.views.job_kill', name="olw_job_kill"),

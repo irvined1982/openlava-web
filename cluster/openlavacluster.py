@@ -1400,6 +1400,15 @@ class Job(JobBase):
         """
         Creates a new instance of the job class.
 
+       >>> # Print all jobs and their status.
+        >>> from cluster.openlavacluster import Job
+        >>> for job in Job.get_job_list(job_state="ALL"):
+        ...     print "Job: %d[%d] is: %s" % ( job.job_id, job.array_index, job.status)
+        ...
+        Job: 6259[9] is: Running
+        Job: 6259[10] is: Running
+        Job: 6296[1] is: Pending
+
         :param job:
 
             If defined, contains the data as a dictionary from the remote server.  Default: Undefined, used only
@@ -1829,8 +1838,19 @@ class Job(JobBase):
         Job: 6296[1] is: Pending
         Job: 6296[2] is: Pending
         Job: 6296[3] is: Pending
-
-        
+        # Get array elements for jobs
+        >>> from cluster.openlavacluster import Job
+        >>> job_ids=set()
+        >>> for job in Job.get_job_list(job_state="ALL"):
+        ...     job_ids.add(job.job_id)
+        ...
+        >>> for id in job_ids:
+        ...     print "Job: %d has %d elements." % (id, len(Job.get_job_list(job_id=id, array_index=-1)))
+        ...
+        Job: 6258 has 2 elements.
+        Job: 6259 has 10 elements.
+        Job: 6296 has 10 elements.
+        Job: 6297 has 10 elements.
 
         :param job_id:
             The numeric Job ID, if this is specified, then queue_name, host_name, user_name, and job_state are

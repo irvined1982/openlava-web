@@ -38,6 +38,25 @@ from django.middleware.csrf import get_token
 from openlava import lsblib
 from django.conf import settings
 
+def create_js_success(data=None, message=""):
+    """
+    Takes a json serializable object, and an optional message, and creates a standard json response document.
+
+    :param data: json serializable object
+    :param message: Optional message to include with response
+    :return: HttpResponse object
+
+    """
+    data = {
+        'status': "OK",
+        'data': data,
+        'message': message,
+    }
+    return HttpResponse(json.dumps(data, sort_keys=True, indent=3, cls=ClusterEncoder),
+                            content_type='application/json')
+
+
+
 def queue_list(request):
     queue_list = Queue.get_queue_list()
     if request.is_ajax() or request.GET.get("json", None):
@@ -737,52 +756,7 @@ class ClusterEncoder(json.JSONEncoder):
 
 
 
-def job_view(request, job_id, array_index=0):
-    job_id = int(job_id)
-    array_index = int(array_index)
-    try:
-        job = Job(job_id=job_id, array_index=array_index)
-        if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(json.dumps(job, sort_keys=True, indent=3, cls=ClusterEncoder),
-                            content_type="application/json")
-        else:
-            return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
 
-    except ClusterException as e:
-        if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
-        else:
-            return render(request, 'openlavaweb/exception.html', {'exception': e})
-    except NoSuchJobError as e:
-        if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
-        else:
-            return render(request, 'openlavaweb/exception.html', {'exception': e})
-
-
-def job_list(request, job_id=0):
-    user_name = request.GET.get('user_name', 'all')
-    queue_name = request.GET.get('queue_name', "")
-    host_name = request.GET.get('host_name', "")
-    job_state = request.GET.get('job_state', 'ACT')
-    job_name = request.GET.get('job_name', "")
-
-    job_list = Job.get_job_list(user_name=user_name, queue_name=queue_name, host_name=host_name, job_state=job_state,
-                                job_name=job_name)
-
-    if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(job_list, sort_keys=True, indent=3, cls=ClusterEncoder),
-                            content_type='application/json')
-
-    paginator = Paginator(job_list, 25)
-    page = request.GET.get('page')
-    try:
-        job_list = paginator.page(page)
-    except PageNotAnInteger:
-        job_list = paginator.page(1)
-    except EmptyPage:
-        job_list = paginator.page(paginator.num_pages)
-    return render(request, 'openlavaweb/job_list.html', {"job_list": job_list, })
 
 
 @ensure_csrf_cookie
@@ -889,6 +863,108 @@ def ajax_login(request):
             'description': "Unable to authenticate",
         }
     return HttpResponse(json.dumps(res), content_type="application/json")
+
+def job_view(request, job_id, array_index=0):
+    """
+    Renders a HTML page showing the specified job.
+
+    :param request: Request object
+    :param job_id: Job ID.
+    :param array_index: The array index, must be zero or higher.
+    :return:
+
+        If the request is AJAX, returns a single json encoded job object.  If it is not an ajax request, then renders
+        a HTML page showing information about the specified job.
+
+        If the job does not exist, raises and renders NoSuchJob
+
+
+    """
+    job_id = int(job_id)
+    array_index = int(array_index)
+    assert(array_index >= 0)
+    try:
+        job = Job(job_id=job_id, array_index=array_index)
+        if request.is_ajax() or request.GET.get("json", None):
+            return create_js_success(data=job)
+        else:
+            return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
+
+    except ClusterException as e:
+        if request.is_ajax() or request.GET.get("json", None):
+            return HttpResponse(e.to_json(), content_type='application/json')
+        else:
+            return render(request, 'openlavaweb/exception.html', {'exception': e})
+
+    except NoSuchJobError as e:
+        if request.is_ajax() or request.GET.get("json", None):
+            return HttpResponse(e.to_json(), content_type='application/json')
+        else:
+            return render(request, 'openlavaweb/exception.html', {'exception': e})
+
+
+def get_job_list(request, job_id=0):
+    """
+    Renders a HTML page listing jobs that match the query.
+
+    :param request:
+        Request object
+
+    :param job_id:
+        Numeric Job ID.  If job_id != 0, then all elements of that job will be returned, use this to see all tasks from
+        an array job.
+
+    :param ?queue_name:
+            The name of the queue.  If specified, implies that job_id and array_index are set to default.  Only returns
+            jobs that are submitted into the named queue.
+
+    :param ?host_name:
+        The name of the host.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are executing on the specified host.
+
+    :param ?user_name:
+        The name of the user.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are owned by the specified user.
+
+    :param ?job_state:
+        Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
+        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+        "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
+        currently suspended.
+
+    :param ?job_name:
+        Only return jobs that are named job_name.
+
+    :return:
+        If an ajax request, then returns an array of JSON Job objects that match the query. Otherwise returns a
+        rendered HTML page listing each job.  Pages are paginated using a paginator.
+
+    """
+
+    if job_id != 0:
+        # Get a list of active elements of the specified job.
+        job_list = Job.get_job_list(job_id=job_id, array_index=-1)
+    else:
+        user_name = request.GET.get('user_name', 'all')
+        queue_name = request.GET.get('queue_name', "")
+        host_name = request.GET.get('host_name', "")
+        job_state = request.GET.get('job_state', 'ACT')
+        job_name = request.GET.get('job_name', "")
+        job_list = Job.get_job_list(user_name=user_name, queue_name=queue_name, host_name=host_name, job_state=job_state,
+                                    job_name=job_name)
+
+    if request.is_ajax() or request.GET.get("json", None):
+        return create_js_success(data=job_list)
+
+    paginator = Paginator(job_list, 50)
+    page = request.GET.get('page')
+    try:
+        job_list = paginator.page(page)
+    except PageNotAnInteger:
+        job_list = paginator.page(1)
+    except EmptyPage:
+        job_list = paginator.page(paginator.num_pages)
+    return render(request, 'openlavaweb/job_list.html', {"job_list": job_list, })
 
 @login_required
 def job_submit(request, form_class="JobSubmitForm"):
