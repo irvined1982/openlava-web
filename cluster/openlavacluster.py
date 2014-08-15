@@ -792,6 +792,7 @@ class Job(JobBase):
         
         jobs = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
 
+        print "Read"
         lsblib.lsb_closejobinfo()
         print "Closed"
         if len(jobs) == 1:
