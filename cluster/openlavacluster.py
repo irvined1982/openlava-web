@@ -647,203 +647,776 @@ class JobStatus(NumericStatus):
 
 
 class Job(JobBase):
-    @classmethod
-    def submit(cls, **kwargs):
-        options = 0
-        options2 = 0
-        #beginTime
-        #termTime
-        #rlimits
-        fields = {
-        'options': {
-        'sname': 'options',
-        'options': 0,
-        'options2': 0,
-        },
-        'options2': {
-        'sname': 'options2',
-        'options': 0,
-        'options2': 0,
-        },
-        'num_processors': {
-        'sname': 'numProcessors',
-        'options': 0,
-        'options2': 0,
-        },
-        'command': {
-        'sname': 'command',
-        'options': 0,
-        'options2': 0,
-        },
-        'job_name': {
-        'sname': 'jobName',
-        'options': lsblib.SUB_JOB_NAME,
-        'options2': 0,
-        },
-        'queue_name': {
-        'sname': 'queue',
-        'options': lsblib.SUB_QUEUE,
-        'options2': 0,
-        },
-        'requested_hosts': {
-        'sname': 'askedHosts',
-        'options': lsblib.SUB_HOST,
-        'options2': 0,
-        },
-        'resource_request': {
-        'sname': 'resReq',
-        'options': lsblib.SUB_RES_REQ,
-        'options2': 0,
-        },
-        'host_specification': {
-        'sname': 'hostSpec',
-        'options': lsblib.SUB_HOST_SPEC,
-        'options2': 0,
-        },
-        'dependency_conditions': {
-        'sname': 'dependCond',
-        'options': lsblib.SUB_DEPEND_COND,
-        'options2': 0,
-        },
-        'signal_value': {
-        'sname': 'sigValue',
-        'options': lsblib.SUB_WINDOW_SIG,
-        'options2': 0,
-        },
-        'input_file': {
-        'sname': 'inFile',
-        'options': lsblib.SUB_IN_FILE,
-        'options2': 0,
-        },
-        'output_file': {
-        'sname': 'outFile',
-        'options': lsblib.SUB_OUT_FILE,
-        'options2': 0,
-        },
-        'error_file': {
-        'sname': 'errFile',
-        'options': lsblib.SUB_ERR_FILE,
-        'options2': 0,
-        },
-        'checkpoint_period': {
-        'sname': 'chkpntPeriod',
-        'options': lsblib.SUB_CHKPNT_PERIOD,
-        'options2': 0,
-        },
-        'checkpoint_directory': {
-        'sname': 'chkpntDir',
-        'options': lsblib.SUB_CHKPNT_DIR,
-        'options2': 0,
-        },
-        'email_user': {
-        'sname': 'mailUser',
-        'options': lsblib.SUB_MAIL_USER,
-        'options2': 0,
-        },
-        'project_name': {
-        'sname': 'projectName',
-        'options': lsblib.SUB_PROJECT_NAME,
-        'options2': 0,
-        },
-        'max_num_processors': {
-        'sname': 'maxNumProcessors',
-        'options': 0,
-        'options2': 0,
-        },
-        'login_shell': {
-        'sname': 'loginShell',
-        'options': lsblib.SUB_LOGIN_SHELL,
-        'options2': 0,
-        },
-        'user_priority': {
-        'sname': 'userPriority',
-        'options': 0,
-        'options2': lsblib.SUB2_JOB_PRIORITY,
-        },
-        }
+    """
+    Get information about, and manipulate jobs on remote server.
 
-        s = lsblib.Submit()
-        for k, v in kwargs.items():
-            if k not in fields:
-                raise JobSubmitError("Field: %s is not a valid field name" % k)
-            print "setting %s to %s" % ( fields[k]['sname'], v)
-            setattr(s, fields[k]['sname'], v)
-            print "got %s from %s" % (getattr(s, fields[k]['sname']), fields[k]['sname'])
-            options = options | fields[k]['options']
-            options2 = options2 | fields[k]['options2']
-        print "options: %s" % options
-        s.command = kwargs['command']
-        options = s.options | options
-        s.options = options
-        options2 = s.options2 | options2
-        s.options2 = options2
-        if s.maxNumProcessors < s.numProcessors:
-            s.maxNumProcessors = s.numProcessors
-        sr = lsblib.SubmitReply()
-        job_id = lsblib.lsb_submit(s, sr)
-        print "Job submitted"
-        if job_id < 0:
-            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
-        jobs=[]
-        job_id = lsblib.get_job_id(job_id)
-        for job in Job.get_job_list():
-            if job.job_id == job_id:
-                jobs.append(job)
+    .. py:attribute:: cluster_type
 
-        return jobs
+        The type of cluster, defines the scheduling environment being used under the hood.
 
+        :return: Scheduler type
+        :rtype: str
 
-    def json_attributes(self):
-        attribs = JobBase.json_attributes(self)
-        attribs.extend([
-            "checkpoint_directory",
-            "checkpoint_period",
-            "cpu_factor",
-            "cwd",
-            "execution_cwd",
-            "execution_home_directory",
-            "execution_user_id",
-            "execution_user_name",
-            "host_specification",
-            "login_shell",
-            "parent_group",
-            "pre_execution_command",
-            "resource_usage_last_update_time",
-            "service_port",
-            "submit_home_directory",
-            "termination_signal",
-        ])
-        return attribs
+    .. py:attribute:: array_index
 
-    @classmethod
-    def get_job_list(cls, job_id=0, array_index=0, queue_name="", host_name="", user_name="all", job_state="ACT",
-                     job_name=""):
-        initialize()
-        if job_state == 'ACT':
-            job_state = lsblib.CUR_JOB
-        elif job_state == "ALL":
-            job_state = lsblib.ALL_JOB
-        elif job_state == "EXIT":
-            job_state = lsblib.DONE_JOB
-        elif job_state == "PEND":
-            job_state = lsblib.PEND_JOB
-        elif job_state == "RUN":
-            job_state = lsblib.RUN_JOB
-        elif job_state == "SUSP":
-            job_state = lsblib.SUSP_JOB
-        else:
-            job_state = lsblib.ALL_JOB
+        The array index of the job, 0 for non-array jobs.
 
-        real_job_id = lsblib.create_job_id(job_id=0, array_index=array_index)
-        num_jobs = lsblib.lsb_openjobinfo(job_id=real_job_id, user=user_name, queue=queue_name, host=host_name,
-                                          job_name=job_name, options=job_state)
-        jl = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
-        lsblib.lsb_closejobinfo()
-        return jl
+        :return: Array Index
+        :rtype: int
 
+    .. py:attribute:: job_id
+
+        Numerical Job ID of the job, not including the array index.
+
+        :return: Job ID
+        :rtype: int
+
+    """
     cluster_type = "openlava"
 
+    @property
+    def admins(self):
+        """
+        List of user names that have administrative rights on this host.
+
+        :return: list of user names
+
+        """
+        return [self.user_name] + self.queue().admins
+
+    @property
+    def begin_time(self):
+        """
+        Earliest time (Epoch UTC) that the job may begin.  Job will not start before this time
+
+        :return: Earliest start time of the job as integer since the Epoch (UTC)
+
+        """
+        self._update_jobinfo()
+        return self._begin_time
+
+    @property
+    def command(self):
+        """
+        Command to execute
+
+        :return: Command as string
+
+        """
+        self._update_jobinfo()
+        return self._command
+
+    @property
+    def consumed_resources(self):
+        """
+        List of ConsumedResource objects
+
+        :return: List of ConsumedResource Objects
+
+        """
+        self._update_jobinfo()
+        return self._consumed_resources
+
+    @property
+    def cpu_time(self):
+        """
+        CPU Time in seconds that the job has consumed
+
+        :return: CPU time in seconds
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._cpu_time
+
+    @property
+    def dependency_condition(self):
+        """
+        Dependency conditions that must be met before the job will be dispatched
+
+        :return: Job dependency information
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._dependency_condition
+
+    @property
+    def email_user(self):
+        """
+        User to email job notifications to if set.
+
+        :return: User email address, may be ""
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._email_user
+
+    @property
+    def end_time(self):
+        """
+        Time the job ended in seconds since epoch UTC.
+
+        :return: Number of seconds since epoch (UTC) when the job exited.
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._end_time
+
+    @property
+    def error_file_name(self):
+        """
+        Path to the job error file, may be ""
+
+        :returns: Path of the job error file.
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._error_file_name
+
+    @property
+    def execution_hosts(self):
+        """List of hosts that job is running on"""
+        self._update_jobinfo()
+        return [ExecutionHost(hn) for hn in self._execution_hosts]
+
+    @property
+    def input_file_name(self):
+        """
+        Path to the job input file, may be ""
+
+        :returns: Path of the job input file.
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._input_file_name
+
+    @property
+    def is_completed(self):
+        """
+        True if the job completed without failure.  For this to be true, the job must have returned exit status zero,
+        must not have been killed by the user or an admin.
+
+        :return: True if job has completed without error.
+        :rtype: bool
+
+        """
+        if self.status.name == "JOB_STAT_DONE":
+            return True
+        return False
+
+    @property
+    def was_killed(self):
+        """
+        True if the job was killed by the owner or an admin.
+
+        :return: True if the job was killed
+        :rtype: bool
+
+        """
+        if self.status.name == "JOB_STAT_EXIT" and self._exit_status == 130:
+            return True
+        else:
+            return False
+
+    @property
+    def is_failed(self):
+        """
+        True if the exited due to failure.  For this to be true, the job must have returned a non zero exit status, and
+        must not have been killed by the user or admin.
+
+        :return: True if the job failed
+        :rtype: bool
+
+        """
+        if self.status.name == "JOB_STAT_EXIT":
+            return True
+        return False
+
+    @property
+    def is_pending(self):
+        """
+        True if the job is pending.
+
+        :return: True if the job is pending
+        :rtype: bool
+
+        """
+        if self.status.name == "JOB_STAT_PEND":
+            return True
+        return False
+
+    @property
+    def is_running(self):
+        """
+        True if the job is running.  For this to be true, the job must currently be executing on compute nodes and the job
+        must not be suspended.
+
+        :return: True if the job is executing
+        :rtype: bool
+
+        """
+        if self.status.name == "JOB_STAT_RUN":
+            return True
+        return False
+
+    @property
+    def is_suspended(self):
+        """
+        True if the job is suspended.  For this to be true, the job must have been suspended by the system, an
+        administrator or the job owner.  The job may have been suspended whilst executing, or whilst in a pending state.
+
+        :return: True if the job is suspended
+        :rtype: bool
+
+        """
+        if self.status.name == "JOB_STAT_USUSP" or self.status.name == "JOB_STAT_SSUSP" or self.status.name == "JOB_STAT_PSUSP":
+            return True
+        return False
+
+    @property
+    def max_requested_slots(self):
+        """
+        The maximum number of slots that this job will execute on.  If the user requested a range of slots to consume,
+        this is set to the upper bound of that range.
+
+        :return: Maximum number of slots requested
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._max_requested_slots
+
+    @property
+    def name(self):
+        """
+        The name given to the job by the user or scheduling system. May be "".
+
+        :return: Name of job
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._name
+
+    @property
+    def options(self):
+        """
+        List of JobOptions for the job
+
+        :return: List of JobOptions
+        :rtype: list
+
+        """
+        self._update_jobinfo()
+        return self._options
+
+    @property
+    def output_file_name(self):
+        """
+        Path to the job output file, may be ""
+
+        :returns: Path of the job output file.
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._output_file_name
+
+    @property
+    def pending_reasons(self):
+        """
+        Text string explainging why the job is pending.
+
+        :return: Reason why the job is pending.
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._pend_reasons
+
+    @property
+    def predicted_start_time(self):
+        """
+        The time the job is predicted to start, in seconds since EPOCH. (UTC)
+
+        :return: The predicted start time
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._predicted_start_time
+
+    @property
+    def priority(self):
+        """
+        The priority given to the job by the user, this may have been modified by the scheduling environment, or an
+        administrator.
+
+        :return: Priority
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._priority
+
+    @property
+    def process_id(self):
+        """
+        The numeric process ID of the primary process associated with this job.
+
+        :return: Process ID
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._process_id
+
+    @property
+    def processes(self):
+        """
+        Array of process objects for each process  started by the job
+
+        :return: Array of Process objects
+        :rtype: list
+
+        """
+        self._update_jobinfo()
+        return self._processes
+
+    @property
+    def project_names(self):
+        """
+        Array of project names that the job was submitted with.
+
+        :return: Project Names
+        :rtype: list of str
+
+        """
+        self._update_jobinfo()
+        return self._project_names
+
+    @property
+    def requested_resources(self):
+        """
+        Resource string requested by the user.  This may be have been modified by the scheduler, or an administrator.
+
+        :return: Resource Requirements
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._requested_resources
+
+    @property
+    def requested_slots(self):
+        """
+        The number of job slots requested by the job
+
+        :return: Slots requested
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._requested_slots
+
+    @property
+    def reservation_time(self):
+        """
+        The time when the slots for this job were reserved.  Time is in seconds since Epoch (UTC)
+
+        :return: Time when slots were reserved.
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._reservation_time
+
+    @property
+    def runtime_limits(self):
+        """
+
+        Array of run time limits imposed on the job.  May have been modified by the scheduler or an administrator.
+
+        :returns: Resource Limits
+        :rtype: list of ResourceLimit objects
+
+        """
+        self._update_jobinfo()
+        return self._runtime_limits
+
+    @property
+    def start_time(self):
+        """
+        The time time the job started in seconds since Epoch. (UTC)
+
+        :returns: Job Start Time
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._start_time
+
+    @property
+    def status(self):
+        """
+        Job Status object that defines the current status of the job.
+
+        :return: Job Status
+        :rtype: JobStatus
+
+        """
+        self._update_jobinfo()
+        status = self._status
+        if status & lsblib.JOB_STAT_DONE: # If its done, its done.
+            status = 0x40
+        return JobStatus(status)
+
+    @property
+    def submission_host(self):
+        """
+        Host object corresponding to the host that the job was submitted from.
+
+        :return: Submit Host object
+        :rtype: Host
+
+        """
+        self._update_jobinfo()
+        return Host(self._submission_host)
+
+    @property
+    def submit_time(self):
+        """
+        The time the job was submitted in seconds since Epoch. (UTC)
+
+        :returns: Job Submit Time
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._submit_time
+
+    @property
+    def submit_time_datetime(self):
+        """
+        The submit time as a datetime object (UTC)
+
+        :return: submit time
+        :rtype: datetime
+
+        """
+        return datetime.datetime.utcfromtimestamp(self.submit_time)
+
+    @property
+    def suspension_reasons(self):
+        """
+        Text string explaining why the job is suspended.
+
+        :return: Reason why the job is suspended.
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._susp_reasons
+
+    @property
+    def termination_time(self):
+        """
+        Termination deadline in seconds since the Epoch. (UTC)  The job will be terminated if it is not finished by
+        this time.
+
+        :return: Job termination time
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._termination_time
+
+    @property
+    def user_name(self):
+        """User name of the job owner.
+
+        :return: Username
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._user_name
+
+    @property
+    def user_priority(self):
+        """User given priority for the job.  This may have been modified by the scheduling system or an administrator.
+
+        :return: priority
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._user_priority
+
+    @property
+    def queue(self):
+        """The queue object that this job is currently in.  This may have been modified by the scheduling system, or an
+        administrator.
+
+        :return: Queue object that the job is in.
+        :rtype: Queue
+
+        """
+        self._update_jobinfo()
+        return Queue(self._queue_name)
+
+    @property
+    def requested_hosts(self):
+        """An array of Host objects corresponding the the hosts that the user requested for this job.  If the user did
+        not request any hosts, then the list will be empty.
+
+        :return: List of requested hosts
+        :rtype: list
+
+        """
+        self._update_jobinfo()
+        return [Host(hn) for hn in self._requested_hosts]
+
+    ## Openlava Only
+    @property
+    def checkpoint_directory(self):
+        """
+        Path to directory where checkpoint data will be written to.
+
+        :return: path to checkpoint directory
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._checkpoint_directory
+
+    @property
+    def checkpoint_period(self):
+        """Number of seconds between checkpoint operations
+
+        :return: Number of seconds between checkpoints
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._checkpoint_period
+
+    @property
+    def checkpoint_period_timedelta(self):
+        """
+        Checkpointing period as a timedelta object
+
+        :return: Checkpointing period
+        :rtype: timedelta
+
+        """
+        return datetime.timedelta(seconds=self.checkpoint_period)
+
+    @property
+    def cpu_factor(self):
+        """
+        CPU Factor of execution host
+
+        :return: CPU Factor
+        :rtype: float
+
+        """
+        self._update_jobinfo()
+        return self._cpu_factor
+
+    @property
+    def cwd(self):
+        """
+        Current Working Directory of the job
+
+        :return: Current Working Directory
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._cwd
+
+    @property
+    def execution_cwd(self):
+        """
+        Current working directory on the execution host
+
+        :return: CWD on exec host
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._execution_cwd
+
+    @property
+    def execution_home_directory(self):
+        """
+        The home directory of the user on the execution host.
+
+        :return Home Directory
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._execution_home_directory
+
+    @property
+    def execution_user_id(self):
+        """
+        User ID of the user used to execute the job on the execution host.
+
+        :return: Numerical ID of the user
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._execution_user_id
+
+    @property
+    def execution_user_name(self):
+        """
+        User name of the user used to execute the job on the execution host.
+
+        :return: name of the user
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._execution_user_name
+
+    @property
+    def host_specification(self):
+        """
+        A hostname or model name that describes the specification of the host being used to execute the job.
+
+        :return: Host Specification
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._host_specification
+
+    @property
+    def login_shell(self):
+        """
+        The shell used when running the job.  If not used, or not specified will be ""
+
+        :return: Login Shell
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._login_shell
+
+    @property
+    def parent_group(self):
+        """
+        The parent Job Group, if not used will be ""
+
+        :return: Parent Job Group
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._parent_group
+
+    @property
+    def pre_execution_command(self):
+        """
+        Pre Execution Command specified by the user, if this is not supplied, will be ""
+
+        :return: Pre Execution Command
+        :rtype: str
+
+        """
+        self._update_jobinfo()
+        return self._pre_execution_command
+
+    @property
+    def resource_usage_last_update_time(self):
+        """
+        The time the resource usage information was last updated in seconds since Epoch. (UTC)
+
+        :return: resource usage update time
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._resource_usage_last_update_time
+
+    @property
+    def resource_usage_last_update_time_datetime(self):
+        """
+        A datetime object set to the time the resource usage information was last updated
+
+        :return: last update time of resource usage
+        :rtype: datetime
+
+        """
+        return datetime.datetime.utcfromtimestamp(self.resource_usage_last_update_time)
+
+    @property
+    def service_port(self):
+        """
+        NIOS Port of the job
+
+        :return: NIOS Port
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._service_port
+
+    @property
+    def submit_home_directory(self):
+        """
+        Home directory on the submit host of the user used to execute the job
+
+        :return: Home Directory
+        :rtype str
+
+        """
+        self._update_jobinfo()
+        return self._submit_home_directory
+
+    @property
+    def termination_signal(self):
+        """
+        Signal to send when job exceeds termination deadline.
+
+        :return: Termination Signal
+        :rtype: int
+
+        """
+        self._update_jobinfo()
+        return self._termination_signal
+
     def __init__(self, job=None, job_id=None, array_index=0):
+        """
+        Creates a new instance of the job class.
+
+        :param job:
+
+            If defined, contains the data as a dictionary from the remote server.  Default: Undefined, used only
+            internally.
+
+        :param job_id: Numeric Job ID.
+        :param array_index: Array index of the job.
+
+        When job is None (Default) then makes a connection to the openlava server using the openlava API, and
+        requests information abou the job with the specified job_id and array index.  If the job exists, then the
+        job is created and returned.  If the job doesnt exist, or there is an error with the API call, an exception
+        is raised.
+
+        :raises NoSuchJobError: When the job doesnt exist
+        :raises ClusterException: When the LSB call fails.
+
+        """
         initialize()
         self._last_update_time = 0
         if job:
@@ -866,6 +1439,90 @@ class Job(JobBase):
                     raise ClusterException("%s" % lsblib.ls_sysmsg())
         else:
             raise ValueError("Job, or job_id required")
+
+    def kill(self):
+        """
+
+        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        :return: None
+
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % ( self.job_id, self.array_index ))
+
+
+    def suspend(self):
+        """
+        Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        :return: None
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(),
+                                "Unable to suspend job: %s[%s]" % ( self.job_id, self.array_index ))
+
+    def requeue(self, hold=False):
+        """
+        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
+
+        :return: None
+        """
+        rq = lsblib.JobRequeue()
+        rq.jobId = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rq.status = lsblib.JOB_STAT_PEND
+        if hold:
+            rq.status = lsblib.JOB_STAT_PSUSP
+
+        if self.status.name == u"JOB_STAT_DONE":
+            rq.options = lsblib.REQUEUE_DONE
+        elif self.status.name == u"JOB_STAT_RUN":
+            rq.options = lsblib.REQUEUE_RUN
+        elif self.status.name == u"JOB_STAT_EXIT":
+            rq.options = lsblib.REQUEUE_EXIT
+        else:
+            raise ValueError(self.status)
+
+        rc = lsblib.lsb_requeuejob(rq)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(),
+                                "Unable to requeue job: %s[%s]" % ( self.job_id, self.array_index ))
+
+    def resume(self):
+        """
+        Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        :return: None
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(),
+                                "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
+
+    def get_output_path(self):
+        """
+        Gets the path to the job output file.  If the job is not owned by the current user, or the job is not running
+        then the output path will be None
+
+        :return: output path
+        :rtype: str or None
+
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        return lsblib.lsb_peekjob(full_job_id)
+
+
+
+
 
     def _update_jobinfo(self, job=None):
         if (int(time.time()) - self._last_update_time) < 60:
@@ -986,407 +1643,203 @@ class Job(JobBase):
         self._pend_reasons = " ".join(lsblib.lsb_pendreason(job.numReasons, job.reasonTb, None, ld).splitlines())
         self._susp_reasons = " ".join(lsblib.lsb_suspreason(job.reasons, job.subreasons, ld).splitlines())
 
-    @property
-    def admins(self):
-        return [self.user_name] + self.queue().admins
+    @classmethod
+    def submit(cls, **kwargs):
+        options = 0
+        options2 = 0
+        # beginTime
+        #termTime
+        #rlimits
+        fields = {
+            'options': {
+                'sname': 'options',
+                'options': 0,
+                'options2': 0,
+            },
+            'options2': {
+                'sname': 'options2',
+                'options': 0,
+                'options2': 0,
+            },
+            'num_processors': {
+                'sname': 'numProcessors',
+                'options': 0,
+                'options2': 0,
+            },
+            'command': {
+                'sname': 'command',
+                'options': 0,
+                'options2': 0,
+            },
+            'job_name': {
+                'sname': 'jobName',
+                'options': lsblib.SUB_JOB_NAME,
+                'options2': 0,
+            },
+            'queue_name': {
+                'sname': 'queue',
+                'options': lsblib.SUB_QUEUE,
+                'options2': 0,
+            },
+            'requested_hosts': {
+                'sname': 'askedHosts',
+                'options': lsblib.SUB_HOST,
+                'options2': 0,
+            },
+            'resource_request': {
+                'sname': 'resReq',
+                'options': lsblib.SUB_RES_REQ,
+                'options2': 0,
+            },
+            'host_specification': {
+                'sname': 'hostSpec',
+                'options': lsblib.SUB_HOST_SPEC,
+                'options2': 0,
+            },
+            'dependency_conditions': {
+                'sname': 'dependCond',
+                'options': lsblib.SUB_DEPEND_COND,
+                'options2': 0,
+            },
+            'signal_value': {
+                'sname': 'sigValue',
+                'options': lsblib.SUB_WINDOW_SIG,
+                'options2': 0,
+            },
+            'input_file': {
+                'sname': 'inFile',
+                'options': lsblib.SUB_IN_FILE,
+                'options2': 0,
+            },
+            'output_file': {
+                'sname': 'outFile',
+                'options': lsblib.SUB_OUT_FILE,
+                'options2': 0,
+            },
+            'error_file': {
+                'sname': 'errFile',
+                'options': lsblib.SUB_ERR_FILE,
+                'options2': 0,
+            },
+            'checkpoint_period': {
+                'sname': 'chkpntPeriod',
+                'options': lsblib.SUB_CHKPNT_PERIOD,
+                'options2': 0,
+            },
+            'checkpoint_directory': {
+                'sname': 'chkpntDir',
+                'options': lsblib.SUB_CHKPNT_DIR,
+                'options2': 0,
+            },
+            'email_user': {
+                'sname': 'mailUser',
+                'options': lsblib.SUB_MAIL_USER,
+                'options2': 0,
+            },
+            'project_name': {
+                'sname': 'projectName',
+                'options': lsblib.SUB_PROJECT_NAME,
+                'options2': 0,
+            },
+            'max_num_processors': {
+                'sname': 'maxNumProcessors',
+                'options': 0,
+                'options2': 0,
+            },
+            'login_shell': {
+                'sname': 'loginShell',
+                'options': lsblib.SUB_LOGIN_SHELL,
+                'options2': 0,
+            },
+            'user_priority': {
+                'sname': 'userPriority',
+                'options': 0,
+                'options2': lsblib.SUB2_JOB_PRIORITY,
+            },
+        }
 
-    @property
-    def begin_time(self):
-        """Job will not start before this time"""
-        self._update_jobinfo()
-        return self._begin_time
+        s = lsblib.Submit()
+        for k, v in kwargs.items():
+            if k not in fields:
+                raise JobSubmitError("Field: %s is not a valid field name" % k)
+            print "setting %s to %s" % ( fields[k]['sname'], v)
+            setattr(s, fields[k]['sname'], v)
+            print "got %s from %s" % (getattr(s, fields[k]['sname']), fields[k]['sname'])
+            options = options | fields[k]['options']
+            options2 = options2 | fields[k]['options2']
+        print "options: %s" % options
+        s.command = kwargs['command']
+        options = s.options | options
+        s.options = options
+        options2 = s.options2 | options2
+        s.options2 = options2
+        if s.maxNumProcessors < s.numProcessors:
+            s.maxNumProcessors = s.numProcessors
+        sr = lsblib.SubmitReply()
+        job_id = lsblib.lsb_submit(s, sr)
+        print "Job submitted"
+        if job_id < 0:
+            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
+        jobs=[]
+        job_id = lsblib.get_job_id(job_id)
+        for job in Job.get_job_list():
+            if job.job_id == job_id:
+                jobs.append(job)
 
-    @property
-    def command(self):
-        """Command to execute"""
-        self._update_jobinfo()
-        return self._command
+        return jobs
 
-    @property
-    def consumed_resources(self):
-        """Array of resource usage information"""
-        self._update_jobinfo()
-        return self._consumed_resources
 
-    @property
-    def cpu_time(self):
-        """CPU Time in seconds that the job has consumed"""
-        self._update_jobinfo()
-        return self._cpu_time
+    def json_attributes(self):
+        attribs = JobBase.json_attributes(self)
+        attribs.extend([
+            "checkpoint_directory",
+            "checkpoint_period",
+            "cpu_factor",
+            "cwd",
+            "execution_cwd",
+            "execution_home_directory",
+            "execution_user_id",
+            "execution_user_name",
+            "host_specification",
+            "login_shell",
+            "parent_group",
+            "pre_execution_command",
+            "resource_usage_last_update_time",
+            "service_port",
+            "submit_home_directory",
+            "termination_signal",
+        ])
+        return attribs
 
-    @property
-    def dependency_condition(self):
-        """Job dependency information"""
-        self._update_jobinfo()
-        return self._dependency_condition
-
-    @property
-    def email_user(self):
-        """User supplied email address to send notifications to"""
-        self._update_jobinfo()
-        return self._email_user
-
-    @property
-    def end_time(self):
-        """Time the job ended in seconds since epoch UTC"""
-        self._update_jobinfo()
-        return self._end_time
-
-    @property
-    def error_file_name(self):
-        """Path to the error file"""
-        self._update_jobinfo()
-        return self._error_file_name
-
-    @property
-    def execution_hosts(self):
-        """List of hosts that job is running on"""
-        self._update_jobinfo()
-        return [ExecutionHost(hn) for hn in self._execution_hosts]
-
-    @property
-    def input_file_name(self):
-        """Path to the input file"""
-        self._update_jobinfo()
-        return self._input_file_name
-
-    @property
-    def is_completed(self):
-        if self.status.name == "JOB_STAT_DONE":
-            return True
-        return False
-
-    @property
-    def was_killed(self):
-        if self.status.name == "JOB_STAT_EXIT" and self._exit_status == 130:
-            return True
+    @classmethod
+    def get_job_list(cls, job_id=0, array_index=0, queue_name="", host_name="", user_name="all", job_state="ACT",
+                     job_name=""):
+        initialize()
+        if job_state == 'ACT':
+            job_state = lsblib.CUR_JOB
+        elif job_state == "ALL":
+            job_state = lsblib.ALL_JOB
+        elif job_state == "EXIT":
+            job_state = lsblib.DONE_JOB
+        elif job_state == "PEND":
+            job_state = lsblib.PEND_JOB
+        elif job_state == "RUN":
+            job_state = lsblib.RUN_JOB
+        elif job_state == "SUSP":
+            job_state = lsblib.SUSP_JOB
         else:
-            return False
+            job_state = lsblib.ALL_JOB
+
+        real_job_id = lsblib.create_job_id(job_id=0, array_index=array_index)
+        num_jobs = lsblib.lsb_openjobinfo(job_id=real_job_id, user=user_name, queue=queue_name, host=host_name,
+                                          job_name=job_name, options=job_state)
+        jl = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
+        lsblib.lsb_closejobinfo()
+        return jl
 
 
-    @property
-    def is_failed(self):
-        if self.status.name == "JOB_STAT_EXIT":
-            return True
-        return False
-
-    @property
-    def is_pending(self):
-        if self.status.name == "JOB_STAT_PEND":
-            return True
-        return False
-
-    @property
-    def is_running(self):
-        if self.status.name == "JOB_STAT_RUN":
-            return True
-        return False
-
-    @property
-    def is_suspended(self):
-        if self.status.name == "JOB_STAT_USUSP" or self.status.name == "JOB_STAT_SSUSP" or self.status.name == "JOB_STAT_PSUSP":
-            return True
-        return False
-
-    @property
-    def max_requested_slots(self):
-        """The maximum number of job slots that could be used by the job"""
-        self._update_jobinfo()
-        return self._max_requested_slots
-
-    @property
-    def name(self):
-        """User or system given name of the job"""
-        self._update_jobinfo()
-        return self._name
-
-    @property
-    def options(self):
-        """List of options that apply to the job"""
-        self._update_jobinfo()
-        return self._options
-
-    @property
-    def output_file_name(self):
-        """Path to the output file"""
-        self._update_jobinfo()
-        return self._output_file_name
-
-    @property
-    def pending_reasons(self):
-        """Text string explainging why the job is pending"""
-        self._update_jobinfo()
-        return self._pend_reasons
-
-    @property
-    def predicted_start_time(self):
-        """Predicted start time of the job"""
-        self._update_jobinfo()
-        return self._predicted_start_time
-
-    @property
-    def priority(self):
-        """Actual priority of the job"""
-        self._update_jobinfo()
-        return self._priority
-
-    @property
-    def process_id(self):
-        """Process id of the job"""
-        self._update_jobinfo()
-        return self._process_id
-
-    @property
-    def processes(self):
-        """Array of processes started by the job"""
-        self._update_jobinfo()
-        return self._processes
-
-    @property
-    def project_names(self):
-        """Array of project names that the job was submitted with"""
-        self._update_jobinfo()
-        return self._project_names
-
-    @property
-    def requested_resources(self):
-        """Resources requested by the job"""
-        self._update_jobinfo()
-        return self._requested_resources
-
-    @property
-    def requested_slots(self):
-        """The number of job slots requested by the job"""
-        self._update_jobinfo()
-        return self._requested_slots
-
-    @property
-    def reservation_time(self):
-        self._update_jobinfo()
-        return self._reservation_time
-
-    @property
-    def runtime_limits(self):
-        """Array of run time limits imposed on the job"""
-        self._update_jobinfo()
-        return self._runtime_limits
-
-    @property
-    def start_time(self):
-        """start time of the job in seconds since epoch UTC"""
-        self._update_jobinfo()
-        return self._start_time
-
-    @property
-    def status(self):
-        """Status of the job"""
-        self._update_jobinfo()
-        status = self._status
-        if status & lsblib.JOB_STAT_DONE: # If its done, its done.
-            status = 0x40
-        return JobStatus(status)
-
-    @property
-    def submission_host(self):
-        """Host job was submitted from"""
-        self._update_jobinfo()
-        return Host(self._submission_host)
-
-    @property
-    def submit_time(self):
-        """Submit time in seconds since epoch"""
-        self._update_jobinfo()
-        return self._submit_time
-
-    @property
-    def suspension_reasons(self):
-        self._update_jobinfo()
-        return self._susp_reasons
-
-    @property
-    def termination_time(self):
-        """Termination deadline - the job will finish before or on this time"""
-        self._update_jobinfo()
-        return self._termination_time
-
-    @property
-    def user_name(self):
-        """User name of the job owner"""
-        self._update_jobinfo()
-        return self._user_name
-
-    @property
-    def user_priority(self):
-        """User given priority of the job"""
-        self._update_jobinfo()
-        return self._user_priority
 
 
-    def queue(self):
-        """The queue object for the queue the job is currently in."""
-        self._update_jobinfo()
-        return Queue(self._queue_name)
-
-    def requested_hosts(self):
-        """Array of host objects the job was submitted to"""
-        self._update_jobinfo()
-        return [Host(hn) for hn in self._requested_hosts]
-
-    def kill(self):
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % ( self.job_id, self.array_index ))
-
-
-    def suspend(self):
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to suspend job: %s[%s]" % ( self.job_id, self.array_index ))
-
-    def requeue(self, hold=False):
-        rq = lsblib.JobRequeue()
-        rq.jobId = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rq.status = lsblib.JOB_STAT_PEND
-        if hold:
-            rq.status = lsblib.JOB_STAT_PSUSP
-
-        if self.status.name == u"JOB_STAT_DONE":
-            rq.options = lsblib.REQUEUE_DONE
-        elif self.status.name == u"JOB_STAT_RUN":
-            rq.options = lsblib.REQUEUE_RUN
-        elif self.status.name == u"JOB_STAT_EXIT":
-            rq.options = lsblib.REQUEUE_EXIT
-        else:
-            raise ValueError(self.status)
-
-        rc = lsblib.lsb_requeuejob(rq)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to requeue job: %s[%s]" % ( self.job_id, self.array_index ))
-
-    def resume(self):
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
-
-    def get_output_path(self):
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        return lsblib.lsb_peekjob(full_job_id)
-
-
-    ## Openlava Only
-    @property
-    def checkpoint_directory(self):
-        """Directory to store checkpoint data"""
-        self._update_jobinfo()
-        return self._checkpoint_directory
-
-    @property
-    def checkpoint_period(self):
-        """Number of seconds between sending checkpoint signals"""
-        self._update_jobinfo()
-        return self._checkpoint_period
-
-    @property
-    def checkpoint_period_timedelta(self):
-        """Timedelta object for checkpointing period"""
-        return datetime.timedelta(seconds=self.checkpoint_period)
-
-    @property
-    def cpu_factor(self):
-        """CPU Factor of execution host"""
-        self._update_jobinfo()
-        return self._cpu_factor
-
-    @property
-    def cwd(self):
-        """Current Working Directory of the job"""
-        self._update_jobinfo()
-        return self._cwd
-
-    @property
-    def execution_cwd(self):
-        """Current working directory on the execution host"""
-        self._update_jobinfo()
-        return self._execution_cwd
-
-    @property
-    def execution_home_directory(self):
-        """Home directory on execution host"""
-        self._update_jobinfo()
-        return self._execution_home_directory
-
-    @property
-    def execution_user_id(self):
-        """User ID on execution host"""
-        self._update_jobinfo()
-        return self._execution_user_id
-
-    @property
-    def execution_user_name(self):
-        """User name on execution host"""
-        self._update_jobinfo()
-        return self._execution_user_name
-
-    @property
-    def host_specification(self):
-        """Host specification"""
-        self._update_jobinfo()
-        return self._host_specification
-
-    @property
-    def login_shell(self):
-        """Login shell of the user"""
-        self._update_jobinfo()
-        return self._login_shell
-
-    @property
-    def parent_group(self):
-        """Parent job group"""
-        self._update_jobinfo()
-        return self._parent_group
-
-    @property
-    def pre_execution_command(self):
-        """User supplied Pre Exec Command"""
-        self._update_jobinfo()
-        return self._pre_execution_command
-
-    @property
-    def resource_usage_last_update_time(self):
-        self._update_jobinfo()
-        return self._resource_usage_last_update_time
-
-    @property
-    def resource_usage_last_update_time_local(self):
-        return datetime.datetime.fromtimestamp(self.resource_usage_last_update_time)
-
-    @property
-    def service_port(self):
-        """NIOS Port of the job"""
-        self._update_jobinfo()
-        return self._service_port
-
-    @property
-    def submit_home_directory(self):
-        """Home directory on the submit host"""
-        self._update_jobinfo()
-        return self._submit_home_directory
-
-    @property
-    def termination_signal(self):
-        """Signal to send when job exceeds termination deadline"""
-        self._update_jobinfo()
-        return self._termination_signal
 
 
 class Host(HostBase):

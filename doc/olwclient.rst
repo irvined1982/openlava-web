@@ -1,8 +1,11 @@
 API Documentation
 =================
 
-JOB
----
+JOB Classes
+-----------
+
+Job classes are used to get information about, and manipulate jobs on the scheduler.  Each class, whether local,
+remote client, or javascript implements the same interface, albeit with slightly different arguments where required.
 
 Local
 ^^^^^
@@ -25,3 +28,9 @@ JavaScript
 
 
 
+Exceptions
+----------
+
+NoSuchJobError
+
+ClusterException
