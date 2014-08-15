@@ -784,21 +784,12 @@ class Job(JobBase):
         print "Job submitted"
         if job_id < 0:
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
-
+        jobs=[]
         job_id = lsblib.get_job_id(job_id)
+        for job in Job.get_job_list():
+            if job.job_id == job_id:
+                jobs.append(job)
 
-        num_jobs = lsblib.lsb_openjobinfo(job_id, options=lsblib.JOBID_ONLY | lsblib.ALL_JOB)
-        print num_jobs
-        print "Openned"
-        i = lsblib.lsb_readjobinfo()
-        print "Job ID: ", i.jobId
-
-
-        jobs = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
-
-        print "Read"
-        lsblib.lsb_closejobinfo()
-        print "Closed"
         if len(jobs) == 1:
             return jobs[0]
         return jobs
