@@ -924,9 +924,9 @@ def job_submit(request, form_class="JobSubmitForm"):
     # p.start()
     # p.join()
     # rc = q.get(False)
-    rc = execute_job_submit(queue=q,request=request, ajax_args=ajax_args, submit_form=form)
+    rc = form.submit(ajax_args)
     try:
-        
+
         if isinstance(rc, Exception):
             raise rc
         else:
