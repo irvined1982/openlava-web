@@ -940,7 +940,7 @@ def get_job_list(request, job_id=0):
         rendered HTML page listing each job.  Pages are paginated using a paginator.
 
     """
-
+    job_id=int(job_id)
     if job_id != 0:
         # Get a list of active elements of the specified job.
         job_list = Job.get_job_list(job_id=job_id, array_index=-1)
@@ -1002,7 +1002,6 @@ def job_submit(request, form_class="JobSubmitForm"):
     rc = q.get(False)
 
     try:
-
         if isinstance(rc, Exception):
             raise rc
         else:

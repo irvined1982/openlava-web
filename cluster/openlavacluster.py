@@ -1673,48 +1673,66 @@ class Job(JobBase):
             ...
             Job <6307> is submitted to default queue <normal>.
 
-
-
         :param options:
             Numeric value to pass to the options of the scheduler.
+
         :param options2:
             Numeric value to pass to the options2 field of the scheduler.
+
         :param requested_slots:
             The number of slots to use (Minimum value.) Default is 1.
+
         :param command:
             The command to execute
+
         :param job_name:
             The name of the job.  If none, then no name is used.
+
         :param queue_name:
             The name of the queue to submit the job into, if none, the default queue is used.
+
         :param requested_hosts
             A string containing the list of hosts separated by a space that the user wishes the job to run on.
+
         :param resource_request
             A string containing the resource request criteria.
+
         :param host_specification
             A string defining the host specification that must be used
+
         :param dependency_conditions
             A string defining the dependency conditions
+
         :param signal_value
             The signal value to send to the job when its termination deadline is reached.
+
         :param input_file
             Job input file to use.
+
         :param output_file
             Job output file to use.
+
         :param error_file
             Job error file to use.
+
         :param checkpoint_period
             Number of seconds in between checkpoint operations
+
         :param checkpoint_directory
             Directory to store checkpoint data
+
         :param email_user
             Email address to send job updates to.
+
         :param project_name
             Name of project to submit to
+
         :param max_requested_slots
             Max number of slots to use
+
         :param login_shell
             Login shell to use
+
         :param user_priority
             User given priority for the job.
 
