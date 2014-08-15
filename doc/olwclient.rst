@@ -11,11 +11,13 @@ Local
 ^^^^^
 
 .. autoclass:: cluster.openlavacluster.Job
+    :members:
 
 Client
 ^^^^^^
 
 .. autoclass:: olwclient.Job
+    :members:
 
 JavaScript
 ^^^^^^^^^^
