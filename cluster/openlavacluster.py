@@ -2682,7 +2682,7 @@ class Queue:
         if self._num_system_suspended_jobs is None:
             self.update_job_count()
         return self._num_system_suspended_jobs
-    
+
 
     def is_accepting_jobs(self):
         for state in self.statuses:

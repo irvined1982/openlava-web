@@ -80,60 +80,6 @@ class ClusterBase:
 
 
 class JobBase:
-    def to_dict_short(self):
-        simple_fields=[
-            'cluster_type',
-            'job_id',
-            'array_index',
-            'status',
-            'name',
-            'user_name',
-            'project_names',
-            'requested_slots',
-            'command',
-            'submit_time',
-            'start_time',
-            'end_time',
-            'pending_reasons',
-            'suspension_reasons',
-
-
-
-
-            'is_pending',
-            'is_running',
-            'is_suspended',
-            'is_failed',
-            'was_killed',
-            'is_completed',
-        ]
-        d={
-            'queue':{
-                'type': "Queue",
-                'name': self._queue_name,
-            },
-            'requested_hosts':[
-                {
-                'type': "Host",
-                'name': hn,
-                } for hn in self._requested_hosts
-            ],
-            'submission_host':{
-                'type': "Host",
-                'name': self._submission_host,
-            },
-            'execution_hosts':[
-                {
-                'type': "Host",
-                'name': hn,
-                } for hn in self._execution_hosts
-            ],
-        }
-        for field in simple_fields:
-            d[field] = getattr(self, field)
-        print "to_dict"
-        return d
-
     def json_attributes(self):
         raise NotImplemented
         return [

@@ -740,12 +740,6 @@ class ClusterEncoder(json.JSONEncoder):
         return obj
 
     def default(self, obj):
-        try:
-            return obj.to_dict()
-        except AttributeError:
-            pass
-        print "to_dict failed: %s, parsing" % obj
-
         if isinstance(obj, datetime.timedelta):
             return obj.total_seconds()
 
