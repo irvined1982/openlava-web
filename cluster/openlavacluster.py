@@ -2589,7 +2589,7 @@ class SingleArgMemoized(object):
             l.append(v)
         return hash
 
-class Queue(Memoized):
+class Queue(SingleArgMemoized):
     cluster_type = "openlava"
     _memoized = {}
 
