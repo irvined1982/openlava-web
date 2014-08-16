@@ -692,7 +692,7 @@ class Job(JobBase):
         :return: Earliest start time of the job as integer since the Epoch (UTC)
 
         """
-        self._update_jobinfo()
+        
         return self._begin_time
 
     @property
@@ -703,7 +703,7 @@ class Job(JobBase):
         :return: Command as string
 
         """
-        self._update_jobinfo()
+        
         return self._command
 
     @property
@@ -714,7 +714,7 @@ class Job(JobBase):
         :return: List of ConsumedResource Objects
 
         """
-        self._update_jobinfo()
+        
         return self._consumed_resources
 
     @property
@@ -726,7 +726,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._cpu_time
 
     @property
@@ -738,7 +738,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._dependency_condition
 
     @property
@@ -750,7 +750,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._email_user
 
     @property
@@ -762,7 +762,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._end_time
 
     @property
@@ -774,13 +774,13 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._error_file_name
 
     @property
     def execution_hosts(self):
         """List of hosts that job is running on"""
-        self._update_jobinfo()
+        
         return [ExecutionHost(hn) for hn in self._execution_hosts]
 
     @property
@@ -792,7 +792,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._input_file_name
 
     @property
@@ -888,7 +888,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._max_requested_slots
 
     @property
@@ -900,7 +900,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._name
 
     @property
@@ -912,7 +912,7 @@ class Job(JobBase):
         :rtype: list
 
         """
-        self._update_jobinfo()
+        
         return self._options
 
     @property
@@ -924,7 +924,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._output_file_name
 
     @property
@@ -936,7 +936,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._pend_reasons
 
     @property
@@ -948,7 +948,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._predicted_start_time
 
     @property
@@ -961,7 +961,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._priority
 
     @property
@@ -973,7 +973,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._process_id
 
     @property
@@ -985,7 +985,7 @@ class Job(JobBase):
         :rtype: list
 
         """
-        self._update_jobinfo()
+        
         return self._processes
 
     @property
@@ -997,7 +997,7 @@ class Job(JobBase):
         :rtype: list of str
 
         """
-        self._update_jobinfo()
+        
         return self._project_names
 
     @property
@@ -1009,7 +1009,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._requested_resources
 
     @property
@@ -1021,7 +1021,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._requested_slots
 
     @property
@@ -1033,7 +1033,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._reservation_time
 
     @property
@@ -1046,7 +1046,7 @@ class Job(JobBase):
         :rtype: list of ResourceLimit objects
 
         """
-        self._update_jobinfo()
+        
         return self._runtime_limits
 
     @property
@@ -1058,7 +1058,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._start_time
 
     @property
@@ -1070,7 +1070,7 @@ class Job(JobBase):
         :rtype: JobStatus
 
         """
-        self._update_jobinfo()
+        
         status = self._status
         if status & lsblib.JOB_STAT_DONE: # If its done, its done.
             status = 0x40
@@ -1085,7 +1085,7 @@ class Job(JobBase):
         :rtype: Host
 
         """
-        self._update_jobinfo()
+        
         return Host(self._submission_host)
 
     @property
@@ -1097,7 +1097,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._submit_time
 
     @property
@@ -1120,7 +1120,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._susp_reasons
 
     @property
@@ -1133,7 +1133,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._termination_time
 
     @property
@@ -1144,7 +1144,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._user_name
 
     @property
@@ -1155,7 +1155,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._user_priority
 
     @property
@@ -1167,7 +1167,7 @@ class Job(JobBase):
         :rtype: Queue
 
         """
-        self._update_jobinfo()
+        
         return Queue(self._queue_name)
 
     @property
@@ -1179,7 +1179,7 @@ class Job(JobBase):
         :rtype: list
 
         """
-        self._update_jobinfo()
+        
         return [Host(hn) for hn in self._requested_hosts]
 
     ## Openlava Only
@@ -1192,7 +1192,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._checkpoint_directory
 
     @property
@@ -1203,7 +1203,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._checkpoint_period
 
     @property
@@ -1226,7 +1226,7 @@ class Job(JobBase):
         :rtype: float
 
         """
-        self._update_jobinfo()
+        
         return self._cpu_factor
 
     @property
@@ -1238,7 +1238,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._cwd
 
     @property
@@ -1250,7 +1250,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._execution_cwd
 
     @property
@@ -1262,7 +1262,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._execution_home_directory
 
     @property
@@ -1274,7 +1274,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._execution_user_id
 
     @property
@@ -1286,7 +1286,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._execution_user_name
 
     @property
@@ -1298,7 +1298,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._host_specification
 
     @property
@@ -1310,7 +1310,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._login_shell
 
     @property
@@ -1322,7 +1322,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._parent_group
 
     @property
@@ -1334,7 +1334,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        self._update_jobinfo()
+        
         return self._pre_execution_command
 
     @property
@@ -1346,7 +1346,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._resource_usage_last_update_time
 
     @property
@@ -1369,7 +1369,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._service_port
 
     @property
@@ -1381,7 +1381,7 @@ class Job(JobBase):
         :rtype str
 
         """
-        self._update_jobinfo()
+        
         return self._submit_home_directory
 
     @property
@@ -1393,7 +1393,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        self._update_jobinfo()
+        
         return self._termination_signal
 
     def __init__(self, job=None, job_id=None, array_index=0):
@@ -1430,14 +1430,12 @@ class Job(JobBase):
         self._last_update_time = 0
         if job:
             self._job_id = lsblib.get_job_id(job.jobId)
-            self._array_index = lsblib.get_array_index(job.jobId)
-            self._update_jobinfo(job)
+            self._array_index = lsblib.get_array_index(job.jobId)  
         elif job_id:
             self._job_id = job_id
             self._array_index = array_index
             full_job_id = lsblib.create_job_id(job_id, array_index)
             num_jobs = lsblib.lsb_openjobinfo(job_id=full_job_id, options=lsblib.ALL_JOB)
-            lsblib.lsb_closejobinfo()
             if num_jobs != 1:
                 errno = lsblib.get_lsberrno()
                 if errno == lsblib.LSBE_NO_JOB:
@@ -1446,109 +1444,12 @@ class Job(JobBase):
                     raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
                 else:
                     raise ClusterException("%s" % lsblib.ls_sysmsg())
-        else:
-            raise ValueError("Job, or job_id required")
-
-    def kill(self):
-        """
-
-        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
-
-        :return: None
-
-        """
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % ( self.job_id, self.array_index ))
-
-
-    def suspend(self):
-        """
-        Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
-
-        :return: None
-        """
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to suspend job: %s[%s]" % ( self.job_id, self.array_index ))
-
-    def requeue(self, hold=False):
-        """
-        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
-
-        :return: None
-        """
-        rq = lsblib.JobRequeue()
-        rq.jobId = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rq.status = lsblib.JOB_STAT_PEND
-        if hold:
-            rq.status = lsblib.JOB_STAT_PSUSP
-
-        if self.status.name == u"JOB_STAT_DONE":
-            rq.options = lsblib.REQUEUE_DONE
-        elif self.status.name == u"JOB_STAT_RUN":
-            rq.options = lsblib.REQUEUE_RUN
-        elif self.status.name == u"JOB_STAT_EXIT":
-            rq.options = lsblib.REQUEUE_EXIT
-        else:
-            raise ValueError(self.status)
-
-        rc = lsblib.lsb_requeuejob(rq)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to requeue job: %s[%s]" % ( self.job_id, self.array_index ))
-
-    def resume(self):
-        """
-        Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
-
-        :return: None
-        """
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
-
-    def get_output_path(self):
-        """
-        Gets the path to the job output file.  If the job is not owned by the current user, or the job is not running
-        then the output path will be None
-
-        :return: output path
-        :rtype: str or None
-
-        """
-        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
-        return lsblib.lsb_peekjob(full_job_id)
-
-
-
-
-
-    def _update_jobinfo(self, job=None):
-        age=int(time.time()) - self._last_update_time
-        print age
-        if (int(time.time()) - self._last_update_time) < 60:
-            return
-        self._last_update_time = int(time.time())
-        print "updating job %s[%s]" % ( self._job_id, self._array_index)
-
-        full_job_id = lsblib.create_job_id(self.job_id, self.array_index)
-        if job == None:
-            num_jobs = lsblib.lsb_openjobinfo(job_id=full_job_id, options=lsblib.ALL_JOB)
-            if num_jobs == 1:
-                job = lsblib.lsb_readjobinfo()
+            job=lsblib.lsb_readjobinfo()
             lsblib.lsb_closejobinfo()
-            if num_jobs != 1:
-                raise NoSuchJobError("Job: %s[%s] does not exist." % (self.job_id, self.array_index))
+        else:
+            raise ValueError("Job ID or Job object required")
+        
+    
         self._exit_status = job.exitStatus
         self._submission_host = job.fromHost
         self._status = job.status
@@ -1654,6 +1555,91 @@ class Job(JobBase):
         ld = lsblib.LoadIndexLog()
         self._pend_reasons = " ".join(lsblib.lsb_pendreason(job.numReasons, job.reasonTb, None, ld).splitlines())
         self._susp_reasons = " ".join(lsblib.lsb_suspreason(job.reasons, job.subreasons, ld).splitlines())
+
+
+    def kill(self):
+        """
+
+        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        :return: None
+
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % ( self.job_id, self.array_index ))
+
+
+    def suspend(self):
+        """
+        Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        :return: None
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(),
+                                "Unable to suspend job: %s[%s]" % ( self.job_id, self.array_index ))
+
+    def requeue(self, hold=False):
+        """
+        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
+
+        :return: None
+        """
+        rq = lsblib.JobRequeue()
+        rq.jobId = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rq.status = lsblib.JOB_STAT_PEND
+        if hold:
+            rq.status = lsblib.JOB_STAT_PSUSP
+
+        if self.status.name == u"JOB_STAT_DONE":
+            rq.options = lsblib.REQUEUE_DONE
+        elif self.status.name == u"JOB_STAT_RUN":
+            rq.options = lsblib.REQUEUE_RUN
+        elif self.status.name == u"JOB_STAT_EXIT":
+            rq.options = lsblib.REQUEUE_EXIT
+        else:
+            raise ValueError(self.status)
+
+        rc = lsblib.lsb_requeuejob(rq)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(),
+                                "Unable to requeue job: %s[%s]" % ( self.job_id, self.array_index ))
+
+    def resume(self):
+        """
+        Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        :return: None
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(),
+                                "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
+
+    def get_output_path(self):
+        """
+        Gets the path to the job output file.  If the job is not owned by the current user, or the job is not running
+        then the output path will be None
+
+        :return: output path
+        :rtype: str or None
+
+        """
+        full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
+        return lsblib.lsb_peekjob(full_job_id)
+
+
+
+
 
     @classmethod
     def submit(cls, **kwargs):
