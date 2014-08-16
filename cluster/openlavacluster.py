@@ -2561,17 +2561,18 @@ def initialize():
 
 
 
-class Memoized(object):
+class SingleArgMemoized(object):
     _memoized = {}
-    def __new__(cls, *args, **kwargs):
-        id=Memoized.get_id_tuple(cls, args, kwargs)
-        if id in Memoized._memoized:
+    def __new__(cls, arg):
+        key = (cls, arg)
+
+        if key in SingleArgMemoized._memoized:
             print "Queue exists"
-            return Memoized._memoized[id]
+            return SingleArgMemoized._memoized[key]
         else:
             print "Queue is created"
-            ob = object.__new__(cls, *args, **kwargs)
-            Memoized._memoized[id] = ob
+            ob = object.__new__(cls, arg)
+            SingleArgMemoized._memoized[key] = ob
             return ob
 
     @staticmethod
@@ -2579,14 +2580,14 @@ class Memoized(object):
         """
         Some quick'n'dirty way to generate a unique key for an specific call.
         """
-        l = [id(cls)]
+        l = [cls]
         for arg in args:
-            l.append(id(arg))
+            l.append(arg)
 
         for k, v in kwargs:
             l.append(k)
-            l.append(id(v))
-        return tuple(l)
+            l.append(v)
+        return hash
 
 class Queue(Memoized):
     cluster_type = "openlava"
