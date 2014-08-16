@@ -81,7 +81,6 @@ class ClusterBase:
 
 class JobBase:
     def json_attributes(self):
-        raise NotImplemented
         return [
             'cluster_type',
             'admins',
