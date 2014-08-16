@@ -2597,7 +2597,7 @@ class Queue(object):
         else:
             print "Queue needs to be instantiated"
             ob = object.__new__(cls, queue, *args, **kwargs)
-            Queue._memoized(queue) = ob
+            Queue._memoized[queue] = ob
             return ob
 
 
