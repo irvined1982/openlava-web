@@ -2558,47 +2558,40 @@ def initialize():
 
 
 
-def get_id_tuple(f, args, kwargs, mark=object()):
-    """
-    Some quick'n'dirty way to generate a unique key for an specific call.
-    """
-    l = [id(f)]
-    for arg in args:
-        l.append(id(arg))
-    l.append(id(mark))
-    for k, v in kwargs:
-        l.append(k)
-        l.append(id(v))
-    return tuple(l)
 
 
 
-def memoize(f):
-    """
-    Some basic memoizer
-    """
-    def memoized(*args, **kwargs):
-        key = get_id_tuple(f, args, kwargs)
-        if key not in _memoized:
-            _memoized[key] = f(*args, **kwargs)
-        return _memoized[key]
-    return memoized
+class Memoized(object):
+    _memoized = {}
+    def __new__(cls, *args, **kwargs):
+        id=Memoized.get_id_tuple(cls, args, kwargs)
+        if id in Memoized._memoized:
+            print "Queue exists"
+            return Memoized._memoized[id]
+        else:
+            print "Queue is created"
+            ob = object.__new__(cls, *args, **kwargs)
+            Memoized._memoized[id] = ob
+            return ob
 
+    @staticmethod
+    def get_id_tuple(cls, args, kwargs):
+        """
+        Some quick'n'dirty way to generate a unique key for an specific call.
+        """
+        l = [id(cls)]
+        for arg in args:
+            l.append(id(arg))
 
+        for k, v in kwargs:
+            l.append(k)
+            l.append(id(v))
+        return tuple(l)
 
-class Queue(object):
+class Queue(Memoized):
     cluster_type = "openlava"
     _memoized = {}
 
-    def __new__(cls, queue, *args, **kwargs):
-        if queue in Queue._memoized:
-            print "Queue already loaded"
-            return Queue._memoized[queue]
-        else:
-            print "Queue needs to be instantiated"
-            ob = object.__new__(cls, queue, *args, **kwargs)
-            Queue._memoized[queue] = ob
-            return ob
 
 
     @classmethod
@@ -2719,33 +2712,27 @@ class Queue(object):
 
     @property
     def total_jobs(self):
-        if self._total_jobs is None:
-            self.update_job_count()
+        self.update_job_count()
         return self._total_jobs
     @property
     def num_running_jobs(self):
-        if self._running_jobs is None:
-            self.update_job_count()
+        self.update_job_count()
         return self._running_jobs
     @property
     def num_pending_jobs(self):
-        if self._num_pending is None:
-            self.update_job_count()
+        self.update_job_count()
         return self._num_pending
     @property
     def num_suspended_jobs(self):
-        if self._num_suspended_jobs is None:
-            self.update_job_count()
+        self.update_job_count()
         return self._num_suspended_jobs
     @property
     def num_user_suspended_jobs(self):
-        if self._num_user_suspended_jobs is None:
-            self.update_job_count()
+        self.update_job_count()
         return self._num_user_suspended_jobs
     @property
     def num_system_suspended_jobs(self):
-        if self._num_system_suspended_jobs is None:
-            self.update_job_count()
+        self.update_job_count()
         return self._num_system_suspended_jobs
 
 
