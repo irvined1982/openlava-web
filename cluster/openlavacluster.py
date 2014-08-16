@@ -2594,25 +2594,12 @@ class Queue:
         self.num_system_suspended_slots = queue.numSSUSP
         self.num_reserved_slots = queue.numRESERVE
         self.max_jobs = queue.maxJobs
-        self.total_jobs = 0
-        self.num_running_jobs = 0
-        self.num_pending_jobs = 0
-        self.num_suspended_jobs = 0
-        self.num_user_suspended_jobs = 0
-        self.num_system_suspended_jobs = 0
-        ## iterate through jobs and count/sum each one.
-        for j in self.jobs():
-            self.total_jobs += 1
-            if j.status.name == "JOB_STAT_RUN":
-                self.num_running_jobs += 1
-            elif j.status.name == "JOB_STAT_SSUSP":
-                self.num_suspended_jobs += 1
-                self.num_system_suspended_jobs += 1
-            elif j.status.name == "JOB_STAT_USUSP":
-                self.num_suspended_jobs += 1
-                self.num_user_suspended_jobs += 1
-            elif j.status.name == "JOB_STAT_PEND":
-                self.num_pending_jobs += 1
+        self._total_jobs = None
+        self._num_running_jobs = None
+        self._num_pending_jobs = None
+        self._num_suspended_jobs = None
+        self._num_user_suspended_jobs = None
+        self._num_system_suspended_jobs = None
         self.pre_execution_command = queue.preCmd.lstrip()
         self.post_execution_command = queue.postCmd.lstrip()
         self.pre_post_user_name = queue.prepostUsername.lstrip()
@@ -2643,6 +2630,59 @@ class Queue:
         self.checkpoint_period_timedelta = datetime.timedelta(minutes=queue.chkpntPeriod)
         self.resume_condition = queue.resumeCond.lstrip()
         self.stop_condition = queue.stopCond.lstrip()
+
+    def update_job_count(self):
+        self._total_jobs = 0
+        self._num_running_jobs = 0
+        self._num_pending_jobs = 0
+        self._num_suspended_jobs = 0
+        self._num_user_suspended_jobs = 0
+        self._num_system_suspended_jobs = 0
+        ## iterate through jobs and count/sum each one.
+        for j in self.jobs():
+            self._total_jobs += 1
+            if j.status.name == "JOB_STAT_RUN":
+                self._num_running_jobs += 1
+            elif j.status.name == "JOB_STAT_SSUSP":
+                self._num_suspended_jobs += 1
+                self._num_system_suspended_jobs += 1
+            elif j.status.name == "JOB_STAT_USUSP":
+                self._num_suspended_jobs += 1
+                self._num_user_suspended_jobs += 1
+            elif j.status.name == "JOB_STAT_PEND":
+                self._num_pending_jobs += 1
+
+    @property
+    def total_jobs(self):
+        if self._total_jobs is None:
+            self.update_job_count()
+        return self._total_jobs
+    @property
+    def num_running_jobs(self):
+        if self._running_jobs is None:
+            self.update_job_count()
+        return self._running_jobs
+    @property
+    def num_pending_jobs(self):
+        if self._num_pending is None:
+            self.update_job_count()
+        return self._num_pending
+    @property
+    def num_suspended_jobs(self):
+        if self._num_suspended_jobs is None:
+            self.update_job_count()
+        return self._num_suspended_jobs
+    @property
+    def num_user_suspended_jobs(self):
+        if self._num_user_suspended_jobs is None:
+            self.update_job_count()
+        return self._num_user_suspended_jobs
+    @property
+    def num_system_suspended_jobs(self):
+        if self._num_system_suspended_jobs is None:
+            self.update_job_count()
+        return self._num_system_suspended_jobs
+    
 
     def is_accepting_jobs(self):
         for state in self.statuses:
