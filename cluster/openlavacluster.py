@@ -2546,9 +2546,58 @@ class QueueAttribute(NumericStatus):
     },
     }
 
-@memoize
+
+
+def initialize():
+    global initialized_openlava
+    if initialized_openlava == False:
+        if lsblib.lsb_init("Openlava Cluster Interface") != 0:
+            raise OpenLavaError(lslib.ls_sysmsg)
+        else:
+            initialized_openlava = True
+
+
+
+def get_id_tuple(f, args, kwargs, mark=object()):
+    """
+    Some quick'n'dirty way to generate a unique key for an specific call.
+    """
+    l = [id(f)]
+    for arg in args:
+        l.append(id(arg))
+    l.append(id(mark))
+    for k, v in kwargs:
+        l.append(k)
+        l.append(id(v))
+    return tuple(l)
+
+
+
+def memoize(f):
+    """
+    Some basic memoizer
+    """
+    def memoized(*args, **kwargs):
+        key = get_id_tuple(f, args, kwargs)
+        if key not in _memoized:
+            _memoized[key] = f(*args, **kwargs)
+        return _memoized[key]
+    return memoized
+
+
+
 class Queue(object):
     cluster_type = "openlava"
+    _memoized = {}
+
+    def __new__(cls, queue, *args, **kwargs):
+        if queue in Queue._memoized:
+            print "Queue already loaded"
+            return _memoized[queue]
+        else:
+            print "Queue needs to be instantiated"
+            return object.__new__(cls, queue, *args, **kwargs)
+
 
     @classmethod
     def get_queue_list(cls):
@@ -2559,6 +2608,10 @@ class Queue(object):
         return [cls(q) for q in qs]
 
     def __init__(self, queue):
+        if hasattr(self, '_initialized'):
+            return
+        self._initialized=True
+
         initialize()
         if isinstance(queue, str) or isinstance(queue, unicode):
             queue = lsblib.lsb_queueinfo(queues=[queue])
