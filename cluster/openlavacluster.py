@@ -2547,7 +2547,7 @@ class QueueAttribute(NumericStatus):
     }
 
 @memoize
-class Queue:
+class Queue(object):
     cluster_type = "openlava"
 
     @classmethod
