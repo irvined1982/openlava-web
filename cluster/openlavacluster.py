@@ -2557,20 +2557,13 @@ def initialize():
             initialized_openlava = True
 
 
-
-
-
-
 class SingleArgMemoized(object):
     _memoized = {}
     def __new__(cls, arg):
         key = (cls, arg)
-
         if key in SingleArgMemoized._memoized:
-            print "Queue exists"
             return SingleArgMemoized._memoized[key]
         else:
-            print "Queue is created"
             ob = object.__new__(cls, arg)
             SingleArgMemoized._memoized[key] = ob
             return ob
@@ -2592,8 +2585,6 @@ class SingleArgMemoized(object):
 class Queue(SingleArgMemoized):
     cluster_type = "openlava"
     _memoized = {}
-
-
 
     @classmethod
     def get_queue_list(cls):
