@@ -80,42 +80,26 @@ class ClusterBase:
 
 
 class JobBase:
-    def to_dict(self):
+    def to_dict_short(self):
         simple_fields=[
             'cluster_type',
-            'admins',
             'job_id',
             'array_index',
-            'begin_time',
-            'command',
-            'consumed_resources',
-            'cpu_time',
-            'dependency_condition',
-            'email_user',
-            'end_time',
-            'error_file_name',
-            'input_file_name',
-            'max_requested_slots',
-            'name',
-            'options',
-            'output_file_name',
-            'pending_reasons',
-            'predicted_start_time',
-            'priority',
-            'process_id',
-            'processes',
-            'project_names',
-            'requested_resources',
-            'requested_slots',
-            'reservation_time',
-            'runtime_limits',
-            'start_time',
             'status',
-            'submit_time',
-            'suspension_reasons',
-            'termination_time',
+            'name',
             'user_name',
-            'user_priority',
+            'project_names',
+            'requested_slots',
+            'command',
+            'submit_time',
+            'start_time',
+            'end_time',
+            'pending_reasons',
+            'suspension_reasons',
+
+
+
+
             'is_pending',
             'is_running',
             'is_suspended',
