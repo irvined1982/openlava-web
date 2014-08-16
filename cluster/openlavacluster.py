@@ -2593,11 +2593,11 @@ class Queue(object):
     def __new__(cls, queue, *args, **kwargs):
         if queue in Queue._memoized:
             print "Queue already loaded"
-            return queue._memoized[queue]
+            return Queue._memoized[queue]
         else:
             print "Queue needs to be instantiated"
             ob = object.__new__(cls, queue, *args, **kwargs)
-            queue._memoized(queue) = ob
+            Queue._memoized(queue) = ob
             return ob
 
 
