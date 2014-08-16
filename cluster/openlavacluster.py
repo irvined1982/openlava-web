@@ -857,9 +857,10 @@ class Job(JobBase):
         :rtype: bool
 
         """
-        if self.status.name == "JOB_STAT_EXIT":
+        if self.status.name == "JOB_STAT_EXIT" and self._exit_status < 128:
             return True
-        return False
+        else:
+            return False
 
     @property
     def is_pending(self):
@@ -2564,7 +2565,7 @@ class SingleArgMemoized(object):
         if key in SingleArgMemoized._memoized:
             return SingleArgMemoized._memoized[key]
         else:
-            ob = object.__new__(cls, arg)
+            ob = object.__new__(cls)
             SingleArgMemoized._memoized[key] = ob
             return ob
 
