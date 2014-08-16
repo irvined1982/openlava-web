@@ -83,6 +83,9 @@ class JobBase:
     def json_attributes(self):
         return [
             'queue',
+            'submission_host',
+            'execution_hosts',
+            'requested_hosts',
             'cluster_type',
             'admins',
             'job_id',
