@@ -2710,11 +2710,11 @@ class Queue(SingleArgMemoized):
     @property
     def num_running_jobs(self):
         self.update_job_count()
-        return self._running_jobs
+        return self._num_running_jobs
     @property
     def num_pending_jobs(self):
         self.update_job_count()
-        return self._num_pending
+        return self._num_pending_jobs
     @property
     def num_suspended_jobs(self):
         self.update_job_count()
@@ -2728,13 +2728,14 @@ class Queue(SingleArgMemoized):
         self.update_job_count()
         return self._num_system_suspended_jobs
 
-
+    @property
     def is_accepting_jobs(self):
         for state in self.statuses:
             if state.name == "QUEUE_STAT_OPEN":
                 return True
         return False
 
+    @property
     def is_despatching_jobs(self):
         for state in self.statuses:
             if state.name == "QUEUE_STAT_ACTIVE":
