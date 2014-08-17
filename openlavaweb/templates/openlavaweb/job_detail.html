@@ -328,7 +328,7 @@
 <!-- Job Info -->
 <h1>Job: {{ job.job_id }} {% if job.array_array_index > 0 %} Array Index: {{ job.array_index }}{% endif %}</h1>
 <dl class="dl-horizontal">
-	<dt>Job ID</dt><dd>{{ job.job_id }}</dd>
+	<dt>Job ID</dt><dd><a href="{% url 'olw_job_list' job.job_id %}">}}{{ job.job_id }}</a></dd>
 	<dt>Array Index ID</dt><dd>{{ job.array_index }}</dd>
 	<dt>Status</dt>	<dd id="status">{{ job.status.friendly }}: {{ job.status.description }}</dd>
     {% if job.status.name == "JOB_STAT_RUN" %}
@@ -341,7 +341,7 @@
 	<dt>Current Working Directory</dt><dd>{{ job.cwd }}</dd>
 	<dt>Submission Host</dt><dd>{{ job.submission_host.host_name }}</dd>
 	<dt>Execution Hosts</dt><dd id="executionHosts">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }}</a> {% empty %}Not executing{% endfor %}</dd>
-	<dt>Job Name</dt><dd>{{ job.name }}</dd>
+	<dt>Job Name</dt><dd>{% if job.name %}<a href="{% url 'olw_job_list' %}?job_name={{ job.name|urlencode }}">{{ job.name }}</a>{% else %}{{ job.name }}{% endif %}</dd>
 	<dt>Job Priority</dt><dd id="priority">{{ job.priority }}</dd>
 	<dt>Job Admins</dt><dd>{% for admin in job.admins %}{{ admin }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
 	<dt>Submission Time</dt><dd>{{ job.submit_time_datetime_local }}</dd>
@@ -378,10 +378,10 @@
 	<dt>Login Shell</dt><dd>{{ job.login_shell|default:"Default"}}</dd>
 	<dt>Parent Group</dt><dd>{{ job.parent_group }}</dd>
 	<dt>Pre Execution Command</dt><dd>{{ job.pre_execution_command|default:"Not Specified" }}</dd>
-	<dt>Resource Usage Last Updated</dt><dd id="resourceUsageLastUpdateTime">{{ job.resource_usage_last_update_time_local }}</dd>
+	<dt>Resource Usage Last Updated</dt><dd id="resourceUsageLastUpdateTime">{{ job.resource_usage_last_update_time_datetime }}</dd>
 	<dt>Service Port</dt><dd id="servicePort">{{ job.service_port }}</dd>
 	<dt>Submit Home Directory</dt><dd>{{ job.submit_home_directory }}</dd>
-	<dt>Termination Signal Value</dt><dd>{{ job.termination_value|default:"Not Specified" }}</dd>
+	<dt>Termination Signal Value</dt><dd>{{ job.termination_signal|default:"Not Specified" }}</dd>
 	{% endif %}
 </dl>
 
