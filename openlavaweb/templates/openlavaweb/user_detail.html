@@ -106,7 +106,7 @@
 </table>
 <h1>Jobs</h1>
 {% include "openlavaweb/widgets/job_list.html" with job_list=oluser.jobs job_limit=20 %}
-<a href="{% url "olw_job_list" %}?user_name={{ oluser.name }}">View All Jobs</a>
+<a href="{% url "olw_job_list" %}?user_name={{ oluser.name|urlencode }}">View All Jobs</a>
 
 {% endblock %}
 
