@@ -328,7 +328,7 @@
 <!-- Job Info -->
 <h1>Job: {{ job.job_id }} {% if job.array_array_index > 0 %} Array Index: {{ job.array_index }}{% endif %}</h1>
 <dl class="dl-horizontal">
-	<dt>Job ID</dt><dd><a href="{% url 'olw_job_list' job.job_id %}">}}{{ job.job_id }}</a></dd>
+	<dt>Job ID</dt><dd><a href="{% url 'olw_job_list' job.job_id %}">{{ job.job_id }}</a></dd>
 	<dt>Array Index ID</dt><dd>{{ job.array_index }}</dd>
 	<dt>Status</dt>	<dd id="status">{{ job.status.friendly }}: {{ job.status.description }}</dd>
     {% if job.status.name == "JOB_STAT_RUN" %}
