@@ -86,3 +86,6 @@ class TestJob(unittest.TestCase):
             self.assertEqual(j2.job_id, job.job_id)
             self.assertEqual(j2.array_index, job.array_index)
             self.assertEqual(j2.was_killed, True)
+
+if __name__ == '__main__':
+    unittest.main()
