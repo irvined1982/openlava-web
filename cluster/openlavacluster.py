@@ -857,7 +857,7 @@ class Job(JobBase):
         :rtype: bool
 
         """
-        if self.status.name == "JOB_STAT_EXIT" and self._exit_status < 128:
+        if self.status.name == "JOB_STAT_EXIT" and not self.was_killed:
             return True
         else:
             return False
