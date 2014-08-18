@@ -2056,15 +2056,6 @@ class Resource(BaseResource):
         return ['name', 'description', 'type', 'order', 'interval', 'flags']
 
 
-class ExecutionHost(Host):
-    def __init__(self, host_name, num_slots=1):
-        Host.__init__(self, host_name)
-        self.num_slots = num_slots
-
-    def json_attributes(self):
-        attribs = Host.json_attributes(self)
-        attribs.append('num_slots')
-        return attribs
 
 
 class QueueStatus(NumericStatus):
@@ -2924,4 +2915,15 @@ class Host(SingleArgMemoized, HostBase):
         })
 
         return indexes
+
+
+class ExecutionHost(Host):
+    def __init__(self, host_name, num_slots=1):
+        Host.__init__(self, host_name)
+        self.num_slots = num_slots
+
+    def json_attributes(self):
+        attribs = Host.json_attributes(self)
+        attribs.append('num_slots')
+        return attribs
 
