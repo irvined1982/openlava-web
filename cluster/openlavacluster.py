@@ -2895,6 +2895,8 @@ class User(UserBase):
             return jobs
         for i in range(num_jobs):
             j = lsblib.lsb_readjobinfo()
+            if j is None:
+                raise_cluster_exception(lsblib.get_lsberrno(), "Unable to read jobs")
             jobs.append(Job(job=j))
         lsblib.lsb_closejobinfo()
         return jobs
