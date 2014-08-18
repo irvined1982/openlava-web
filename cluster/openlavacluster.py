@@ -1464,13 +1464,13 @@ class Job(JobBase):
             if num_jobs != 1:
                 errno = lsblib.get_lsberrno()
                 if errno == lsblib.LSBE_NO_JOB:
-                    lsblib.closejobinfo()
+                    lsblib.lsb_closejobinfo()
                     raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
                 elif errno == 0:
-                    lsblib.closejobinfo()
+                    lsblib.lsb_closejobinfo()
                     raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
                 else:
-                    lsblib.closejobinfo()
+                    lsblib.lsb_closejobinfo()
                     raise ClusterException("%s" % lsblib.ls_sysmsg())
             job=lsblib.lsb_readjobinfo()
             lsblib.lsb_closejobinfo()
@@ -2505,7 +2505,7 @@ class User(UserBase):
                                           options=options)
         jobs = []
         if num_jobs < 1:
-            lsblib.closejobinfo()
+            lsblib.lsb_closejobinfo()
             return jobs
         for i in range(num_jobs):
             j = lsblib.lsb_readjobinfo()
