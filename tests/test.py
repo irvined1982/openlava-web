@@ -82,7 +82,7 @@ class TestJob(unittest.TestCase):
         if job.is_pending or job.is_running:
             job.kill()
             time.sleep(10)
-            j2 = Job(jjob_id=job.job_id, array_index=job.array_index)
+            j2 = Job(job_id=job.job_id, array_index=job.array_index)
             self.assertEqual(j2.job_id, job.job_id)
             self.assertEqual(j2.array_index, job.array_index)
             self.assertEqual(j2.was_killed, True)
