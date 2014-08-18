@@ -1464,10 +1464,13 @@ class Job(JobBase):
             if num_jobs != 1:
                 errno = lsblib.get_lsberrno()
                 if errno == lsblib.LSBE_NO_JOB:
+                    lsblib.closejobinfo()
                     raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
                 elif errno == 0:
+                    lsblib.closejobinfo()
                     raise NoSuchJobError("Job: %s[%s] does not exist." % (job_id, array_index))
                 else:
+                    lsblib.closejobinfo()
                     raise ClusterException("%s" % lsblib.ls_sysmsg())
             job=lsblib.lsb_readjobinfo()
             lsblib.lsb_closejobinfo()
@@ -2502,6 +2505,7 @@ class User(UserBase):
                                           options=options)
         jobs = []
         if num_jobs < 1:
+            lsblib.closejobinfo()
             return jobs
         for i in range(num_jobs):
             j = lsblib.lsb_readjobinfo()
@@ -2879,6 +2883,7 @@ class Host(SingleArgMemoized, HostBase):
                                           options=options)
         jobs = []
         if num_jobs < 1:
+            lsblib.lsb_closejobinfo()
             return jobs
         jobs = []
         for i in range(num_jobs):
