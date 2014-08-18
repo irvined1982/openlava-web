@@ -56,10 +56,10 @@ Local
 ^^^^^
 
 .. autoclass:: cluster.openlavacluster.Host
-    :members
+    :members:
 
 .. autoclass:: cluster.openlavacluster.ExecutionHost
-    :members
+    :members:
 
 Client
 ^^^^^^

@@ -813,7 +813,6 @@ class Job(JobBase):
 
         return hosts.values()
 
-
     @property
     def input_file_name(self):
         """
