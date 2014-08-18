@@ -807,7 +807,7 @@ class Job(JobBase):
         hosts={}
         for hn in self._execution_hosts:
             if hn in hosts:
-                hosts[hn].num_slots += 1
+                hosts[hn].num_slots_for_job_for_job += 1
             else:
                 hosts[hn] = ExecutionHost(hn)
 
@@ -2983,28 +2983,28 @@ class Host(SingleArgMemoized, HostBase):
 
 class ExecutionHost(Host):
     """
-    Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots attribute
+    Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots_for_job attribute
     indicating how many slots (Processors) are allocated to the job.
 
     """
-    def __init__(self, host_name, num_slots=1):
+    def __init__(self, host_name, num_slots_for_job=1):
         """
-        Accepts the additional optional argument num_slots (default 1) that indicates how many slots are allocated.
+        Accepts the additional optional argument num_slots_for_job (default 1) that indicates how many slots are allocated.
 
         Otherwise functions identically to Host().
 
         :param host_name: The host name of the host.
-        :param num_slots: The number of slots that are allocated to the job.
+        :param num_slots_for_job: The number of slots that are allocated to the job.
         :return: ExecutionHost()
 
         """
 
         Host.__init__(self, host_name)
         #: The number of slots that are allocated to the job
-        self.num_slots = num_slots
+        self.num_slots_for_job = num_slots_for_job
 
     def json_attributes(self):
         attribs = Host.json_attributes(self)
-        attribs.append('num_slots')
+        attribs.append('num_slots_for_job')
         return attribs
 
