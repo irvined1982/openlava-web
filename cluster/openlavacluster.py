@@ -804,8 +804,15 @@ class Job(JobBase):
     @property
     def execution_hosts(self):
         """List of hosts that job is running on"""
-        
-        return [ExecutionHost(hn) for hn in self._execution_hosts]
+        hosts={}
+        for hn in self._execution_hosts:
+            if hn in hosts:
+                hosts[hn].num_slots += 1
+            else:
+                hosts[hn] = ExecutionHost(hn)
+
+        return hosts.values()
+
 
     @property
     def input_file_name(self):
@@ -2975,8 +2982,25 @@ class Host(SingleArgMemoized, HostBase):
 
 
 class ExecutionHost(Host):
+    """
+    Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots attribute
+    indicating how many slots (Processors) are allocated to the job.
+
+    """
     def __init__(self, host_name, num_slots=1):
+        """
+        Accepts the additional optional argument num_slots (default 1) that indicates how many slots are allocated.
+
+        Otherwise functions identically to Host().
+
+        :param host_name: The host name of the host.
+        :param num_slots: The number of slots that are allocated to the job.
+        :return: ExecutionHost()
+
+        """
+
         Host.__init__(self, host_name)
+        #: The number of slots that are allocated to the job
         self.num_slots = num_slots
 
     def json_attributes(self):

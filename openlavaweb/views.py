@@ -33,7 +33,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from cluster import ClusterException, NoSuchJobError
-from cluster.openlavacluster import Cluster, Host, Job, Queue, User
+from cluster.openlavacluster import Cluster, Host, Job, Queue, User, ExecutionHost
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 from openlava import lsblib
@@ -709,7 +709,13 @@ def job_output(request, job_id, array_index=0):
 
 class ClusterEncoder(json.JSONEncoder):
     def check(self, obj):
-
+        if isinstance(obj, ExecutionHost):
+            return {
+                'type': "ExecutionHost",
+                'name': obj.name,
+                'num_slots': obj.num_slots,
+                'url': reverse("olw_host_view", args=[obj.name]),
+            }
         if isinstance(obj, Host):
             return {
                 'type': "Host",

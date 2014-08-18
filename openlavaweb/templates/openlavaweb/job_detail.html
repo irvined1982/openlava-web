@@ -340,7 +340,7 @@
 	<dt>CPU Time Consumed</dt><dd id="cpuTimeConsumed">{{ job.cpu_time_timedelta }}</dd>
 	<dt>Current Working Directory</dt><dd>{{ job.cwd }}</dd>
 	<dt>Submission Host</dt><dd>{{ job.submission_host.host_name }}</dd>
-	<dt>Execution Hosts</dt><dd id="executionHosts">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }}</a> {% empty %}Not executing{% endfor %}</dd>
+	<dt>Execution Hosts</dt><dd id="executionHosts">{% for h in job.execution_hosts %} <a href='{% url "olw_host_view" h.host_name %}'>{{ h.host_name }} ({{ h.num_slots }} Slots)</a> {% empty %}Not executing{% endfor %}</dd>
 	<dt>Job Name</dt><dd>{{ job.name }}</dd>
 	<dt>Job Priority</dt><dd id="priority">{{ job.priority }}</dd>
 	<dt>Job Admins</dt><dd>{% for admin in job.admins %}{{ admin }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</dd>
