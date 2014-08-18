@@ -2021,394 +2021,6 @@ class Job(JobBase):
         return jl
 
 
-class Host(SingleArgMemoized, HostBase):
-    cluster_type = "openlava"
-
-    def open(self):
-        rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name)
-
-    def close(self):
-        rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_CLOSE)
-        if rc == 0:
-            return rc
-        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
-
-    def admins(self):
-        return Cluster().admins
-
-    def is_busy(self):
-        for s in self.statuses:
-            busy = [
-                "HOST_STAT_BUSY",
-                "HOST_STAT_FULL",
-                "HOST_STAT_LOCKED",
-                "HOST_STAT_EXCLUSIVE",
-                "HOST_STAT_LOCKED_MASTER",
-            ]
-            if s.name in busy:
-                return True
-        return False
-
-    def is_down(self):
-        for s in self.statuses:
-            if s.name in ["HOST_STAT_UNREACH", "HOST_STAT_UNAVAIL", "HOST_STAT_NO_LIM", ]:
-                return True
-        return False
-
-    def is_closed(self):
-        for s in self.statuses:
-            if s.name in ["HOST_STAT_WIND", "HOST_STAT_DISABLED", ]:
-                return True
-        return False
-
-    def json_attributes(self):
-        attribs = HostBase.json_attributes(self)
-        attribs.extend([
-            'cpu_factor',
-            'is_server',
-            'num_disks',
-            'num_user_suspended_jobs',
-            'num_user_suspended_slots',
-            'num_system_suspended_jobs',
-            'num_system_suspended_slots',
-            'has_kernel_checkpoint_copy',
-            'max_slots_per_user',
-            'run_windows',
-        ])
-        return attribs
-
-    @classmethod
-    def get_host_list(cls):
-        initialize()
-        hs = lsblib.lsb_hostinfo()
-        if hs is None:
-            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of hosts")
-        return [cls(h.host) for h in hs]
-
-    def __init__(self, host_name):
-        initialize()
-        self._lsb_update_time = 0
-        self._update_time = 0
-        HostBase.__init__(self, host_name)
-
-        # check host exists
-        self._model = lslib.ls_gethostmodel(host_name)
-        if self._model == None:
-            raise NoSuchHostError("Host: %s does not exist" % host_name)
-
-    def _update_hostinfo(self):
-        if (int(time.time()) - self._update_time) < 60:
-            return
-        self._update_time = int(time.time())
-        # cache this....
-        hosts = lslib.ls_gethostinfo(resReq="", hostList=[self.host_name], options=0)
-        if len(hosts) != 1:
-            raise ValueError("Invalid number of hosts returned")
-        host = hosts[0]
-        self._max_processors = host.maxCpus
-        self._max_ram = host.maxMem
-        self._max_swap = host.maxSwap
-        self._max_tmp = host.maxTmp
-        self._num_disks = host.nDisks
-        self._is_server = host.isServer
-        self._run_windows = host.windows
-        resource_names = host.resources
-        self._resources = []
-        c = Cluster()
-        for r in c.resources():
-            if r.name in resource_names:
-                self._resources.append(r)
-
-    def _update_lsb_hostinfo(self):
-        if (int(time.time()) - self._lsb_update_time) < 60:
-            return
-        self._lsb_update_time = int(time.time())
-
-        hosts = lsblib.lsb_hostinfo(hosts=[self.host_name])
-        if hosts == None or len(hosts) != 1:
-            raise ValueError("Invalid number of hosts")
-        host = hosts[0]
-        self._status = host.hStatus
-        self._max_slots = host.maxJobs
-        self._total_slots = host.numJobs
-
-        self._num_running_slots = host.numRUN
-        self._num_suspended_slots = host.numSSUSP + host.numUSUSP
-        self._num_user_suspended_slots = host.numUSUSP
-        self._num_system_suspended_slots = host.numSSUSP
-        self._num_reserved_slots = host.numRESERVE
-
-        self._max_jobs = host.maxJobs
-        self._total_jobs = 0
-        self._num_running_jobs = 0
-        self._num_suspended_jobs = 0
-        self._num_user_suspended_jobs = 0
-        self._num_system_suspended_jobs = 0
-        self._max_slots_per_user = host.userJobLimit
-
-        if (host.attr & lsblib.H_ATTR_CHKPNTABLE) != 0:
-            self._has_checkpoint_support = True
-        else:
-            self._has_checkpoint_support = False
-
-        if (host.attr & lsblib.H_ATTR_CHKPNT_COPY ) != 0:
-            self._has_kernel_checkpoint_support = True
-        else:
-            self._has_kernel_checkpoint_support = False
-
-        self._load = host.load
-
-        self._load_sched = host.loadSched
-        for i in range(len(self._load_sched)):
-            if self._load_sched[i] == 2147483648.0 or self._load_sched[i] == -2147483648.00:
-                self._load_sched[i] = -1
-
-        self._load_stop = host.loadStop
-        for i in range(len(self._load_stop)):
-            if self._load_stop[i] == 2147483648.0 or self._load_stop[i] == -2147483648.00:
-                self._load_stop[i] = -1
-
-    def _update_job_count(self):
-        s_total = set()
-        s_run = set()
-        s_susp = set()
-        s_ususp = set()
-        s_ssusp = set()
-
-        for j in self.jobs():
-            s_total.add(j.job_id)
-            if j.status.name == "JOB_STAT_RUN":
-                s_run.add(j.job_id)
-            elif j.status.name == "JOB_STAT_SSUSP":
-                s_susp.add(j.job_id)
-                s_ssusp.add(j.job_id)
-            elif j.status.name == "JOB_STAT_USUSP":
-                s_susp.add(j.job_id)
-                s_ususp.add(j.job_id)
-        self._total_jobs = len(s_total)
-        self._num_running_jobs = len(s_run)
-        self._num_suspended_jobs = len(s_susp)
-        self._num_user_suspended_jobs = len(s_ususp)
-        self._num_system_suspended_jobs = len(s_ssusp)
-
-    @property
-    def has_checkpoint_support(self):
-        """True if the host supports checkpointing"""
-        self._update_lsb_hostinfo()
-        return self._has_checkpoint_support
-
-    @property
-    def host_model(self):
-        """String containing model information"""
-        return self._model
-
-    @property
-    def host_type(self):
-        """String containing host type information"""
-        return lslib.ls_gethosttype(self.name)
-
-
-    @property
-    def resources(self):
-        """Array of resources available"""
-        self._update_hostinfo()
-        return self._resources
-
-    @property
-    def max_jobs(self):
-        """Returns the maximum number of jobs that may execute on this host"""
-        self._update_lsb_hostinfo()
-        return self._max_jobs
-
-    @property
-    def max_processors(self):
-        """Maximum number of processors available on the host"""
-        self._update_hostinfo()
-        return self._max_processors
-
-    @property
-    def max_ram(self):
-        """Max Ram"""
-        self._update_hostinfo()
-        return self._max_ram
-
-    @property
-    def max_slots(self):
-        """Returns the maximum number of scheduling slots that may be consumed on this host"""
-        self._update_lsb_hostinfo()
-        return self._max_slots
-
-
-    @property
-    def max_swap(self):
-        """Max swap space"""
-        self._update_hostinfo()
-        return self._max_swap
-
-    @property
-    def max_tmp(self):
-        """Max tmp space"""
-        self._update_hostinfo()
-        return self._max_tmp
-
-    @property
-    def num_reserved_slots(self):
-        """Returns the number of scheduling slots that are reserved"""
-        self._update_lsb_hostinfo()
-        return self._num_reserved_slots
-
-    @property
-    def num_running_jobs(self):
-        """Returns the nuber of jobs that are executing on the host"""
-        self._update_job_count()
-        return self._num_running_jobs
-
-    @property
-    def num_running_slots(self):
-        """Returns the total number of scheduling slots that are consumed on this host"""
-        self._update_lsb_hostinfo()
-        return self._num_running_slots
-
-    @property
-    def num_suspended_jobs(self):
-        """Returns the number of jobs that are suspended on this host"""
-        self._update_job_count()
-        return self._num_suspended_jobs
-
-    @property
-    def num_suspended_slots(self):
-        """Returns the number of scheduling slots that are suspended on this host"""
-        self._update_lsb_hostinfo()
-        return self._num_suspended_jobs
-
-    @property
-    def run_windows(self):
-        """Run Windows"""
-        self._update_lsb_hostinfo()
-        return self._run_windows
-
-    @property
-    def statuses(self):
-        """Array of statuses that apply to the host"""
-        self._update_lsb_hostinfo()
-        return HostStatus.get_status_list(self._status)
-
-    @property
-    def total_jobs(self):
-        """Returns the total number of jobs that are running on this host, including suspended jobs."""
-        self._update_lsb_hostinfo()
-        return self._total_jobs
-
-    @property
-    def total_slots(self):
-        """Returns the total number of slots that are consumed on this host, including those from  suspended jobs."""
-        self._update_lsb_hostinfo()
-        return self._total_slots
-
-
-    #Openlava Only
-
-    @property
-    def cpu_factor(self):
-        """Openlava Specific - returns the CPU factor of the host"""
-        return lslib.ls_gethostfactor(self.name)
-
-    @property
-    def is_server(self):
-        """True if host is an openlava server (as opposed to submission host)"""
-        self._update_hostinfo()
-        return self._is_server
-
-    @property
-    def num_disks(self):
-        """Openlava specific: Returns the number of physical disks installed in the machine"""
-        self._update_hostinfo()
-        return self._num_disks
-
-    @property
-    def num_user_suspended_jobs(self):
-        """Returns the number of jobs that have been suspended by the user on this host"""
-        self._update_job_count()
-        return self._num_user_suspended_jobs
-
-    @property
-    def num_user_suspended_slots(self):
-        """Returns the number of scheduling slots that have been suspended by the user on this host"""
-        self._update_lsb_hostinfo()
-        return self._num_user_suspended_slots
-
-    @property
-    def num_system_suspended_jobs(self):
-        """Returns the number of jobs that have been suspended by the system on this host"""
-        self._update_job_count()
-        return self._num_system_suspended_jobs
-
-    @property
-    def num_system_suspended_slots(self):
-        """Returns the number of scheduling slots that have been suspended by the system on this host"""
-        self._update_lsb_hostinfo()
-        return self._num_system_suspended_slots
-
-    @property
-    def has_kernel_checkpoint_copy(self):
-        """Returns true if the host supports kernel checkpointing"""
-        self._update_lsb_hostinfo()
-        return self._has_kernel_checkpoint_support
-
-    @property
-    def max_slots_per_user(self):
-        """Returns the maximum slots that a user can occupy on the host"""
-        self._update_lsb_hostinfo()
-        return self._max_slots_per_user
-
-
-    def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
-        """Return jobs on this host"""
-        num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=user, queue=queue, host=self.host_name,
-                                          options=options)
-        jobs = []
-        if num_jobs < 1:
-            return jobs
-        jobs = []
-        for i in range(num_jobs):
-            j = lsblib.lsb_readjobinfo()
-            jobs.append(Job(job=j))
-        lsblib.lsb_closejobinfo()
-        return jobs
-
-    def load_information(self):
-        """Return load information on the host"""
-        self._update_lsb_hostinfo()
-
-        indexes = {
-        'names': ["15s Load", "1m Load", "15m Load", "Avg CPU Utilization", "Paging Rate (Pages/Sec)",
-                  "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
-                  "Free Memory (MB)"],
-        'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
-        'values': []
-        }
-
-        indexes['values'].append({
-        'name': "Actual Load",
-        'values': self._load
-        })
-
-        indexes['values'].append({
-        'name': "Stop Dispatching Load",
-        'values': self._load_sched
-        })
-
-        indexes['values'].append({
-        'name': "Stop Executing Load",
-        'values': self._load_stop
-        })
-
-        return indexes
-
-
 class Resource(BaseResource):
     def __init__(self, res):
         if isinstance(res, lslib.ResItem):
@@ -2924,3 +2536,392 @@ class User(UserBase):
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of users")
 
         return [cls(u) for u in us]
+
+
+class Host(SingleArgMemoized, HostBase):
+    cluster_type = "openlava"
+
+    def open(self):
+        rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name)
+
+    def close(self):
+        rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_CLOSE)
+        if rc == 0:
+            return rc
+        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
+
+    def admins(self):
+        return Cluster().admins
+
+    def is_busy(self):
+        for s in self.statuses:
+            busy = [
+                "HOST_STAT_BUSY",
+                "HOST_STAT_FULL",
+                "HOST_STAT_LOCKED",
+                "HOST_STAT_EXCLUSIVE",
+                "HOST_STAT_LOCKED_MASTER",
+            ]
+            if s.name in busy:
+                return True
+        return False
+
+    def is_down(self):
+        for s in self.statuses:
+            if s.name in ["HOST_STAT_UNREACH", "HOST_STAT_UNAVAIL", "HOST_STAT_NO_LIM", ]:
+                return True
+        return False
+
+    def is_closed(self):
+        for s in self.statuses:
+            if s.name in ["HOST_STAT_WIND", "HOST_STAT_DISABLED", ]:
+                return True
+        return False
+
+    def json_attributes(self):
+        attribs = HostBase.json_attributes(self)
+        attribs.extend([
+            'cpu_factor',
+            'is_server',
+            'num_disks',
+            'num_user_suspended_jobs',
+            'num_user_suspended_slots',
+            'num_system_suspended_jobs',
+            'num_system_suspended_slots',
+            'has_kernel_checkpoint_copy',
+            'max_slots_per_user',
+            'run_windows',
+        ])
+        return attribs
+
+    @classmethod
+    def get_host_list(cls):
+        initialize()
+        hs = lsblib.lsb_hostinfo()
+        if hs is None:
+            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of hosts")
+        return [cls(h.host) for h in hs]
+
+    def __init__(self, host_name):
+        initialize()
+        self._lsb_update_time = 0
+        self._update_time = 0
+        HostBase.__init__(self, host_name)
+
+        # check host exists
+        self._model = lslib.ls_gethostmodel(host_name)
+        if self._model == None:
+            raise NoSuchHostError("Host: %s does not exist" % host_name)
+
+    def _update_hostinfo(self):
+        if (int(time.time()) - self._update_time) < 60:
+            return
+        self._update_time = int(time.time())
+        # cache this....
+        hosts = lslib.ls_gethostinfo(resReq="", hostList=[self.host_name], options=0)
+        if len(hosts) != 1:
+            raise ValueError("Invalid number of hosts returned")
+        host = hosts[0]
+        self._max_processors = host.maxCpus
+        self._max_ram = host.maxMem
+        self._max_swap = host.maxSwap
+        self._max_tmp = host.maxTmp
+        self._num_disks = host.nDisks
+        self._is_server = host.isServer
+        self._run_windows = host.windows
+        resource_names = host.resources
+        self._resources = []
+        c = Cluster()
+        for r in c.resources():
+            if r.name in resource_names:
+                self._resources.append(r)
+
+    def _update_lsb_hostinfo(self):
+        if (int(time.time()) - self._lsb_update_time) < 60:
+            return
+        self._lsb_update_time = int(time.time())
+
+        hosts = lsblib.lsb_hostinfo(hosts=[self.host_name])
+        if hosts == None or len(hosts) != 1:
+            raise ValueError("Invalid number of hosts")
+        host = hosts[0]
+        self._status = host.hStatus
+        self._max_slots = host.maxJobs
+        self._total_slots = host.numJobs
+
+        self._num_running_slots = host.numRUN
+        self._num_suspended_slots = host.numSSUSP + host.numUSUSP
+        self._num_user_suspended_slots = host.numUSUSP
+        self._num_system_suspended_slots = host.numSSUSP
+        self._num_reserved_slots = host.numRESERVE
+
+        self._max_jobs = host.maxJobs
+        self._total_jobs = 0
+        self._num_running_jobs = 0
+        self._num_suspended_jobs = 0
+        self._num_user_suspended_jobs = 0
+        self._num_system_suspended_jobs = 0
+        self._max_slots_per_user = host.userJobLimit
+
+        if (host.attr & lsblib.H_ATTR_CHKPNTABLE) != 0:
+            self._has_checkpoint_support = True
+        else:
+            self._has_checkpoint_support = False
+
+        if (host.attr & lsblib.H_ATTR_CHKPNT_COPY ) != 0:
+            self._has_kernel_checkpoint_support = True
+        else:
+            self._has_kernel_checkpoint_support = False
+
+        self._load = host.load
+
+        self._load_sched = host.loadSched
+        for i in range(len(self._load_sched)):
+            if self._load_sched[i] == 2147483648.0 or self._load_sched[i] == -2147483648.00:
+                self._load_sched[i] = -1
+
+        self._load_stop = host.loadStop
+        for i in range(len(self._load_stop)):
+            if self._load_stop[i] == 2147483648.0 or self._load_stop[i] == -2147483648.00:
+                self._load_stop[i] = -1
+
+    def _update_job_count(self):
+        s_total = set()
+        s_run = set()
+        s_susp = set()
+        s_ususp = set()
+        s_ssusp = set()
+
+        for j in self.jobs():
+            s_total.add(j.job_id)
+            if j.status.name == "JOB_STAT_RUN":
+                s_run.add(j.job_id)
+            elif j.status.name == "JOB_STAT_SSUSP":
+                s_susp.add(j.job_id)
+                s_ssusp.add(j.job_id)
+            elif j.status.name == "JOB_STAT_USUSP":
+                s_susp.add(j.job_id)
+                s_ususp.add(j.job_id)
+        self._total_jobs = len(s_total)
+        self._num_running_jobs = len(s_run)
+        self._num_suspended_jobs = len(s_susp)
+        self._num_user_suspended_jobs = len(s_ususp)
+        self._num_system_suspended_jobs = len(s_ssusp)
+
+    @property
+    def has_checkpoint_support(self):
+        """True if the host supports checkpointing"""
+        self._update_lsb_hostinfo()
+        return self._has_checkpoint_support
+
+    @property
+    def host_model(self):
+        """String containing model information"""
+        return self._model
+
+    @property
+    def host_type(self):
+        """String containing host type information"""
+        return lslib.ls_gethosttype(self.name)
+
+
+    @property
+    def resources(self):
+        """Array of resources available"""
+        self._update_hostinfo()
+        return self._resources
+
+    @property
+    def max_jobs(self):
+        """Returns the maximum number of jobs that may execute on this host"""
+        self._update_lsb_hostinfo()
+        return self._max_jobs
+
+    @property
+    def max_processors(self):
+        """Maximum number of processors available on the host"""
+        self._update_hostinfo()
+        return self._max_processors
+
+    @property
+    def max_ram(self):
+        """Max Ram"""
+        self._update_hostinfo()
+        return self._max_ram
+
+    @property
+    def max_slots(self):
+        """Returns the maximum number of scheduling slots that may be consumed on this host"""
+        self._update_lsb_hostinfo()
+        return self._max_slots
+
+
+    @property
+    def max_swap(self):
+        """Max swap space"""
+        self._update_hostinfo()
+        return self._max_swap
+
+    @property
+    def max_tmp(self):
+        """Max tmp space"""
+        self._update_hostinfo()
+        return self._max_tmp
+
+    @property
+    def num_reserved_slots(self):
+        """Returns the number of scheduling slots that are reserved"""
+        self._update_lsb_hostinfo()
+        return self._num_reserved_slots
+
+    @property
+    def num_running_jobs(self):
+        """Returns the nuber of jobs that are executing on the host"""
+        self._update_job_count()
+        return self._num_running_jobs
+
+    @property
+    def num_running_slots(self):
+        """Returns the total number of scheduling slots that are consumed on this host"""
+        self._update_lsb_hostinfo()
+        return self._num_running_slots
+
+    @property
+    def num_suspended_jobs(self):
+        """Returns the number of jobs that are suspended on this host"""
+        self._update_job_count()
+        return self._num_suspended_jobs
+
+    @property
+    def num_suspended_slots(self):
+        """Returns the number of scheduling slots that are suspended on this host"""
+        self._update_lsb_hostinfo()
+        return self._num_suspended_jobs
+
+    @property
+    def run_windows(self):
+        """Run Windows"""
+        self._update_lsb_hostinfo()
+        return self._run_windows
+
+    @property
+    def statuses(self):
+        """Array of statuses that apply to the host"""
+        self._update_lsb_hostinfo()
+        return HostStatus.get_status_list(self._status)
+
+    @property
+    def total_jobs(self):
+        """Returns the total number of jobs that are running on this host, including suspended jobs."""
+        self._update_lsb_hostinfo()
+        return self._total_jobs
+
+    @property
+    def total_slots(self):
+        """Returns the total number of slots that are consumed on this host, including those from  suspended jobs."""
+        self._update_lsb_hostinfo()
+        return self._total_slots
+
+
+    #Openlava Only
+
+    @property
+    def cpu_factor(self):
+        """Openlava Specific - returns the CPU factor of the host"""
+        return lslib.ls_gethostfactor(self.name)
+
+    @property
+    def is_server(self):
+        """True if host is an openlava server (as opposed to submission host)"""
+        self._update_hostinfo()
+        return self._is_server
+
+    @property
+    def num_disks(self):
+        """Openlava specific: Returns the number of physical disks installed in the machine"""
+        self._update_hostinfo()
+        return self._num_disks
+
+    @property
+    def num_user_suspended_jobs(self):
+        """Returns the number of jobs that have been suspended by the user on this host"""
+        self._update_job_count()
+        return self._num_user_suspended_jobs
+
+    @property
+    def num_user_suspended_slots(self):
+        """Returns the number of scheduling slots that have been suspended by the user on this host"""
+        self._update_lsb_hostinfo()
+        return self._num_user_suspended_slots
+
+    @property
+    def num_system_suspended_jobs(self):
+        """Returns the number of jobs that have been suspended by the system on this host"""
+        self._update_job_count()
+        return self._num_system_suspended_jobs
+
+    @property
+    def num_system_suspended_slots(self):
+        """Returns the number of scheduling slots that have been suspended by the system on this host"""
+        self._update_lsb_hostinfo()
+        return self._num_system_suspended_slots
+
+    @property
+    def has_kernel_checkpoint_copy(self):
+        """Returns true if the host supports kernel checkpointing"""
+        self._update_lsb_hostinfo()
+        return self._has_kernel_checkpoint_support
+
+    @property
+    def max_slots_per_user(self):
+        """Returns the maximum slots that a user can occupy on the host"""
+        self._update_lsb_hostinfo()
+        return self._max_slots_per_user
+
+
+    def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
+        """Return jobs on this host"""
+        num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=user, queue=queue, host=self.host_name,
+                                          options=options)
+        jobs = []
+        if num_jobs < 1:
+            return jobs
+        jobs = []
+        for i in range(num_jobs):
+            j = lsblib.lsb_readjobinfo()
+            jobs.append(Job(job=j))
+        lsblib.lsb_closejobinfo()
+        return jobs
+
+    def load_information(self):
+        """Return load information on the host"""
+        self._update_lsb_hostinfo()
+
+        indexes = {
+        'names': ["15s Load", "1m Load", "15m Load", "Avg CPU Utilization", "Paging Rate (Pages/Sec)",
+                  "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
+                  "Free Memory (MB)"],
+        'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
+        'values': []
+        }
+
+        indexes['values'].append({
+        'name': "Actual Load",
+        'values': self._load
+        })
+
+        indexes['values'].append({
+        'name': "Stop Dispatching Load",
+        'values': self._load_sched
+        })
+
+        indexes['values'].append({
+        'name': "Stop Executing Load",
+        'values': self._load_stop
+        })
+
+        return indexes
+
