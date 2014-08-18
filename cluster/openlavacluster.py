@@ -2452,7 +2452,7 @@ class Queue(SingleArgMemoized):
         ]
 
 
-class User(UserBase):
+class User(SingleArgMemoized, UserBase):
     cluster_type = "openlava"
 
     def __init__(self, user):
@@ -2479,25 +2479,71 @@ class User(UserBase):
         self.num_system_suspended_slots = user.numSSUSP
         self.num_reserved_slots = user.numRESERVE
         self.max_jobs = user.maxJobs
-        self.total_jobs = 0
-        self.num_running_jobs = 0
-        self.num_pending_jobs = 0
-        self.num_suspended_jobs = 0
-        self.num_user_suspended_jobs = 0
-        self.num_system_suspended_jobs = 0
+        self._total_jobs = 0
+        self._num_running_jobs = 0
+        self._num_pending_jobs = 0
+        self._num_suspended_jobs = 0
+        self._num_user_suspended_jobs = 0
+        self._num_system_suspended_jobs = 0
         ## iterate through jobs and count/sum each one.
+
+    def _update_job_count(self):
+        s_total = set()
+        s_run = set()
+        s_susp = set()
+        s_ususp = set()
+        s_ssusp = set()
+        s_pend = set()
+
         for j in self.jobs():
-            self.total_jobs += 1
+            s_total.add(j.job_id)
+            if j.status.name == "JOB_STAT_PEND":
+                s_pend.add(j.job_id)
             if j.status.name == "JOB_STAT_RUN":
-                self.num_running_jobs += 1
+                s_run.add(j.job_id)
             elif j.status.name == "JOB_STAT_SSUSP":
-                self.num_suspended_jobs += 1
-                self.num_system_suspended_jobs += 1
+                s_susp.add(j.job_id)
+                s_ssusp.add(j.job_id)
             elif j.status.name == "JOB_STAT_USUSP":
-                self.num_suspended_jobs += 1
-                self.num_user_suspended_jobs += 1
-            elif j.status.name == "JOB_STAT_PEND":
-                self.num_pending_jobs += 1
+                s_susp.add(j.job_id)
+                s_ususp.add(j.job_id)
+        self._total_jobs = len(s_total)
+        self._num_pending_jobs = len(s_pend)
+        self._num_running_jobs = len(s_run)
+        self._num_suspended_jobs = len(s_susp)
+        self._num_user_suspended_jobs = len(s_ususp)
+        self._num_system_suspended_jobs = len(s_ssusp)
+
+    @property
+    def num_running_jobs(self):
+        """Returns the number of jobs that are executing"""
+        self._update_job_count()
+        return self._num_running_jobs
+
+    @property
+    def num_pending_jobs(self):
+        """Returns the number of jobs that are pending"""
+        self._update_job_count()
+        return self._num_pending_jobs
+
+    @property
+    def num_suspended_jobs(self):
+        """Returns the nuber of jobs that are suspended"""
+        self._update_job_count()
+        return self._num_suspended_jobs
+
+    @property
+    def num_user_suspended_jobs(self):
+        """Returns the nuber of jobs that are suspended by the user"""
+        self._update_job_count()
+        return self._num_user_suspended_jobs
+
+    @property
+    def num_system_suspended_jobs(self):
+        """Returns the nuber of jobs that are suspended by the system"""
+        self._update_job_count()
+        return self._num_system_suspended_jobs
+
 
     def jobs(self, job_id=0, job_name="", queue="", host="", options=0):
         """Return jobs on this host"""
