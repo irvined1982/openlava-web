@@ -713,7 +713,7 @@ class ClusterEncoder(json.JSONEncoder):
             return {
                 'type': "ExecutionHost",
                 'name': obj.name,
-                'num_slots': obj.num_slots,
+                'num_slots': obj.num_slots_for_job,
                 'url': reverse("olw_host_view", args=[obj.name]),
             }
         if isinstance(obj, Host):
