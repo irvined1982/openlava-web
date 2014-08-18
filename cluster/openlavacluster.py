@@ -2515,6 +2515,12 @@ class User(SingleArgMemoized, UserBase):
         self._num_system_suspended_jobs = len(s_ssusp)
 
     @property
+    def total_jobs(self):
+        """Returns the total number of jobs that owned by this user"""
+        self._update_job_count()
+        return self._total_jobs
+
+    @property
     def num_running_jobs(self):
         """Returns the number of jobs that are executing"""
         self._update_job_count()
