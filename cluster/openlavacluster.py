@@ -2021,11 +2021,7 @@ class Job(JobBase):
         return jl
 
 
-
-
-
-
-class Host(HostBase):
+class Host(SingleArgMemoized, HostBase):
     cluster_type = "openlava"
 
     def open(self):
@@ -2175,17 +2171,28 @@ class Host(HostBase):
             if self._load_stop[i] == 2147483648.0 or self._load_stop[i] == -2147483648.00:
                 self._load_stop[i] = -1
 
-        ## iterate through jobs and count/sum each one.
+    def _update_job_count(self):
+        s_total = set()
+        s_run = set()
+        s_susp = set()
+        s_ususp = set()
+        s_ssusp = set()
+
         for j in self.jobs():
-            self._total_jobs += 1
+            s_total.add(j.job_id)
             if j.status.name == "JOB_STAT_RUN":
-                self._num_running_jobs += 1
+                s_run.add(j.job_id)
             elif j.status.name == "JOB_STAT_SSUSP":
-                self._num_suspended_jobs += 1
-                self._num_system_suspended_jobs += 1
+                s_susp.add(j.job_id)
+                s_ssusp.add(j.job_id)
             elif j.status.name == "JOB_STAT_USUSP":
-                self._num_suspended_jobs += 1
-                self._num_user_suspended_jobs += 1
+                s_susp.add(j.job_id)
+                s_ususp.add(j.job_id)
+        self._total_jobs = len(s_total)
+        self._num_running_jobs = len(s_run)
+        self._num_suspended_jobs = len(s_susp)
+        self._num_user_suspended_jobs = len(s_ususp)
+        self._num_system_suspended_jobs = len(s_ssusp)
 
     @property
     def has_checkpoint_support(self):
@@ -2256,7 +2263,7 @@ class Host(HostBase):
     @property
     def num_running_jobs(self):
         """Returns the nuber of jobs that are executing on the host"""
-        self._update_lsb_hostinfo()
+        self._update_job_count()
         return self._num_running_jobs
 
     @property
@@ -2268,7 +2275,7 @@ class Host(HostBase):
     @property
     def num_suspended_jobs(self):
         """Returns the number of jobs that are suspended on this host"""
-        self._update_lsb_hostinfo()
+        self._update_job_count()
         return self._num_suspended_jobs
 
     @property
@@ -2324,7 +2331,7 @@ class Host(HostBase):
     @property
     def num_user_suspended_jobs(self):
         """Returns the number of jobs that have been suspended by the user on this host"""
-        self._update_lsb_hostinfo()
+        self._update_job_count()
         return self._num_user_suspended_jobs
 
     @property
@@ -2336,7 +2343,7 @@ class Host(HostBase):
     @property
     def num_system_suspended_jobs(self):
         """Returns the number of jobs that have been suspended by the system on this host"""
-        self._update_lsb_hostinfo()
+        self._update_job_count()
         return self._num_system_suspended_jobs
 
     @property
