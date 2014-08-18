@@ -807,7 +807,7 @@ class Job(JobBase):
         hosts={}
         for hn in self._execution_hosts:
             if hn in hosts:
-                hosts[hn].num_slots_for_job_for_job += 1
+                hosts[hn].num_slots_for_job += 1
             else:
                 hosts[hn] = ExecutionHost(hn)
 
