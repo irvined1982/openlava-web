@@ -71,7 +71,7 @@ class TestJob(unittest.TestCase):
             job = j2
 
         if job.is_suspended:
-            job.unsuspend()
+            job.resume()
             time.sleep(10)
             j2 = Job(job_id=job.job_id, array_index=job.array_index)
             self.assertEqual(j2.job_id, job.job_id)
