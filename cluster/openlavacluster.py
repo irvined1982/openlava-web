@@ -1473,8 +1473,7 @@ class Job(JobBase):
             lsblib.lsb_closejobinfo()
         else:
             raise ValueError("Job ID or Job object required")
-        
-    
+
         self._exit_status = job.exitStatus
         self._submission_host = job.fromHost
         self._status = job.status
