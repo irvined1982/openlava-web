@@ -1994,7 +1994,7 @@ class Job(JobBase):
                 j=Job(job=lsblib.lsb_readjobinfo())
                 if j.job_id == job_id:
                     job_list.append(j)
-            lsblib.closejobinfo()
+            lsblib.lsb_closejobinfo()
             return job_list
 
         if job_state == 'ACT':
