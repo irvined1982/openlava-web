@@ -979,6 +979,7 @@ def get_job_list(request, job_id=0):
 @login_required
 def job_submit(request, form_class="JobSubmitForm"):
     logger = log_to_stderr()
+    logger.debug("Starting sub")
     ajax_args = None
     form = None
     for cls in OLWSubmit.__subclasses__():
