@@ -793,11 +793,11 @@ def system_overview_hosts(request):
     for host in cluster.hosts():
         if not host.is_server:
             continue
-        if host.is_down():
+        if host.is_down:
             states['Down'] += 1
-        elif host.is_busy():
+        elif host.is_busy:
             states['Full'] += 1
-        elif host.is_closed():
+        elif host.is_closed:
             states['Closed'] += 1
         elif len(host.jobs()) > 0:
             states['In Use'] += 1

@@ -2593,7 +2593,7 @@ class User(SingleArgMemoized, UserBase):
 
 class Host(SingleArgMemoized, HostBase):
     """
-    Retrieve queue information and perform administrative actions on queues on the cluster.
+    Retrieve Host information and perform administrative actions on hosts on the cluster.
 
 
     """
