@@ -1010,9 +1010,8 @@ def job_submit(request, form_class="JobSubmitForm"):
     q = MPQueue()
     p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
     p.start()
+    rc = q.get(True)
     p.join()
-    rc = q.get(False)
-
     try:
         if isinstance(rc, Exception):
             raise rc

@@ -2592,7 +2592,41 @@ class User(SingleArgMemoized, UserBase):
 
 
 class Host(SingleArgMemoized, HostBase):
+    """
+    Retrieve queue information and perform administrative actions on queues on the cluster.
+
+
+    """
+
+    #: Type of cluster this host object is for.
     cluster_type = "openlava"
+
+    @classmethod
+    def get_host_list(cls):
+        """
+        Get all hosts that are part of the cluster.
+
+        :return: List of Host Objects, one for each host on the cluster.
+        :rtype: list
+        """
+        initialize()
+        hs = lsblib.lsb_hostinfo()
+        if hs is None:
+            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of hosts")
+        return [cls(h.host) for h in hs]
+
+
+
+    def __init__(self, host_name):
+        initialize()
+        self._lsb_update_time = 0
+        self._update_time = 0
+        HostBase.__init__(self, host_name)
+
+        # check host exists
+        self._model = lslib.ls_gethostmodel(host_name)
+        if self._model == None:
+            raise NoSuchHostError("Host: %s does not exist" % host_name)
 
     def open(self):
         rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
@@ -2606,68 +2640,52 @@ class Host(SingleArgMemoized, HostBase):
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
 
-    def admins(self):
-        return Cluster().admins
 
-    def is_busy(self):
-        for s in self.statuses:
-            busy = [
-                "HOST_STAT_BUSY",
-                "HOST_STAT_FULL",
-                "HOST_STAT_LOCKED",
-                "HOST_STAT_EXCLUSIVE",
-                "HOST_STAT_LOCKED_MASTER",
-            ]
-            if s.name in busy:
-                return True
-        return False
+    def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
+        """Return jobs on this host"""
+        num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=user, queue=queue, host=self.host_name,
+                                          options=options)
+        jobs = []
+        if num_jobs < 1:
+            lsblib.lsb_closejobinfo()
+            return jobs
+        jobs = []
+        for i in range(num_jobs):
+            j = lsblib.lsb_readjobinfo()
+            jobs.append(Job(job=j))
+        lsblib.lsb_closejobinfo()
+        return jobs
 
-    def is_down(self):
-        for s in self.statuses:
-            if s.name in ["HOST_STAT_UNREACH", "HOST_STAT_UNAVAIL", "HOST_STAT_NO_LIM", ]:
-                return True
-        return False
+    def load_information(self):
+        """Return load information on the host"""
+        self._update_lsb_hostinfo()
 
-    def is_closed(self):
-        for s in self.statuses:
-            if s.name in ["HOST_STAT_WIND", "HOST_STAT_DISABLED", ]:
-                return True
-        return False
+        indexes = {
+        'names': ["15s Load", "1m Load", "15m Load", "Avg CPU Utilization", "Paging Rate (Pages/Sec)",
+                  "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
+                  "Free Memory (MB)"],
+        'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
+        'values': []
+        }
 
-    def json_attributes(self):
-        attribs = HostBase.json_attributes(self)
-        attribs.extend([
-            'cpu_factor',
-            'is_server',
-            'num_disks',
-            'num_user_suspended_jobs',
-            'num_user_suspended_slots',
-            'num_system_suspended_jobs',
-            'num_system_suspended_slots',
-            'has_kernel_checkpoint_copy',
-            'max_slots_per_user',
-            'run_windows',
-        ])
-        return attribs
+        indexes['values'].append({
+        'name': "Actual Load",
+        'values': self._load
+        })
 
-    @classmethod
-    def get_host_list(cls):
-        initialize()
-        hs = lsblib.lsb_hostinfo()
-        if hs is None:
-            raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of hosts")
-        return [cls(h.host) for h in hs]
+        indexes['values'].append({
+        'name': "Stop Dispatching Load",
+        'values': self._load_sched
+        })
 
-    def __init__(self, host_name):
-        initialize()
-        self._lsb_update_time = 0
-        self._update_time = 0
-        HostBase.__init__(self, host_name)
+        indexes['values'].append({
+        'name': "Stop Executing Load",
+        'values': self._load_stop
+        })
 
-        # check host exists
-        self._model = lslib.ls_gethostmodel(host_name)
-        if self._model == None:
-            raise NoSuchHostError("Host: %s does not exist" % host_name)
+        return indexes
+
+
 
     def _update_hostinfo(self):
         if (int(time.time()) - self._update_time) < 60:
@@ -2763,6 +2781,57 @@ class Host(SingleArgMemoized, HostBase):
         self._num_suspended_jobs = len(s_susp)
         self._num_user_suspended_jobs = len(s_ususp)
         self._num_system_suspended_jobs = len(s_ssusp)
+
+    def json_attributes(self):
+        attribs = HostBase.json_attributes(self)
+        attribs.extend([
+            'cpu_factor',
+            'is_server',
+            'num_disks',
+            'num_user_suspended_jobs',
+            'num_user_suspended_slots',
+            'num_system_suspended_jobs',
+            'num_system_suspended_slots',
+            'has_kernel_checkpoint_copy',
+            'max_slots_per_user',
+            'run_windows',
+        ])
+        return attribs
+
+
+
+    @property
+    def admins(self):
+        return Cluster().admins
+
+    @property
+    def is_busy(self):
+        for s in self.statuses:
+            busy = [
+                "HOST_STAT_BUSY",
+                "HOST_STAT_FULL",
+                "HOST_STAT_LOCKED",
+                "HOST_STAT_EXCLUSIVE",
+                "HOST_STAT_LOCKED_MASTER",
+            ]
+            if s.name in busy:
+                return True
+        return False
+
+    @property
+    def is_down(self):
+        for s in self.statuses:
+            if s.name in ["HOST_STAT_UNREACH", "HOST_STAT_UNAVAIL", "HOST_STAT_NO_LIM", ]:
+                return True
+        return False
+
+    @property
+    def is_closed(self):
+        for s in self.statuses:
+            if s.name in ["HOST_STAT_WIND", "HOST_STAT_DISABLED", ]:
+                return True
+        return False
+
 
     @property
     def has_checkpoint_support(self):
@@ -2933,51 +3002,6 @@ class Host(SingleArgMemoized, HostBase):
         """Returns the maximum slots that a user can occupy on the host"""
         self._update_lsb_hostinfo()
         return self._max_slots_per_user
-
-
-    def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
-        """Return jobs on this host"""
-        num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=user, queue=queue, host=self.host_name,
-                                          options=options)
-        jobs = []
-        if num_jobs < 1:
-            lsblib.lsb_closejobinfo()
-            return jobs
-        jobs = []
-        for i in range(num_jobs):
-            j = lsblib.lsb_readjobinfo()
-            jobs.append(Job(job=j))
-        lsblib.lsb_closejobinfo()
-        return jobs
-
-    def load_information(self):
-        """Return load information on the host"""
-        self._update_lsb_hostinfo()
-
-        indexes = {
-        'names': ["15s Load", "1m Load", "15m Load", "Avg CPU Utilization", "Paging Rate (Pages/Sec)",
-                  "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
-                  "Free Memory (MB)"],
-        'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
-        'values': []
-        }
-
-        indexes['values'].append({
-        'name': "Actual Load",
-        'values': self._load
-        })
-
-        indexes['values'].append({
-        'name': "Stop Dispatching Load",
-        'values': self._load_sched
-        })
-
-        indexes['values'].append({
-        'name': "Stop Executing Load",
-        'values': self._load_stop
-        })
-
-        return indexes
 
 
 class ExecutionHost(Host):
