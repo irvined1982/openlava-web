@@ -411,6 +411,12 @@ class HostBase:
             'cluster_type',
         ]
 
+    def __str__(self):
+        return self.host_name
+
+    def __unicode__(self):
+        return u"%s" % self.host_name
+
     def __init__(self, host_name, description=u""):
         self.name = host_name
         self.host_name = host_name

@@ -2615,8 +2615,6 @@ class Host(SingleArgMemoized, HostBase):
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of hosts")
         return [cls(h.host) for h in hs]
 
-
-
     def __init__(self, host_name):
         initialize()
         self._lsb_update_time = 0
