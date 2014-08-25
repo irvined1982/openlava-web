@@ -44,9 +44,8 @@ NoSuchJobError
 
 ClusterException
 
-
 Host Classes
------------
+------------
 
 Host classes are used to get information about and manipulate hosts on the cluster.  Primarily this is done through the
 Host() class, however when associated with a Job() they may be through ExecutionHost classes which also contain

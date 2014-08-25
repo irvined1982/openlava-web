@@ -18,12 +18,12 @@
 import json
 import os
 import pwd
-
+import logging
 
 import datetime
 from multiprocessing import Process as MPProcess
 from multiprocessing import Queue as MPQueue
-
+from multiprocessing import log_to_stderr
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
@@ -1024,11 +1024,19 @@ def job_submit(request, form_class="JobSubmitForm"):
 
 
 def execute_job_submit(request, queue, ajax_args, submit_form):
+    logger = log_to_stderr()
+    logger.setLevel(logging.DEBUG)
+    logger.debug("Entering execute_job_submit")
     try:
+        logger.debug("Setting user ID")
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
+        logger.debug("Set UID")
+        logger.debug("Submitting form")
         queue.put(submit_form.submit(ajax_args))
+        logger.debug("Form Submitted to Queue")
     except Exception as e:
+        logger.debug("Got Exception, putting to queue")
         queue.put(e)
 
 
@@ -1045,21 +1053,29 @@ class OLWSubmit(forms.Form):
         return self.__class__.__name__
 
     def submit(self, ajax_args = None):
+        logger = log_to_stderr()
+        logger.setLevel(logging.DEBUG)
+        logger.debug("Entering OLWSubmit submit")
         kwargs = None
         if ajax_args:
             kwargs = ajax_args
         else:
             kwargs = self._get_args()
-
+        logger.debug("Calling Pre Submit")
         self._pre_submit()
-
+        logger.debug("Returned from Pre Submit")
         try:
+            logger.debug("Submitting Job")
             jobs = Job.submit(**kwargs)
+            logger.debug("Job Submitted, jobs has: %d elements" % len(jobs))
+            logger.debug("Calling Post Submit")
             self._post_submit(jobs)
-
+            logger.debug("Returned from Post Submit")
             if ajax_args:
-                return HttpResponse(json.dumps(jobs, sort_keys=True, indent=3, cls=ClusterEncoder),
-                                    content_type='application/json')
+                logger.debug("Generating job ajax list...")
+                d = json.dumps(jobs, cls=ClusterEncoder)
+                logger.debug("Generated job ajax list...")
+                return HttpResponse(d, content_type='application/json')
             return HttpResponseRedirect(reverse("olw_job_view_array", args=[jobs[0].job_id, jobs[0].array_index]))
         except Exception as e:
             return e
