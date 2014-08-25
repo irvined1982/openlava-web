@@ -49,7 +49,7 @@ class ClusterBase:
     def problem_hosts(self):
         host_list = []
         for host in self.hosts():
-            if host.is_down():
+            if host.is_down:
                 host_list.append(host)
         return host_list
 
