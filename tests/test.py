@@ -41,7 +41,7 @@ class TestJob(unittest.TestCase):
     def test_job_actions(self, job):
         self.assertIsInstance(job.is_completed, bool)
         self.assertIsInstance(job.is_failed, bool)
-        self.assertIsInstance(job.is_pending, bool)
+        self.assertIsInstance(job.is_pending, bool) 
         self.assertIsInstance(job.is_running, bool)
         self.assertIsInstance(job.is_suspended, bool)
         count = 0
@@ -86,6 +86,7 @@ class TestJob(unittest.TestCase):
             self.assertEqual(j2.job_id, job.job_id)
             self.assertEqual(j2.array_index, job.array_index)
             self.assertEqual(j2.was_killed, True)
+            job = j2
 
 if __name__ == '__main__':
     unittest.main()

@@ -74,7 +74,7 @@ def queue_view(request, queue_name):
     if request.is_ajax() or request.GET.get("json", None):
         return HttpResponse(json.dumps(queue, sort_keys=True, indent=3, cls=ClusterEncoder),
                             content_type='application/json')
-    return render(request, 'openlavaweb/queue_detail.html', {"queue": queue, 'job_list': job_list}, )
+    return render(request, 'openlavaweb/queue_detail.html', {"queue": queue }, )
 
 
 @login_required
