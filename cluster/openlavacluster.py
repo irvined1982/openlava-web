@@ -1412,7 +1412,7 @@ class Job(JobBase):
         """
         The number of job slots requested by the job.
 
-            Example::
+        Example::
 
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
@@ -1776,8 +1776,8 @@ class Job(JobBase):
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
-        >>> job.cpu_factor
-        0.0
+            >>> job.cpu_factor
+            0.0
 
         :return: CPU Factor
         :rtype: float
@@ -2068,6 +2068,8 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+        
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
