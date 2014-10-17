@@ -54,9 +54,6 @@ Job Status
 
 .. autoclass:: cluster.openlavacluster.JobStatus
 
-
-
-
 Host Classes
 ------------
 
@@ -77,9 +74,6 @@ Client
 ^^^^^^
 
 .. autoclass:: olwclient.Host
-    :members:
-
-.. autoclass:: olwclient.ExecutionHost
     :members:
 
 
