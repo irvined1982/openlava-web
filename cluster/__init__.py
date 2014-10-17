@@ -675,7 +675,7 @@ class ConsumedResource:
         self.limit = None
         self.unit = None
 
-    def str(self):
+    def __str__(self):
         s = "%s: %s" % (self.name, self.value)
         if self.unit:
             s += "%s" % self.unit
