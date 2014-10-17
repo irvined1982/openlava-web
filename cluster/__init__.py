@@ -676,7 +676,16 @@ class ResourceLimit:
     def json_attributes(self):
         return ['name', 'soft_limit', 'hard_limit', 'description', 'unit']
 
+    def __str__(self):
+        return "%s:%s (%s)" % (self.name, self.soft_limit, self.hard_limit)
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
+
+    
 class ConsumedResource:
     def __init__(self, name, value, limit=None, unit=None):
         self.name = name

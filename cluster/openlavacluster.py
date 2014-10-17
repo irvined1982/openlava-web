@@ -1324,6 +1324,10 @@ class Job(JobBase):
         is aware of, processes that are started independently of openlava will not be included. Generally this only
         includes the primary process on the primary host and any child processes.
 
+            >>> job.is_running
+            True
+            >>> job.processes
+            [None:23987]
 
         :return: Array of Process objects
         :rtype: list
@@ -1337,6 +1341,9 @@ class Job(JobBase):
         """
         Array of project names that the job was submitted with.
 
+            >>> job.project_names
+            [u'default']
+
         :return: Project Names
         :rtype: list of str
 
@@ -1348,6 +1355,10 @@ class Job(JobBase):
     def requested_resources(self):
         """
         Resource string requested by the user.  This may be have been modified by the scheduler, or an administrator.
+        If no resources were requested, returns an empty string.
+
+            >>> job.requested_resources
+            u''
 
         :return: Resource Requirements
         :rtype: str
@@ -1359,7 +1370,10 @@ class Job(JobBase):
     @property
     def requested_slots(self):
         """
-        The number of job slots requested by the job
+        The number of job slots requested by the job.
+
+            >>> job.requested_slots
+            1
 
         :return: Slots requested
         :rtype: int
@@ -1371,7 +1385,11 @@ class Job(JobBase):
     @property
     def reservation_time(self):
         """
-        The time when the slots for this job were reserved.  Time is in seconds since Epoch (UTC)
+        The time when the slots for this job were reserved.  Time is in seconds since Epoch (UTC).  If the slots were
+        not reserved, then returns zero.
+
+            >>> job.reservation_time
+            0
 
         :return: Time when slots were reserved.
         :rtype: int
