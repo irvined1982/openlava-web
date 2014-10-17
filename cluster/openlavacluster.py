@@ -715,7 +715,16 @@ class Job(JobBase):
     @property
     def admins(self):
         """
-        List of user names that have administrative rights on this host.
+        List of user names that have administrative rights for this job. This is the job Owner and the Queue
+        administrators.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.admins
+            [u'irvined', u'openlava']
 
         :return: list of user names
 
@@ -725,7 +734,16 @@ class Job(JobBase):
     @property
     def begin_time(self):
         """
-        Earliest time (Epoch UTC) that the job may begin.  Job will not start before this time
+        Earliest time (Epoch UTC) that the job may begin.  Job will not start before this time.  If no begin time
+        was specified in job submission then the value will be zero.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.begin_time
+            0
 
         :return: Earliest start time of the job as integer since the Epoch (UTC)
 
@@ -736,7 +754,15 @@ class Job(JobBase):
     @property
     def command(self):
         """
-        Command to execute
+        Command to execute as specified by the user.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.command
+            u'sleep 500'
 
         :return: Command as string
 
@@ -1234,6 +1260,10 @@ class Job(JobBase):
         """
         Path to directory where checkpoint data will be written to.
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: path to checkpoint directory
         :rtype: str
 
@@ -1244,6 +1274,10 @@ class Job(JobBase):
     @property
     def checkpoint_period(self):
         """Number of seconds between checkpoint operations
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: Number of seconds between checkpoints
         :rtype: int
@@ -1257,6 +1291,10 @@ class Job(JobBase):
         """
         Checkpointing period as a timedelta object
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: Checkpointing period
         :rtype: timedelta
 
@@ -1267,6 +1305,10 @@ class Job(JobBase):
     def cpu_factor(self):
         """
         CPU Factor of execution host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: CPU Factor
         :rtype: float
@@ -1280,6 +1322,10 @@ class Job(JobBase):
         """
         Current Working Directory of the job
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: Current Working Directory
         :rtype: str
 
@@ -1291,6 +1337,10 @@ class Job(JobBase):
     def execution_cwd(self):
         """
         Current working directory on the execution host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: CWD on exec host
         :rtype: str
@@ -1304,6 +1354,10 @@ class Job(JobBase):
         """
         The home directory of the user on the execution host.
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return Home Directory
         :rtype: str
 
@@ -1315,6 +1369,10 @@ class Job(JobBase):
     def execution_user_id(self):
         """
         User ID of the user used to execute the job on the execution host.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: Numerical ID of the user
         :rtype: int
@@ -1328,6 +1386,10 @@ class Job(JobBase):
         """
         User name of the user used to execute the job on the execution host.
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: name of the user
         :rtype: str
 
@@ -1339,6 +1401,10 @@ class Job(JobBase):
     def host_specification(self):
         """
         A hostname or model name that describes the specification of the host being used to execute the job.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: Host Specification
         :rtype: str
@@ -1352,6 +1418,10 @@ class Job(JobBase):
         """
         The shell used when running the job.  If not used, or not specified will be ""
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: Login Shell
         :rtype: str
 
@@ -1363,6 +1433,10 @@ class Job(JobBase):
     def parent_group(self):
         """
         The parent Job Group, if not used will be ""
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: Parent Job Group
         :rtype: str
@@ -1376,6 +1450,10 @@ class Job(JobBase):
         """
         Pre Execution Command specified by the user, if this is not supplied, will be ""
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: Pre Execution Command
         :rtype: str
 
@@ -1387,6 +1465,10 @@ class Job(JobBase):
     def resource_usage_last_update_time(self):
         """
         The time the resource usage information was last updated in seconds since Epoch. (UTC)
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: resource usage update time
         :rtype: int
@@ -1400,6 +1482,10 @@ class Job(JobBase):
         """
         A datetime object set to the time the resource usage information was last updated
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: last update time of resource usage
         :rtype: datetime
 
@@ -1410,6 +1496,10 @@ class Job(JobBase):
     def service_port(self):
         """
         NIOS Port of the job
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: NIOS Port
         :rtype: int
@@ -1423,6 +1513,10 @@ class Job(JobBase):
         """
         Home directory on the submit host of the user used to execute the job
 
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
         :return: Home Directory
         :rtype str
 
@@ -1434,6 +1528,10 @@ class Job(JobBase):
     def termination_signal(self):
         """
         Signal to send when job exceeds termination deadline.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: Termination Signal
         :rtype: int
