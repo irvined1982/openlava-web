@@ -775,6 +775,24 @@ class Job(JobBase):
         """
         List of ConsumedResource objects
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> import time
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> while not job.is_running:
+            ...  job=Job(job_id=job.job_id)
+            ...  time.sleep(1)
+            >>> for r in job.consumed_resources:
+            ...  print r
+            ...
+            Resident Memory: 1860
+            Virtual Memory: 32216
+            User Time: 0:00:00
+            System Time: 0:00:00
+            Num Active Processes: 1
+
         :return: List of ConsumedResource Objects
 
         """
@@ -784,10 +802,18 @@ class Job(JobBase):
     @property
     def cpu_time(self):
         """
-        CPU Time in seconds that the job has consumed
+        CPU Time in seconds that the job has consumed.  This is the amount of processor time, consumed by the job.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.cpu_time
+            0.0
 
         :return: CPU time in seconds
-        :rtype: int
+        :rtype: float
 
         """
         
@@ -796,7 +822,20 @@ class Job(JobBase):
     @property
     def dependency_condition(self):
         """
-        Dependency conditions that must be met before the job will be dispatched
+        Dependency conditions that must be met before the job will be dispatched.  Returns an empty string if
+        no job dependencies have been specified.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9591> is submitted to default queue <normal>.
+            >>> job.dependency_condition
+            u''
+            >>> job2 = Job.submit(command="sleep 500", dependency_conditions="done(%s)" % job.job_id, requested_slots=1)[0]
+            Job <9592> is submitted to default queue <normal>.
+            >>> job2.dependency_condition
+            u'done(9591)'
 
         :return: Job dependency information
         :rtype: str
@@ -808,7 +847,20 @@ class Job(JobBase):
     @property
     def email_user(self):
         """
-        User to email job notifications to if set.
+        User to email job notifications to if set.  If no email address was supplied, then returns an empty
+        string.
+
+        .. note::
+
+            If no email address was specified, openlava may still email the owner of the job if so configured.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.email_user
+            u''
 
         :return: User email address, may be ""
         :rtype: str
@@ -820,7 +872,26 @@ class Job(JobBase):
     @property
     def end_time(self):
         """
-        Time the job ended in seconds since epoch UTC.
+        Time the job ended in seconds since epoch UTC.  If the job has not yet finished, then end_time will be 0.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> import time
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_completed
+            False
+            >>> job.end_time
+            0
+            >>> job.is_running
+            True
+            >>> time.sleep(500)
+            >>> job = Job(job_id=job.job_id)
+            >>> job.is_completed
+            True
+            >>> job.end_time
+            1413559708
 
         :return: Number of seconds since epoch (UTC) when the job exited.
         :rtype: int
@@ -832,7 +903,15 @@ class Job(JobBase):
     @property
     def error_file_name(self):
         """
-        Path to the job error file, may be ""
+        Path to the job error file, may be empty if none was specified.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.error_file_name
+            u'/dev/null'
 
         :returns: Path of the job error file.
         :rtype: str
@@ -843,7 +922,13 @@ class Job(JobBase):
 
     @property
     def execution_hosts(self):
-        """List of hosts that job is running on"""
+        """
+        List of hosts that job is running on, if the job is neither finished nor executing then the list will be empty
+
+        :returns: List of ExecutionHost objects, one for each host the job is executing on.
+        :rtype: list
+
+        """
         hosts = {}
         for hn in self._execution_hosts:
             if hn in hosts:
@@ -3169,6 +3254,12 @@ class ExecutionHost(Host):
         Host.__init__(self, host_name)
         #: The number of slots that are allocated to the job
         self.num_slots_for_job = num_slots_for_job
+
+    def __str__(self):
+        return "%s:%s" % (self.host_name, self.num_slots_for_job)
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
 
     def json_attributes(self):
         attribs = Host.json_attributes(self)
