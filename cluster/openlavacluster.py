@@ -682,6 +682,8 @@ class JobStatus(NumericStatus):
             contact with the master batch daemon (mbatchd).",
         },
     }
+    """states has the following options..."""
+
 
 
 class Job(JobBase):
@@ -1456,7 +1458,6 @@ class Job(JobBase):
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
-
 
         :returns: Resource Limits
         :rtype: list of ResourceLimit objects

@@ -13,18 +13,11 @@ Local
 .. autoclass:: cluster.openlavacluster.Job
     :members:
 
-.. autoclass:: cluster.openlavacluster.ExecutionHost
-    :members
-
 Client
 ^^^^^^
 
 .. autoclass:: olwclient.Job
     :members:
-
-.. autoclass:: olwclient.ExecutionHost
-    :members
-
 
 JavaScript
 ^^^^^^^^^^
@@ -35,14 +28,34 @@ JavaScript
     :param job_id: The job_id to load
     :param array_index: The array index to load
 
+Process Classes
+---------------
 
+Process classes represent individual processes that are executing on a given host.
 
-Exceptions
+.. autoclass:: cluster.Process
+
+Resource Limit Classes
+----------------------
+
+Resource limits classes define resource limits that are imposed on a given job.
+
+.. autoclass:: cluster.ResourceLimit
+
+Consumed Resources
+------------------
+
+Consumed resources represent resources that have been consumed by a given job.
+
+.. autoclass:: cluster.ConsumedResource
+
+Job Status
 ----------
 
-NoSuchJobError
+.. autoclass:: cluster.openlavacluster.JobStatus
 
-ClusterException
+
+
 
 Host Classes
 ------------
@@ -67,7 +80,7 @@ Client
     :members:
 
 .. autoclass:: olwclient.ExecutionHost
-    :members
+    :members:
 
 
 JavaScript
@@ -85,3 +98,32 @@ JavaScript
     :param num_slots_for_job: The number of slots allocated to the job
 
 
+Exceptions
+----------
+
+.. autoclass:: cluster.ClusterException
+    :members:
+
+.. autoclass:: cluster.NoSuchHostError
+    :members:
+
+.. autoclass:: cluster.NoSuchJobError
+    :members:
+
+.. autoclass:: cluster.NoSuchQueueError
+    :members:
+
+.. autoclass:: cluster.NoSuchUserError
+    :members:
+
+.. autoclass:: cluster.ResourceDoesntExistError
+    :members:
+
+.. autoclass:: cluster.ClusterInterfaceError
+    :members:
+
+.. autoclass:: cluster.PermissionDeniedError
+    :members:
+
+.. autoclass:: cluster.JobSubmitError
+    :members:
