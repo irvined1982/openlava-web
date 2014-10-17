@@ -652,6 +652,15 @@ class Process:
             setattr(self, k, v)
             self.extras.append(k)
 
+    def __str__(self):
+        return "%s:%s" % (self.hostname, self.process_id)
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
+
+    def __repr__(self):
+        return self.__str__()
+
     def json_attributes(self):
         return ['hostname', 'process_id'] + self.extras
 

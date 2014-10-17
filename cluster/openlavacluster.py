@@ -925,6 +925,23 @@ class Job(JobBase):
         """
         List of hosts that job is running on, if the job is neither finished nor executing then the list will be empty
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> import time
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.execution_hosts
+            []
+            time.sleep(10)
+            >>> job.is_running
+            True
+            >>> for ex in job.execution_hosts:
+            ...  print ex
+            comp00:1
+
         :returns: List of ExecutionHost objects, one for each host the job is executing on.
         :rtype: list
 
@@ -943,6 +960,15 @@ class Job(JobBase):
         """
         Path to the job input file, may be ""
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> .input_file_name
+            u'/dev/null'
+            >>>
+
         :returns: Path of the job input file.
         :rtype: str
 
@@ -956,6 +982,24 @@ class Job(JobBase):
         True if the job completed without failure.  For this to be true, the job must have returned exit status zero,
         must not have been killed by the user or an admin.
 
+    Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.is_completed
+            False
+            >>> job.is_pending
+            True
+            >>> job.was_killed
+            False
+            >>> job.is_failed
+            False
+            >>> job.is_suspended
+            False
+
         :return: True if job has completed without error.
         :rtype: bool
 
@@ -968,6 +1012,24 @@ class Job(JobBase):
     def was_killed(self):
         """
         True if the job was killed by the owner or an admin.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.is_completed
+            False
+            >>> job.is_pending
+            True
+            >>> job.was_killed
+            False
+            >>> job.is_failed
+            False
+            >>> job.is_suspended
+            False
 
         :return: True if the job was killed
         :rtype: bool
@@ -984,6 +1046,24 @@ class Job(JobBase):
         True if the exited due to failure.  For this to be true, the job must have returned a non zero exit status, and
         must not have been killed by the user or admin.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.is_completed
+            False
+            >>> job.is_pending
+            True
+            >>> job.was_killed
+            False
+            >>> job.is_failed
+            False
+            >>> job.is_suspended
+            False
+
         :return: True if the job failed
         :rtype: bool
 
@@ -997,6 +1077,24 @@ class Job(JobBase):
     def is_pending(self):
         """
         True if the job is pending.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.is_completed
+            False
+            >>> job.is_pending
+            True
+            >>> job.was_killed
+            False
+            >>> job.is_failed
+            False
+            >>> job.is_suspended
+            False
 
         :return: True if the job is pending
         :rtype: bool
@@ -1012,6 +1110,24 @@ class Job(JobBase):
         True if the job is running.  For this to be true, the job must currently be executing on compute nodes and the
         job must not be suspended.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.is_completed
+            False
+            >>> job.is_pending
+            True
+            >>> job.was_killed
+            False
+            >>> job.is_failed
+            False
+            >>> job.is_suspended
+            False
+
         :return: True if the job is executing
         :rtype: bool
 
@@ -1025,6 +1141,24 @@ class Job(JobBase):
         """
         True if the job is suspended.  For this to be true, the job must have been suspended by the system, an
         administrator or the job owner.  The job may have been suspended whilst executing, or whilst in a pending state.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            False
+            >>> job.is_completed
+            False
+            >>> job.is_pending
+            True
+            >>> job.was_killed
+            False
+            >>> job.is_failed
+            False
+            >>> job.is_suspended
+            False
 
         :return: True if the job is suspended
         :rtype: bool
@@ -1041,6 +1175,14 @@ class Job(JobBase):
         The maximum number of slots that this job will execute on.  If the user requested a range of slots to consume,
         this is set to the upper bound of that range.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.max_requested_slots
+            1
+
         :return: Maximum number of slots requested
         :rtype: int
 
@@ -1051,7 +1193,21 @@ class Job(JobBase):
     @property
     def name(self):
         """
-        The name given to the job by the user or scheduling system. May be "".
+        The name given to the job by the user or scheduling system. May be "".  If this is an array job, then the
+        job name will contain the array information.  Generally if no name was specified, then the name will be set
+        to the command that was specified.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9601> is submitted to default queue <normal>.
+            >>> job.name
+            u'sleep 500'
+            >>> job = Job.submit(command="sleep 500", job_name="foo[1-10]", requested_slots=1)[0]
+            Job <9600> is submitted to default queue <normal>.
+            >>> job.name
+            u'foo[1-10]'
 
         :return: Name of job
         :rtype: str
@@ -1075,7 +1231,11 @@ class Job(JobBase):
     @property
     def output_file_name(self):
         """
-        Path to the job output file, may be ""
+        Path to the job output file, may be "" if the job output is not being directed to a file.
+
+
+            >>> job.output_file_name
+            u'/dev/null'
 
         :returns: Path of the job output file.
         :rtype: str
@@ -1087,7 +1247,13 @@ class Job(JobBase):
     @property
     def pending_reasons(self):
         """
-        Text string explainging why the job is pending.
+        Text string explaining why the job is pending.  These are the human readable reasons that Openlava has for not
+        executing the job at present.
+
+            >>> job.is_pending
+            True
+            >>> job.pending_reasons
+            u' Load information unavailable: 4 hosts;  Job slot limit reached: 2 hosts;'
 
         :return: Reason why the job is pending.
         :rtype: str
@@ -1099,7 +1265,11 @@ class Job(JobBase):
     @property
     def predicted_start_time(self):
         """
-        The time the job is predicted to start, in seconds since EPOCH. (UTC)
+        The time the job is predicted to start, in seconds since EPOCH. (UTC)  If the expected start time is not
+        available then returns zero.
+
+            >>> job.predicted_start_time
+            0
 
         :return: The predicted start time
         :rtype: int
@@ -1112,7 +1282,11 @@ class Job(JobBase):
     def priority(self):
         """
         The priority given to the job by the user, this may have been modified by the scheduling environment, or an
-        administrator.
+        administrator.  If no priority was given, then returns -1.
+
+
+            >>> job.priority
+            -1
 
         :return: Priority
         :rtype: int
@@ -1124,7 +1298,17 @@ class Job(JobBase):
     @property
     def process_id(self):
         """
-        The numeric process ID of the primary process associated with this job.
+        The numeric process ID of the primary process associated with this job.  If the job does not have a process id
+        then returns -1.
+
+            >>> job.is_pending
+            True
+            >>> job.process_id
+            -1
+            >>> job.is_running
+            True
+            >>> job.process_id
+            25148
 
         :return: Process ID
         :rtype: int
@@ -1136,7 +1320,10 @@ class Job(JobBase):
     @property
     def processes(self):
         """
-        Array of process objects for each process  started by the job
+        Array of process objects for each process started by the job.  This only includes processes that Openlava
+        is aware of, processes that are started independently of openlava will not be included. Generally this only
+        includes the primary process on the primary host and any child processes.
+
 
         :return: Array of Process objects
         :rtype: list
