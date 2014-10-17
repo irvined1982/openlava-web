@@ -1233,7 +1233,11 @@ class Job(JobBase):
         """
         Path to the job output file, may be "" if the job output is not being directed to a file.
 
+        Example::
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.output_file_name
             u'/dev/null'
 
@@ -1250,6 +1254,11 @@ class Job(JobBase):
         Text string explaining why the job is pending.  These are the human readable reasons that Openlava has for not
         executing the job at present.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.is_pending
             True
             >>> job.pending_reasons
@@ -1268,6 +1277,11 @@ class Job(JobBase):
         The time the job is predicted to start, in seconds since EPOCH. (UTC)  If the expected start time is not
         available then returns zero.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.predicted_start_time
             0
 
@@ -1284,7 +1298,11 @@ class Job(JobBase):
         The priority given to the job by the user, this may have been modified by the scheduling environment, or an
         administrator.  If no priority was given, then returns -1.
 
+        Example::
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.priority
             -1
 
@@ -1301,6 +1319,11 @@ class Job(JobBase):
         The numeric process ID of the primary process associated with this job.  If the job does not have a process id
         then returns -1.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.is_pending
             True
             >>> job.process_id
@@ -1324,6 +1347,11 @@ class Job(JobBase):
         is aware of, processes that are started independently of openlava will not be included. Generally this only
         includes the primary process on the primary host and any child processes.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
             True
             >>> job.processes
@@ -1341,6 +1369,11 @@ class Job(JobBase):
         """
         Array of project names that the job was submitted with.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.project_names
             [u'default']
 
@@ -1357,6 +1390,11 @@ class Job(JobBase):
         Resource string requested by the user.  This may be have been modified by the scheduler, or an administrator.
         If no resources were requested, returns an empty string.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.requested_resources
             u''
 
@@ -1372,6 +1410,11 @@ class Job(JobBase):
         """
         The number of job slots requested by the job.
 
+            Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.requested_slots
             1
 
@@ -1388,6 +1431,11 @@ class Job(JobBase):
         The time when the slots for this job were reserved.  Time is in seconds since Epoch (UTC).  If the slots were
         not reserved, then returns zero.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
             >>> job.reservation_time
             0
 
@@ -1401,8 +1449,14 @@ class Job(JobBase):
     @property
     def runtime_limits(self):
         """
-
         Array of run time limits imposed on the job.  May have been modified by the scheduler or an administrator.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+
 
         :returns: Resource Limits
         :rtype: list of ResourceLimit objects
@@ -1414,7 +1468,15 @@ class Job(JobBase):
     @property
     def start_time(self):
         """
-        The time time the job started in seconds since Epoch. (UTC)
+        The time time the job started in seconds since Epoch. (UTC)  If the job has not yet started, returns 0.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.start_time
+            1413561969
 
         :returns: Job Start Time
         :rtype: int
@@ -1443,6 +1505,14 @@ class Job(JobBase):
         """
         Host object corresponding to the host that the job was submitted from.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.submission_host
+            u'master'
+
         :return: Submit Host object
         :rtype: Host
 
@@ -1454,6 +1524,14 @@ class Job(JobBase):
     def submit_time(self):
         """
         The time the job was submitted in seconds since Epoch. (UTC)
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.submit_time
+            1413561967
 
         :returns: Job Submit Time
         :rtype: int
@@ -1467,6 +1545,14 @@ class Job(JobBase):
         """
         The submit time as a datetime object (UTC)
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> print job.submit_time_datetime
+            2014-10-17 16:06:07
+
         :return: submit time
         :rtype: datetime
 
@@ -1476,7 +1562,22 @@ class Job(JobBase):
     @property
     def suspension_reasons(self):
         """
-        Text string explaining why the job is suspended.
+        Text string explaining why the job is suspended.  If the job is not suspended, may return invalid information.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.is_running
+            True
+            >>> job.suspend()
+            0
+            >>> job=Job(job_id=job.job_id)
+            >>> job.is_suspended
+            True
+            >>> job.suspension_reasons
+            u' The job was suspended by user;'
 
         :return: Reason why the job is suspended.
         :rtype: str
@@ -1489,7 +1590,15 @@ class Job(JobBase):
     def termination_time(self):
         """
         Termination deadline in seconds since the Epoch. (UTC)  The job will be terminated if it is not finished by
-        this time.
+        this time.  If no termination deadline was specified, returns zero.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.termination_time
+            0
 
         :return: Job termination time
         :rtype: int
@@ -1500,7 +1609,16 @@ class Job(JobBase):
 
     @property
     def user_name(self):
-        """User name of the job owner.
+        """
+        User name of the job owner.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.user_name
+            u'irvined'
 
         :return: Username
         :rtype: str
@@ -1511,7 +1629,17 @@ class Job(JobBase):
 
     @property
     def user_priority(self):
-        """User given priority for the job.  This may have been modified by the scheduling system or an administrator.
+        """
+        User given priority for the job.  This may have been modified by the scheduling system or an administrator.
+        If the user did not specify a priority, then returns -1.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.user_priority
+            -1
 
         :return: priority
         :rtype: int
@@ -1525,6 +1653,14 @@ class Job(JobBase):
         """The queue ob ject that this job is currently in.  This may have been modified by the scheduling system, or an
         administrator.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.queue
+            u'normal'
+
         :return: Queue object that the job is in.
         :rtype: Queue
 
@@ -1537,6 +1673,14 @@ class Job(JobBase):
         """An array of Host objects corresponding the the hosts that the user requested for this job.  If the user did
         not request any hosts, then the list will be empty.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.requested_hosts
+            []
+
         :return: List of requested hosts
         :rtype: list
 
@@ -1548,11 +1692,20 @@ class Job(JobBase):
     @property
     def checkpoint_directory(self):
         """
-        Path to directory where checkpoint data will be written to.
+        Path to directory where checkpoint data will be written to.  If no checkpoint directory was specified then
+        returns an empty string.
 
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.checkpoint_directory
+            u''
 
         :return: path to checkpoint directory
         :rtype: str
@@ -1563,11 +1716,20 @@ class Job(JobBase):
 
     @property
     def checkpoint_period(self):
-        """Number of seconds between checkpoint operations
+        """
+        Number of seconds between checkpoint operations.  If no checkpointing period was specified, then returns 0.
 
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.checkpoint_period
+            0
 
         :return: Number of seconds between checkpoints
         :rtype: int
@@ -1585,6 +1747,14 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> print job.checkpoint_period_timedelta
+            0:00:00
+
         :return: Checkpointing period
         :rtype: timedelta
 
@@ -1594,11 +1764,19 @@ class Job(JobBase):
     @property
     def cpu_factor(self):
         """
-        CPU Factor of execution host
+        CPU Factor of execution host.
 
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+        >>> job.cpu_factor
+        0.0
 
         :return: CPU Factor
         :rtype: float
@@ -1610,11 +1788,19 @@ class Job(JobBase):
     @property
     def cwd(self):
         """
-        Current Working Directory of the job
+        Current Working Directory of the job.  This is a relative path, and may consist of only the basename.
 
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.cwd
+            u'development'
 
         :return: Current Working Directory
         :rtype: str
@@ -1632,6 +1818,14 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.execution_cwd
+            u'/home/irvined/development'
+
         :return: CWD on exec host
         :rtype: str
 
@@ -1647,6 +1841,14 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.execution_cwd
+            u'/home/irvined/development'
 
         :return Home Directory
         :rtype: str
@@ -1664,6 +1866,14 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.execution_user_id
+            1000
+
         :return: Numerical ID of the user
         :rtype: int
 
@@ -1679,6 +1889,14 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.execution_user_name
+            u'irvined'
 
         :return: name of the user
         :rtype: str
@@ -1696,6 +1914,12 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.host_specification
+            u'comp00'
+
         :return: Host Specification
         :rtype: str
 
@@ -1706,11 +1930,17 @@ class Job(JobBase):
     @property
     def login_shell(self):
         """
-        The shell used when running the job.  If not used, or not specified will be ""
+        The shell used when running the job.  If not used, or not specified will return an empty string.
 
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.login_shell
+            u''
 
         :return: Login Shell
         :rtype: str
@@ -1728,6 +1958,12 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.parent_group
+            u'/'
+
         :return: Parent Job Group
         :rtype: str
 
@@ -1738,11 +1974,17 @@ class Job(JobBase):
     @property
     def pre_execution_command(self):
         """
-        Pre Execution Command specified by the user, if this is not supplied, will be ""
+        Pre Execution Command specified by the user, if this is not supplied, will return and empty string.
 
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.pre_execution_command
+            u''
 
         :return: Pre Execution Command
         :rtype: str
@@ -1760,6 +2002,12 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.resource_usage_last_update_time
+            1413562733
+
         :return: resource usage update time
         :rtype: int
 
@@ -1776,6 +2024,12 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> print job.resource_usage_last_update_time_datetime
+            2014-10-17 16:18:53
+
         :return: last update time of resource usage
         :rtype: datetime
 
@@ -1790,6 +2044,12 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.service_port
+            0
 
         :return: NIOS Port
         :rtype: int
@@ -1807,6 +2067,12 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.submit_home_directory
+            u'/home/irvined'
+
         :return: Home Directory
         :rtype str
 
@@ -1822,6 +2088,12 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+            >>> from cluster.openlavacluster import Job
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <9581> is submitted to default queue <normal>.
+            >>> job.termination_signal
+            0
 
         :return: Termination Signal
         :rtype: int
@@ -2760,6 +3032,16 @@ class Queue(SingleArgMemoized):
                 self._num_user_suspended_jobs += 1
             elif j.status.name == "JOB_STAT_PEND":
                 self._num_pending_jobs += 1
+
+    def __str__(self):
+        return "%s" % self.name
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
+
 
     @property
     def total_jobs(self):

@@ -417,6 +417,9 @@ class HostBase:
     def __unicode__(self):
         return u"%s" % self.host_name
 
+    def __repr__(self):
+        return self.__str__()
+
     def __init__(self, host_name, description=u""):
         self.name = host_name
         self.host_name = host_name
@@ -685,7 +688,7 @@ class ResourceLimit:
     def __unicode__(self):
         return u"%s" % self.__str__()
 
-    
+
 class ConsumedResource:
     def __init__(self, name, value, limit=None, unit=None):
         self.name = name
