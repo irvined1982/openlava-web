@@ -21,6 +21,8 @@ import datetime
 import time
 
 initialized_openlava = False
+_memoized = {}
+
 
 def get_id_tuple(f, args, kwargs, mark=object()):
     """
@@ -35,7 +37,7 @@ def get_id_tuple(f, args, kwargs, mark=object()):
         l.append(id(v))
     return tuple(l)
 
-_memoized = {}
+
 def memoize(f):
     """
     Some basic memoizer
@@ -47,9 +49,10 @@ def memoize(f):
         return _memoized[key]
     return memoized
 
+
 def initialize():
     global initialized_openlava
-    if initialized_openlava == False:
+    if initialized_openlava is False:
         if lsblib.lsb_init("Openlava Cluster Interface") != 0:
             raise OpenLavaError(lslib.ls_sysmsg)
         else:
@@ -58,138 +61,139 @@ def initialize():
 
 def raise_cluster_exception(code, message):
     messages = {
-    0: "No error",
-    1: "No matching job found",
-    2: "Job has not started yet",
-    3: "Job has already started",
-    4: "Job has already finished",
-    5: "Error 5",
-    6: "Dependency condition syntax error",
-    7: "Queue does not accept EXCLUSIVE jobs",
-    8: "Root job submission is disabled",
-    9: "Job is already being migrated",
-    10: "Job is not checkpointable",
-    11: "No output so far",
-    12: "No job Id can be used now",
-    13: "Queue only accepts interactive jobs",
-    14: "Queue does not accept interactive jobs",
-    15: "No user is defined in the lsb.users file",
-    16: "Unknown user",
-    17: "User permission denied",
-    18: "No such queue",
-    19: "Queue name must be specified",
-    20: "Queue has been closed",
-    21: "Not activated because queue windows are closed",
-    22: "User cannot use the queue",
-    23: "Bad host name, host group name or cluster name",
-    24: "Too many processors requested",
-    25: "Reserved for future use",
-    26: "Reserved for future use",
-    27: "No user/host group defined in the system",
-    28: "No such user/host group",
-    29: "Host or host group is not used by the queue",
-    30: "Queue does not have enough per-user job slots",
-    31: "Current host is more suitable at this time",
-    32: "Checkpoint log is not found or is corrupted",
-    33: "Queue does not have enough per-processor job slots",
-    34: "Request from non-LSF host rejected",
-    35: "Bad argument",
-    36: "Bad time specification",
-    37: "Start time is later than termination time",
-    38: "Bad CPU limit specification",
-    39: "Cannot exceed queue's hard limit(s)",
-    40: "Empty job",
-    41: "Signal not supported",
-    42: "Bad job name",
-    43: "The destination queue has reached its job limit",
-    44: "Unknown event",
-    45: "Bad event format",
-    46: "End of file",
-    47: "Master batch daemon internal error",
-    48: "Slave batch daemon internal error",
-    49: "Batch library internal error",
-    50: "Failed in an LSF library call",
-    51: "System call failed",
-    52: "Cannot allocate memory",
-    53: "Batch service not registered",
-    54: "LSB_SHAREDIR not defined",
-    55: "Checkpoint system call failed",
-    56: "Batch daemon cannot fork",
-    57: "Batch protocol error",
-    58: "XDR encode/decode error",
-    59: "Fail to bind to an appropriate port number",
-    60: "Contacting batch daemon: Communication timeout",
-    61: "Timeout on connect call to server",
-    62: "Connection refused by server",
-    63: "Server connection already exists",
-    64: "Server is not connected",
-    65: "Unable to contact execution host",
-    66: "Operation is in progress",
-    67: "User or one of user's groups does not have enough job slots",
-    68: "Job parameters cannot be changed now; non-repetitive job is running",
-    69: "Modified parameters have not been used",
-    70: "Job cannot be run more than once",
-    71: "Unknown cluster name or cluster master",
-    72: "Modified parameters are being used",
-    73: "Queue does not have enough per-host job slots",
-    74: "Mbatchd could not find the message that SBD mentions about",
-    75: "Bad resource requirement syntax",
-    76: "Not enough host(s) currently eligible",
-    77: "Error 77",
-    78: "Error 78",
-    79: "No resource defined",
-    80: "Bad resource name",
-    81: "Interactive job cannot be rerunnable",
-    82: "Input file not allowed with pseudo-terminal",
-    83: "Cannot find restarted or newly submitted job's submission host and host type",
-    84: "Error 109",
-    85: "User not in the specified user group",
-    86: "Cannot exceed queue's resource reservation",
-    87: "Bad host specification",
-    88: "Bad user group name",
-    89: "Request aborted by esub",
-    90: "Bad or invalid action specification",
-    91: "Has dependent jobs",
-    92: "Job group does not exist",
-    93: "Bad/empty job group name",
-    94: "Cannot operate on job array",
-    95: "Operation not supported for a suspended job",
-    96: "Operation not supported for a forwarded job",
-    97: "Job array index error",
-    98: "Job array index too large",
-    99: "Job array does not exist",
-    100: "Job exists",
-    101: "Cannot operate on element job",
-    102: "Bad jobId",
-    103: "Change job name is not allowed for job array",
-    104: "Child process died",
-    105: "Invoker is not in specified project group",
-    106: "No host group defined in the system",
-    107: "No user group defined in the system",
-    108: "Unknown jobid index file format",
-    109: "Source file for spooling does not exist",
-    110: "Number of failed spool hosts reached max",
-    111: "Spool copy failed for this host",
-    112: "Fork for spooling failed",
-    113: "Status of spool child is not available",
-    114: "Spool child terminated with failure",
-    115: "Unable to find a host for spooling",
-    116: "Cannot get $JOB_SPOOL_DIR for this host",
-    117: "Cannot delete spool file for this host",
-    118: "Bad user priority",
-    119: "Job priority control undefined",
-    120: "Job has already been requeued",
-    121: "Multiple first execution hosts specified",
-    122: "Host group specified as first execution host",
-    123: "Host partition specified as first execution host",
-    124: "\"Others\" specified as first execution host",
-    125: "Too few processors requested",
-    126: "Only the following parameters can be used to modify a running job: -c, -M, -W, -o, -e, -r",
-    127: "You must set LSB_JOB_CPULIMIT in lsf.conf to modify the CPU limit of a running job",
-    128: "You must set LSB_JOB_MEMLIMIT in lsf.conf to modify the memory limit of a running job",
-    129: "No error file specified before job dispatch. Error file does not exist, so error file name cannot be changed",
-    130: "The host is locked by master LIM",
-    131: "Dependent arrays do not have the same size",
+        0: "No error",
+        1: "No matching job found",
+        2: "Job has not started yet",
+        3: "Job has already started",
+        4: "Job has already finished",
+        5: "Error 5",
+        6: "Dependency condition syntax error",
+        7: "Queue does not accept EXCLUSIVE jobs",
+        8: "Root job submission is disabled",
+        9: "Job is already being migrated",
+        10: "Job is not checkpointable",
+        11: "No output so far",
+        12: "No job Id can be used now",
+        13: "Queue only accepts interactive jobs",
+        14: "Queue does not accept interactive jobs",
+        15: "No user is defined in the lsb.users file",
+        16: "Unknown user",
+        17: "User permission denied",
+        18: "No such queue",
+        19: "Queue name must be specified",
+        20: "Queue has been closed",
+        21: "Not activated because queue windows are closed",
+        22: "User cannot use the queue",
+        23: "Bad host name, host group name or cluster name",
+        24: "Too many processors requested",
+        25: "Reserved for future use",
+        26: "Reserved for future use",
+        27: "No user/host group defined in the system",
+        28: "No such user/host group",
+        29: "Host or host group is not used by the queue",
+        30: "Queue does not have enough per-user job slots",
+        31: "Current host is more suitable at this time",
+        32: "Checkpoint log is not found or is corrupted",
+        33: "Queue does not have enough per-processor job slots",
+        34: "Request from non-LSF host rejected",
+        35: "Bad argument",
+        36: "Bad time specification",
+        37: "Start time is later than termination time",
+        38: "Bad CPU limit specification",
+        39: "Cannot exceed queue's hard limit(s)",
+        40: "Empty job",
+        41: "Signal not supported",
+        42: "Bad job name",
+        43: "The destination queue has reached its job limit",
+        44: "Unknown event",
+        45: "Bad event format",
+        46: "End of file",
+        47: "Master batch daemon internal error",
+        48: "Slave batch daemon internal error",
+        49: "Batch library internal error",
+        50: "Failed in an LSF library call",
+        51: "System call failed",
+        52: "Cannot allocate memory",
+        53: "Batch service not registered",
+        54: "LSB_SHAREDIR not defined",
+        55: "Checkpoint system call failed",
+        56: "Batch daemon cannot fork",
+        57: "Batch protocol error",
+        58: "XDR encode/decode error",
+        59: "Fail to bind to an appropriate port number",
+        60: "Contacting batch daemon: Communication timeout",
+        61: "Timeout on connect call to server",
+        62: "Connection refused by server",
+        63: "Server connection already exists",
+        64: "Server is not connected",
+        65: "Unable to contact execution host",
+        66: "Operation is in progress",
+        67: "User or one of user's groups does not have enough job slots",
+        68: "Job parameters cannot be changed now; non-repetitive job is running",
+        69: "Modified parameters have not been used",
+        70: "Job cannot be run more than once",
+        71: "Unknown cluster name or cluster master",
+        72: "Modified parameters are being used",
+        73: "Queue does not have enough per-host job slots",
+        74: "Mbatchd could not find the message that SBD mentions about",
+        75: "Bad resource requirement syntax",
+        76: "Not enough host(s) currently eligible",
+        77: "Error 77",
+        78: "Error 78",
+        79: "No resource defined",
+        80: "Bad resource name",
+        81: "Interactive job cannot be rerunnable",
+        82: "Input file not allowed with pseudo-terminal",
+        83: "Cannot find restarted or newly submitted job's submission host and host type",
+        84: "Error 109",
+        85: "User not in the specified user group",
+        86: "Cannot exceed queue's resource reservation",
+        87: "Bad host specification",
+        88: "Bad user group name",
+        89: "Request aborted by esub",
+        90: "Bad or invalid action specification",
+        91: "Has dependent jobs",
+        92: "Job group does not exist",
+        93: "Bad/empty job group name",
+        94: "Cannot operate on job array",
+        95: "Operation not supported for a suspended job",
+        96: "Operation not supported for a forwarded job",
+        97: "Job array index error",
+        98: "Job array index too large",
+        99: "Job array does not exist",
+        100: "Job exists",
+        101: "Cannot operate on element job",
+        102: "Bad jobId",
+        103: "Change job name is not allowed for job array",
+        104: "Child process died",
+        105: "Invoker is not in specified project group",
+        106: "No host group defined in the system",
+        107: "No user group defined in the system",
+        108: "Unknown jobid index file format",
+        109: "Source file for spooling does not exist",
+        110: "Number of failed spool hosts reached max",
+        111: "Spool copy failed for this host",
+        112: "Fork for spooling failed",
+        113: "Status of spool child is not available",
+        114: "Spool child terminated with failure",
+        115: "Unable to find a host for spooling",
+        116: "Cannot get $JOB_SPOOL_DIR for this host",
+        117: "Cannot delete spool file for this host",
+        118: "Bad user priority",
+        119: "Job priority control undefined",
+        120: "Job has already been requeued",
+        121: "Multiple first execution hosts specified",
+        122: "Host group specified as first execution host",
+        123: "Host partition specified as first execution host",
+        124: "\"Others\" specified as first execution host",
+        125: "Too few processors requested",
+        126: "Only the following parameters can be used to modify a running job: -c, -M, -W, -o, -e, -r",
+        127: "You must set LSB_JOB_CPULIMIT in lsf.conf to modify the CPU limit of a running job",
+        128: "You must set LSB_JOB_MEMLIMIT in lsf.conf to modify the memory limit of a running job",
+        129: "No error file specified before job dispatch. Error file does not exist, so error file name\
+         cannot be changed",
+        130: "The host is locked by master LIM",
+        131: "Dependent arrays do not have the same size",
     }
     e = ClusterException
     if code == lsblib.LSBE_NO_JOB:
@@ -234,24 +238,27 @@ class Cluster(ClusterBase):
     def resources(self):
         """Returns an array of resources that are part of thecluster"""
         cluster_info = lslib.ls_info()
-        if cluster_info == None:
+        if cluster_info is None:
             raise OpenLavaError(lslib.ls_sysmsg())
         return [Resource(r) for r in cluster_info.resTable]
 
     @property
     def admins(self):
         """
-		Gets the cluster administrators.  Cluster administrators can perform any action on the scheduling system.  This does not imply they are actual superusers on the physical systems.
-		:returns: Array of usernames
-		:rtype: array
-		:raise: OpenLavaError on failure
-		"""
+        Gets the cluster administrators.  Cluster administrators can perform any action on the scheduling system.
+        This does not imply they are actual superusers on the physical systems.
+
+        :returns: Array of usernames
+        :rtype: array
+        :raise: OpenLavaError on failure
+
+        """
         cluster_info = lslib.ls_clusterinfo(clusterList=[lslib.ls_getclustername()], listsize=1)
-        if cluster_info == None:
+        if cluster_info is None:
             raise OpenLavaError(lslib.ls_sysmsg())
         cluster_info = cluster_info[0]
         if cluster_info.clusterName != lslib.ls_getclustername():
-            raise OpenLavaError("Cluster returned didnt match cluster name")
+            raise OpenLavaError("Cluster returned didn't match cluster name")
         return cluster_info.admins
 
     def users(self):
@@ -547,126 +554,133 @@ class SubmitOption(NumericStatus):
 
 class HostStatus(NumericStatus):
     states = {
-    0x0: {
-    'friendly': 'Ok',
-    'name': 'HOST_STAT_OK',
-    'description': "Ready to accept and run jobs.  ",
-    },
-    0x01: {
-    'friendly': 'Busy',
-    'name': 'HOST_STAT_BUSY',
-    'description': "The host load is greater than a scheduling threshold.  In this status, no new job will be scheduled to run on this host.  ",
-    },
-    0x02: {
-    'friendly': 'Dispatch Window Closed',
-    'name': 'HOST_STAT_WIND',
-    'description': "The host dispatch window is closed.  In this status, no new job will be accepted.  ",
-    },
-    0x04: {
-    'friendly': 'Disabled by Administrator',
-    'name': 'HOST_STAT_DISABLED',
-    'description': "The host has been disabled by the LSF administrator and will not accept jobs.  In this status, no new job will be scheduled to run on this host.  ",
-    },
-    0x08: {
-    'friendly': 'Locked',
-    'name': 'HOST_STAT_LOCKED',
-    'description': "The host is locked by a exclusive task.  In this status, no new job will be scheduled to run on this host.  ",
-    },
-    0x10: {
-    'friendly': 'Full',
-    'name': 'HOST_STAT_FULL',
-    'description': "Great than job limit.  The host has reached its job limit. In this status, no new job will be scheduled to run on this host.  ",
-    },
-    0x20: {
-    'friendly': 'Unreachable',
-    'name': 'HOST_STAT_UNREACH',
-    'description': "The sbatchd on this host is unreachable.  ",
-    },
-    0x40: {
-    'friendly': 'Unavailable',
-    'name': 'HOST_STAT_UNAVAIL',
-    'description': "The LIM and sbatchd on this host are unavailable.  ",
-    },
-    0x80: {
-    'friendly': 'No LIM',
-    'name': 'HOST_STAT_NO_LIM',
-    'description': "The host is running an sbatchd but not a LIM.  ",
-    },
-    0x100: {
-    'friendly': 'Exclusive',
-    'name': 'HOST_STAT_EXCLUSIVE',
-    'description': "Running exclusive job.  ",
-    },
-    0x200: {
-    'friendly': 'Locked by Master LIM',
-    'name': 'HOST_STAT_LOCKED_MASTER',
-    'description': "Lim locked by master LIM.  ",
-    },
+        0x0: {
+            'friendly': 'Ok',
+            'name': 'HOST_STAT_OK',
+            'description': "Ready to accept and run jobs.  ",
+        },
+        0x01: {
+            'friendly': 'Busy',
+            'name': 'HOST_STAT_BUSY',
+            'description': "The host load is greater than a scheduling threshold.  In this status, no new job will be \
+            scheduled to run on this host.  ",
+        },
+        0x02: {
+            'friendly': 'Dispatch Window Closed',
+            'name': 'HOST_STAT_WIND',
+            'description': "The host dispatch window is closed.  In this status, no new job will be accepted.  ",
+        },
+        0x04: {
+            'friendly': 'Disabled by Administrator',
+            'name': 'HOST_STAT_DISABLED',
+            'description': "The host has been disabled by the LSF administrator and will not accept jobs.  \
+            In this status, no new job will be scheduled to run on this host.  ",
+        },
+        0x08: {
+            'friendly': 'Locked',
+            'name': 'HOST_STAT_LOCKED',
+            'description': "The host is locked by a exclusive task.  In this status, no new job will be scheduled to \
+            run on this host.  ",
+        },
+        0x10: {
+            'friendly': 'Full',
+            'name': 'HOST_STAT_FULL',
+            'description': "Great than job limit.  The host has reached its job limit. In this status, no new job will \
+            be scheduled to run on this host.  ",
+        },
+        0x20: {
+            'friendly': 'Unreachable',
+            'name': 'HOST_STAT_UNREACH',
+            'description': "The sbatchd on this host is unreachable.  ",
+        },
+        0x40: {
+            'friendly': 'Unavailable',
+            'name': 'HOST_STAT_UNAVAIL',
+            'description': "The LIM and sbatchd on this host are unavailable.  ",
+        },
+        0x80: {
+            'friendly': 'No LIM',
+            'name': 'HOST_STAT_NO_LIM',
+            'description': "The host is running an sbatchd but not a LIM.  ",
+        },
+        0x100: {
+            'friendly': 'Exclusive',
+            'name': 'HOST_STAT_EXCLUSIVE',
+            'description': "Running exclusive job.  ",
+        },
+        0x200: {
+            'friendly': 'Locked by Master LIM',
+            'name': 'HOST_STAT_LOCKED_MASTER',
+            'description': "Lim locked by master LIM.  ",
+        },
     }
 
 
 class JobStatus(NumericStatus):
     states = {
-    0x00: {
-    'friendly': "Null",
-    'name': 'JOB_STAT_NULL',
-    'description': 'State null.',
-    },
-    0x01: {
-    'friendly': "Pending",
-    'name': 'JOB_STAT_PEND',
-    'description': 'The job is pending, i.e., it has not been dispatched yet.',
-    },
-    0x02: {
-    'friendly': "Held",
-    'name': "JOB_STAT_PSUSP",
-    'description': "The pending job was suspended by its owner or the LSF system administrator.",
-    },
-    0x04: {
-    'friendly': "Running",
-    'name': "JOB_STAT_RUN",
-    'description': "The job is running.",
-    },
-    0x08: {
-    'friendly': "Suspended by system",
-    'name': "JOB_STAT_SSUSP",
-    'description': "The running job was suspended by the system because an execution host was overloaded or the queue run window closed.",
-    },
-    0x10: {
-    'friendly': "Suspended by user",
-    'name': "JOB_STAT_USUSP",
-    'description': "The running job was suspended by its owner or the LSF system administrator.",
-    },
-    0x20: {
-    'friendly': "Exited",
-    'name': "JOB_STAT_EXIT",
-    'description': "The job has terminated with a non-zero status - it may have been aborted due to an error in its execution, or killed by its owner or by the LSF system administrator.",
-    },
-    0x40: {
-    'friendly': "Completed",
-    'name': "JOB_STAT_DONE",
-    'description': "The job has terminated with status 0.",
-    },
-    0x80: {
-    'friendly': "Process Completed",
-    'name': "JOB_STAT_PDONE",
-    'description': "Post job process done successfully.",
-    },
-    0x100: {
-    'friendly': "Process Error",
-    'name': "JOB_STAT_PERR",
-    'description': "Post job process has error.",
-    },
-    0x200: {
-    'friendly': "Waiting for execution",
-    'name': "JOB_STAT_WAIT",
-    'description': "Chunk job waiting its turn to exec.",
-    },
-    0x10000: {
-    'friendly': "Unknown",
-    'name': "JOB_STAT_UNKWN",
-    'description': "The slave batch daemon (sbatchd) on the host on which the job is processed has lost contact with the master batch daemon (mbatchd).",
-    },
+        0x00: {
+            'friendly': "Null",
+            'name': 'JOB_STAT_NULL',
+            'description': 'State null.',
+        },
+        0x01: {
+            'friendly': "Pending",
+            'name': 'JOB_STAT_PEND',
+            'description': 'The job is pending, i.e., it has not been dispatched yet.',
+        },
+        0x02: {
+            'friendly': "Held",
+            'name': "JOB_STAT_PSUSP",
+            'description': "The pending job was suspended by its owner or the LSF system administrator.",
+        },
+        0x04: {
+            'friendly': "Running",
+            'name': "JOB_STAT_RUN",
+            'description': "The job is running.",
+        },
+        0x08: {
+            'friendly': "Suspended by system",
+            'name': "JOB_STAT_SSUSP",
+            'description': "The running job was suspended by the system because an execution host was overloaded \
+            or the queue run window closed.",
+        },
+        0x10: {
+            'friendly': "Suspended by user",
+            'name': "JOB_STAT_USUSP",
+            'description': "The running job was suspended by its owner or the LSF system administrator.",
+        },
+        0x20: {
+            'friendly': "Exited",
+            'name': "JOB_STAT_EXIT",
+            'description': "The job has terminated with a non-zero status - it may have been aborted due to an \
+            error in its execution, or killed by its owner or by the LSF system administrator.",
+        },
+        0x40: {
+            'friendly': "Completed",
+            'name': "JOB_STAT_DONE",
+            'description': "The job has terminated with status 0.",
+        },
+        0x80: {
+            'friendly': "Process Completed",
+            'name': "JOB_STAT_PDONE",
+            'description': "Post job process done successfully.",
+        },
+        0x100: {
+            'friendly': "Process Error",
+            'name': "JOB_STAT_PERR",
+            'description': "Post job process has error.",
+        },
+        0x200: {
+            'friendly': "Waiting for execution",
+            'name': "JOB_STAT_WAIT",
+            'description': "Chunk job waiting its turn to exec.",
+        },
+        0x10000: {
+            'friendly': "Unknown",
+            'name': "JOB_STAT_UNKWN",
+            'description': "The slave batch daemon (sbatchd) on the host on which the job is processed has lost \
+            contact with the master batch daemon (mbatchd).",
+        },
     }
 
 
@@ -804,7 +818,7 @@ class Job(JobBase):
     @property
     def execution_hosts(self):
         """List of hosts that job is running on"""
-        hosts={}
+        hosts = {}
         for hn in self._execution_hosts:
             if hn in hosts:
                 hosts[hn].num_slots_for_job += 1
@@ -884,8 +898,8 @@ class Job(JobBase):
     @property
     def is_running(self):
         """
-        True if the job is running.  For this to be true, the job must currently be executing on compute nodes and the job
-        must not be suspended.
+        True if the job is running.  For this to be true, the job must currently be executing on compute nodes and the
+        job must not be suspended.
 
         :return: True if the job is executing
         :rtype: bool
@@ -905,7 +919,8 @@ class Job(JobBase):
         :rtype: bool
 
         """
-        if self.status.name == "JOB_STAT_USUSP" or self.status.name == "JOB_STAT_SSUSP" or self.status.name == "JOB_STAT_PSUSP":
+        if self.status.name == "JOB_STAT_USUSP" or self.status.name == "JOB_STAT_SSUSP" \
+                or self.status.name == "JOB_STAT_PSUSP":
             return True
         return False
 
@@ -1103,7 +1118,7 @@ class Job(JobBase):
         """
         
         status = self._status
-        if status & lsblib.JOB_STAT_DONE: # If its done, its done.
+        if status & lsblib.JOB_STAT_DONE:  # If its done, its done.
             status = 0x40
         return JobStatus(status)
 
@@ -1478,7 +1493,7 @@ class Job(JobBase):
                 else:
                     lsblib.lsb_closejobinfo()
                     raise ClusterException("%s" % lsblib.ls_sysmsg())
-            job=lsblib.lsb_readjobinfo()
+            job = lsblib.lsb_readjobinfo()
             lsblib.lsb_closejobinfo()
         else:
             raise ValueError("Job ID or Job object required")
@@ -1589,11 +1604,18 @@ class Job(JobBase):
         self._pend_reasons = " ".join(lsblib.lsb_pendreason(job.numReasons, job.reasonTb, None, ld).splitlines())
         self._susp_reasons = " ".join(lsblib.lsb_suspreason(job.reasons, job.subreasons, ld).splitlines())
 
-
     def kill(self):
         """
 
         Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> # Submit a normal job.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <6306> is submitted to default queue <normal>.
+            >>> job.kill()
 
         :return: None
 
@@ -1602,12 +1624,20 @@ class Job(JobBase):
         rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGKILL)
         if rc == 0:
             return rc
-        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % ( self.job_id, self.array_index ))
-
+        raise_cluster_exception(lsblib.get_lsberrno(), "Unable to kill job: %s[%s]" % (self.job_id, self.array_index))
 
     def suspend(self):
         """
         Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> # Submit a normal job.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <6306> is submitted to default queue <normal>.
+            >>> job.suspend()
+            >>> job.resume()
 
         :return: None
         """
@@ -1616,11 +1646,22 @@ class Job(JobBase):
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to suspend job: %s[%s]" % ( self.job_id, self.array_index ))
+                                "Unable to suspend job: %s[%s]" % (self.job_id, self.array_index))
 
     def requeue(self, hold=False):
         """
         Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> import time
+            >>> # Submit a normal job.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            >>> while not job.is_running:
+            ...  job=Job(job_id=job.job_id)
+            ...  time.sleep(1)
+            >>> job.requeue()
 
         :return: None
         """
@@ -1643,11 +1684,20 @@ class Job(JobBase):
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to requeue job: %s[%s]" % ( self.job_id, self.array_index ))
+                                "Unable to requeue job: %s[%s]" % (self.job_id, self.array_index))
 
     def resume(self):
         """
         Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> # Submit a normal job.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            Job <6306> is submitted to default queue <normal>.
+            >>> job.suspend()
+            >>> job.resume()
 
         :return: None
         """
@@ -1656,12 +1706,23 @@ class Job(JobBase):
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(),
-                                "Unable to resume job: %s[%s]" % ( self.job_id, self.array_index ))
+                                "Unable to resume job: %s[%s]" % (self.job_id, self.array_index))
 
     def get_output_path(self):
         """
         Gets the path to the job output file.  If the job is not owned by the current user, or the job is not running
         then the output path will be None
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> import time
+            >>> # Submit a normal job.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
+            >>> while not job.is_running:
+            ...  job=Job(job_id=job.job_id)
+            ...  time.sleep(1)
+            >>> job.get_output_path()
 
         :return: output path
         :rtype: str or None
@@ -1669,10 +1730,6 @@ class Job(JobBase):
         """
         full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
         return lsblib.lsb_peekjob(full_job_id)
-
-
-
-
 
     @classmethod
     def submit(cls, **kwargs):
@@ -1683,11 +1740,11 @@ class Job(JobBase):
 
             >>> from cluster.openlavacluster import Job
             >>> # Submit a normal job.
-            ... job = Job.submit(command="sleep 500", requested_slots=1)
+            ... job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <6306> is submitted to default queue <normal>.
             >>> assert(len(job) == 1)
             >>> job=job[0]
-            >>> print "Job: %d submitted."
+            >>> print "Job: %d submitted." % job.job_id
             Job: %d submitted.
             >>>
             >>> for job in  Job.submit(job_name="test_job[1-100]",command="sleep 10", requested_slots=1):
@@ -1900,7 +1957,6 @@ class Job(JobBase):
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to submit job")
         return Job.get_job_list(job_id=job_id, array_index=-1)
 
-
     def json_attributes(self):
         attribs = JobBase.json_attributes(self)
         attribs.extend([
@@ -1947,8 +2003,8 @@ class Job(JobBase):
             >>> for job in Job.get_job_list(job_state="ALL"):
             ...     job_ids.add(job.job_id)
             ...
-            >>> for id in job_ids:
-            ...     print "Job: %d has %d elements." % (id, len(Job.get_job_list(job_id=id, array_index=-1)))
+            >>> for jid in job_ids:
+            ...     print "Job: %d has %d elements." % (jid, len(Job.get_job_list(job_id=jid, array_index=-1)))
             ...
             Job: 6258 has 2 elements.
             Job: 6259 has 10 elements.
@@ -1993,13 +2049,12 @@ class Job(JobBase):
 
         initialize()
 
-
         # Handle a job search for array jobs
         if array_index == -1:
-            job_list=[]
+            job_list = []
             num_jobs = lsblib.lsb_openjobinfo(options=lsblib.ALL_JOB)
             for i in range(num_jobs):
-                j=Job(job=lsblib.lsb_readjobinfo())
+                j = Job(job=lsblib.lsb_readjobinfo())
                 if j.job_id == job_id:
                     job_list.append(j)
             lsblib.lsb_closejobinfo()
@@ -2033,6 +2088,7 @@ class Job(JobBase):
 class Resource(BaseResource):
     def __init__(self, res):
         if isinstance(res, lslib.ResItem):
+            super(Resource, self).__init__(res.name)
             self._name = res.name
             self._description = res.des
             self._type = res.valueType
@@ -2045,7 +2101,6 @@ class Resource(BaseResource):
             pass
         else:
             raise ValueError("ri must be a ResItem object or resource name")
-
 
     @property
     def type(self):
@@ -2061,124 +2116,119 @@ class Resource(BaseResource):
     def flags(self):
         return self._flags
 
-    def json_attributes(self):
+    @staticmethod
+    def json_attributes():
         return ['name', 'description', 'type', 'order', 'interval', 'flags']
-
-
 
 
 class QueueStatus(NumericStatus):
     states = {
-    0x01: {
-    'friendly': "Open",
-    'name': 'QUEUE_STAT_OPEN',
-    'description': 'The queue is open to accept newly submitted jobs.',
-    },
-    0x02: {
-    'friendly': "Active",
-    'name': 'QUEUE_STAT_ACTIVE',
-    'description': 'The queue is actively dispatching jobs. The queue can be inactivated and reactivated by the LSF administrator using lsb_queuecontrol. The queue will also be inactivated when its run or dispatch window is closed. In this case it cannot be reactivated manually; it will be reactivated by the LSF system when its run and dispatch windows reopen.',
-    },
-    0x04: {
-    'friendly': 'Run windows open',
-    'name': 'QUEUE_STAT_RUN',
-    'description': 'The queue run and dispatch windows are open. The initial state of a queue at LSF boot time is open and either active or inactive, depending on its run and dispatch windows.',
-    },
-    0x08: {
-    'friendly': 'No Pemission',
-    'name': 'QUEUE_STAT_NOPERM',
-    'description': 'Remote queue rejecting jobs.',
-    },
-    0x10: {
-    'friendly': 'Remote Disconnected',
-    'name': 'QUEUE_STAT_DISC',
-    'description': 'Remote queue status is disconnected.',
-    },
-    0x20: {
-    'friendly': 'Runwindow Closed',
-    'name': 'QUEUE_STAT_RUNWIN_CLOSE',
-    'description': 'Queue run windows are closed.',
-    },
+        0x01: {
+            'friendly': "Open",
+            'name': 'QUEUE_STAT_OPEN',
+            'description': 'The queue is open to accept newly submitted jobs.',
+        },
+        0x02: {
+            'friendly': "Active",
+            'name': 'QUEUE_STAT_ACTIVE',
+            'description': 'The queue is actively dispatching jobs. The queue can be inactivated and reactivated by \
+            the LSF administrator using lsb_queuecontrol. The queue will also be inactivated when its run or dispatch \
+            window is closed. In this case it cannot be reactivated manually; it will be reactivated by the LSF system \
+            when its run and dispatch windows reopen.',
+        },
+        0x04: {
+            'friendly': 'Run windows open',
+            'name': 'QUEUE_STAT_RUN',
+            'description': 'The queue run and dispatch windows are open. The initial state of a queue at LSF boot time \
+            is open and either active or inactive, depending on its run and dispatch windows.',
+        },
+        0x08: {
+            'friendly': 'No Pemission',
+            'name': 'QUEUE_STAT_NOPERM',
+            'description': 'Remote queue rejecting jobs.',
+        },
+        0x10: {
+            'friendly': 'Remote Disconnected',
+            'name': 'QUEUE_STAT_DISC',
+            'description': 'Remote queue status is disconnected.',
+        },
+        0x20: {
+            'friendly': 'Runwindow Closed',
+            'name': 'QUEUE_STAT_RUNWIN_CLOSE',
+            'description': 'Queue run windows are closed.',
+        },
     }
 
 
 class QueueAttribute(NumericStatus):
     states = {
-    0x01: {
-    'friendly': "Exclusive",
-    'name': 'Q_ATTRIB_EXCLUSIVE',
-    'description': "This queue accepts jobs which request exclusive execution. ",
-    },
-    0x02: {
-    'friendly': "Default Queue",
-    'name': 'Q_ATTRIB_DEFAULT',
-    'description': "This queue is a default LSF queue. ",
-    },
-    0x04: {
-    'friendly': "Round Robin Scheduling Policy",
-    'name': 'Q_ATTRIB_FAIRSHARE',
-    'description': "This queue uses the Round Robin scheduling policy.",
-    },
-    0x80: {
-    'friendly': 'Backfill Enabled',
-    'name': 'Q_ATTRIB_BACKFILL',
-    'description': "This queue uses a backfilling policy. ",
-    },
-    0x100: {
-    'friendly': "Preference Scheduling Policy",
-    'name': 'Q_ATTRIB_HOST_PREFER',
-    'description': "This queue uses a host preference policy. ",
-    },
-    0x800: {
-    'friendly': "Non-Interactive only",
-    'name': 'Q_ATTRIB_NO_INTERACTIVE',
-    'description': "This queue does not accept batch interactive jobs. ",
-    },
-    0x1000: {
-    'friendly': "Interactive Only",
-    'name': 'Q_ATTRIB_ONLY_INTERACTIVE',
-    'description': "This queue only accepts batch interactive jobs. ",
-    },
-    0x2000: {
-    'friendly': "No host type resources",
-    'name': 'Q_ATTRIB_NO_HOST_TYPE',
-    'description': "No host type related resource name specified in resource requirement. ",
-    },
-    0x4000: {
-    'friendly': "Ignores deadlines",
-    'name': 'Q_ATTRIB_IGNORE_DEADLINE',
-    'description': "This queue disables deadline constrained resource scheduling. ",
-    },
-    0x8000: {
-    'friendly': "Checkpointing supported",
-    'name': 'Q_ATTRIB_CHKPNT',
-    'description': "Jobs may run as chkpntable. ",
-    },
-    0x10000: {
-    'friendly': "Re-Runnable",
-    'name': 'Q_ATTRIB_RERUNNABLE',
-    'description': "Jobs may run as rerunnable. ",
-    },
-    0x80000: {
-    'friendly': "Interactive First",
-    'name': 'Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD',
-    'description': "Push interactive jobs in front of other jobs in queue. ",
-    },
+        0x01: {
+            'friendly': "Exclusive",
+            'name': 'Q_ATTRIB_EXCLUSIVE',
+            'description': "This queue accepts jobs which request exclusive execution. ",
+        },
+        0x02: {
+            'friendly': "Default Queue",
+            'name': 'Q_ATTRIB_DEFAULT',
+            'description': "This queue is a default LSF queue. ",
+        },
+        0x04: {
+            'friendly': "Round Robin Scheduling Policy",
+            'name': 'Q_ATTRIB_FAIRSHARE',
+            'description': "This queue uses the Round Robin scheduling policy.",
+        },
+        0x80: {
+            'friendly': 'Backfill Enabled',
+            'name': 'Q_ATTRIB_BACKFILL',
+            'description': "This queue uses a backfilling policy. ",
+        },
+        0x100: {
+            'friendly': "Preference Scheduling Policy",
+            'name': 'Q_ATTRIB_HOST_PREFER',
+            'description': "This queue uses a host preference policy. ",
+        },
+        0x800: {
+            'friendly': "Non-Interactive only",
+            'name': 'Q_ATTRIB_NO_INTERACTIVE',
+            'description': "This queue does not accept batch interactive jobs. ",
+        },
+        0x1000: {
+            'friendly': "Interactive Only",
+            'name': 'Q_ATTRIB_ONLY_INTERACTIVE',
+            'description': "This queue only accepts batch interactive jobs. ",
+        },
+        0x2000: {
+            'friendly': "No host type resources",
+            'name': 'Q_ATTRIB_NO_HOST_TYPE',
+            'description': "No host type related resource name specified in resource requirement. ",
+        },
+        0x4000: {
+            'friendly': "Ignores deadlines",
+            'name': 'Q_ATTRIB_IGNORE_DEADLINE',
+            'description': "This queue disables deadline constrained resource scheduling. ",
+        },
+        0x8000: {
+            'friendly': "Checkpointing supported",
+            'name': 'Q_ATTRIB_CHKPNT',
+            'description': "Jobs may run as chkpntable. ",
+        },
+        0x10000: {
+            'friendly': "Re-Runnable",
+            'name': 'Q_ATTRIB_RERUNNABLE',
+            'description': "Jobs may run as rerunnable. ",
+        },
+        0x80000: {
+            'friendly': "Interactive First",
+            'name': 'Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD',
+            'description': "Push interactive jobs in front of other jobs in queue. ",
+        },
     }
 
 
-
-def initialize():
-    global initialized_openlava
-    if initialized_openlava == False:
-        if lsblib.lsb_init("Openlava Cluster Interface") != 0:
-            raise OpenLavaError(lslib.ls_sysmsg)
-        else:
-            initialized_openlava = True
-
-
 class SingleArgMemoized(object):
+
     _memoized = {}
+
     def __new__(cls, arg):
         key = (cls, arg)
         if key in SingleArgMemoized._memoized:
@@ -2202,6 +2252,7 @@ class SingleArgMemoized(object):
             l.append(v)
         return hash
 
+
 class Queue(SingleArgMemoized):
     cluster_type = "openlava"
     _memoized = {}
@@ -2217,12 +2268,12 @@ class Queue(SingleArgMemoized):
     def __init__(self, queue):
         if hasattr(self, '_initialized'):
             return
-        self._initialized=True
+        self._initialized = True
 
         initialize()
         if isinstance(queue, str) or isinstance(queue, unicode):
             queue = lsblib.lsb_queueinfo(queues=[queue])
-            if queue == None or len(queue) != 1:
+            if queue is None or len(queue) != 1:
                 raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get load queue: %s" % queue)
             queue = queue[0]
         if not isinstance(queue, lsblib.QueueInfoEnt):
@@ -2326,22 +2377,27 @@ class Queue(SingleArgMemoized):
     def total_jobs(self):
         self.update_job_count()
         return self._total_jobs
+
     @property
     def num_running_jobs(self):
         self.update_job_count()
         return self._num_running_jobs
+
     @property
     def num_pending_jobs(self):
         self.update_job_count()
         return self._num_pending_jobs
+
     @property
     def num_suspended_jobs(self):
         self.update_job_count()
         return self._num_suspended_jobs
+
     @property
     def num_user_suspended_jobs(self):
         self.update_job_count()
         return self._num_user_suspended_jobs
+
     @property
     def num_system_suspended_jobs(self):
         self.update_job_count()
@@ -2394,7 +2450,8 @@ class Queue(SingleArgMemoized):
     def jobs(self):
         return Job.get_job_list(queue_name=self.name)
 
-    def json_attributes(self):
+    @staticmethod
+    def json_attributes():
         return [
             'name',
             'description',
@@ -2465,9 +2522,9 @@ class User(SingleArgMemoized, UserBase):
         initialize()
         if isinstance(user, str) or isinstance(user, unicode):
             user = lsblib.lsb_userinfo(user_list=[user], numusers=1)
-            if user == None:
+            if user is None:
                 raise_cluster_exception(lsblib.get_lsberrno(),
-                                        "Unable load user: %s[%s]" % ( self.job_id, self.array_index ))
+                                        "Unable load user")
             if len(user) != 1:
                 raise ValueError("Invalid User")
             user = user[0]
@@ -2556,7 +2613,6 @@ class User(SingleArgMemoized, UserBase):
         self._update_job_count()
         return self._num_system_suspended_jobs
 
-
     def jobs(self, job_id=0, job_name="", queue="", host="", options=0):
         """Return jobs on this host"""
         num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=self.name, queue=queue, host=host,
@@ -2584,7 +2640,7 @@ class User(SingleArgMemoized, UserBase):
     @classmethod
     def get_user_list(cls):
         initialize()
-        us=lsblib.lsb_userinfo()
+        us = lsblib.lsb_userinfo()
         if us is None:
             raise_cluster_exception(lsblib.get_lsberrno(), "Unable to get list of users")
 
@@ -2623,7 +2679,7 @@ class Host(SingleArgMemoized, HostBase):
 
         # check host exists
         self._model = lslib.ls_gethostmodel(host_name)
-        if self._model == None:
+        if self._model is None:
             raise NoSuchHostError("Host: %s does not exist" % host_name)
 
     def open(self):
@@ -2637,7 +2693,6 @@ class Host(SingleArgMemoized, HostBase):
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
-
 
     def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
         """Return jobs on this host"""
@@ -2659,31 +2714,29 @@ class Host(SingleArgMemoized, HostBase):
         self._update_lsb_hostinfo()
 
         indexes = {
-        'names': ["15s Load", "1m Load", "15m Load", "Avg CPU Utilization", "Paging Rate (Pages/Sec)",
-                  "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
-                  "Free Memory (MB)"],
-        'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
-        'values': []
+            'names': ["15s Load", "1m Load", "15m Load", "Avg CPU Utilization", "Paging Rate (Pages/Sec)",
+                      "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
+                      "Free Memory (MB)"],
+            'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
+            'values': []
         }
 
         indexes['values'].append({
-        'name': "Actual Load",
-        'values': self._load
+            'name': "Actual Load",
+            'values': self._load
         })
 
         indexes['values'].append({
-        'name': "Stop Dispatching Load",
-        'values': self._load_sched
+            'name': "Stop Dispatching Load",
+            'values': self._load_sched
         })
 
         indexes['values'].append({
-        'name': "Stop Executing Load",
-        'values': self._load_stop
+            'name': "Stop Executing Load",
+            'values': self._load_stop
         })
 
         return indexes
-
-
 
     def _update_hostinfo(self):
         if (int(time.time()) - self._update_time) < 60:
@@ -2714,7 +2767,7 @@ class Host(SingleArgMemoized, HostBase):
         self._lsb_update_time = int(time.time())
 
         hosts = lsblib.lsb_hostinfo(hosts=[self.host_name])
-        if hosts == None or len(hosts) != 1:
+        if hosts is None or len(hosts) != 1:
             raise ValueError("Invalid number of hosts")
         host = hosts[0]
         self._status = host.hStatus
@@ -2740,7 +2793,7 @@ class Host(SingleArgMemoized, HostBase):
         else:
             self._has_checkpoint_support = False
 
-        if (host.attr & lsblib.H_ATTR_CHKPNT_COPY ) != 0:
+        if (host.attr & lsblib.H_ATTR_CHKPNT_COPY) != 0:
             self._has_kernel_checkpoint_support = True
         else:
             self._has_kernel_checkpoint_support = False
@@ -2796,8 +2849,6 @@ class Host(SingleArgMemoized, HostBase):
         ])
         return attribs
 
-
-
     @property
     def admins(self):
         return Cluster().admins
@@ -2830,7 +2881,6 @@ class Host(SingleArgMemoized, HostBase):
                 return True
         return False
 
-
     @property
     def has_checkpoint_support(self):
         """True if the host supports checkpointing"""
@@ -2846,7 +2896,6 @@ class Host(SingleArgMemoized, HostBase):
     def host_type(self):
         """String containing host type information"""
         return lslib.ls_gethosttype(self.name)
-
 
     @property
     def resources(self):
@@ -2877,7 +2926,6 @@ class Host(SingleArgMemoized, HostBase):
         """Returns the maximum number of scheduling slots that may be consumed on this host"""
         self._update_lsb_hostinfo()
         return self._max_slots
-
 
     @property
     def max_swap(self):
@@ -2945,9 +2993,7 @@ class Host(SingleArgMemoized, HostBase):
         self._update_lsb_hostinfo()
         return self._total_slots
 
-
     #Openlava Only
-
     @property
     def cpu_factor(self):
         """Openlava Specific - returns the CPU factor of the host"""
@@ -3004,13 +3050,15 @@ class Host(SingleArgMemoized, HostBase):
 
 class ExecutionHost(Host):
     """
-    Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots_for_job attribute
+    Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots_for_job
+    attribute
     indicating how many slots (Processors) are allocated to the job.
 
     """
     def __init__(self, host_name, num_slots_for_job=1):
         """
-        Accepts the additional optional argument num_slots_for_job (default 1) that indicates how many slots are allocated.
+        Accepts the additional optional argument num_slots_for_job (default 1) that indicates how many slots are
+        allocated.
 
         Otherwise functions identically to Host().
 
@@ -3028,4 +3076,3 @@ class ExecutionHost(Host):
         attribs = Host.json_attributes(self)
         attribs.append('num_slots_for_job')
         return attribs
-

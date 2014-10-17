@@ -549,7 +549,7 @@ class LoadIndex:
         return self._description
 
 
-class BaseResource:
+class BaseResource(object):
     def __init__(self, name, description=""):
         self._name = unicode(name)
         self._value = value
@@ -596,28 +596,25 @@ class ClusterException(Exception):
 class NoSuchHostError(ClusterException):
     pass
 
-
 class NoSuchJobError(ClusterException):
     pass
-
 
 class NoSuchQueueError(ClusterException):
     pass
 
-
 class NoSuchUserError(ClusterException):
     pass
-
 
 class ResourceDoesntExistError(ClusterException):
     pass
 
-
 class ClusterInterfaceError(ClusterException):
     pass
 
-
 class PermissionDeniedError(ClusterException):
+    pass
+
+class JobSubmitError(ClusterException):
     pass
 
 
@@ -683,5 +680,5 @@ class ConsumedResource:
 
 
 __ALL__ = [UserBase, ClusterBase, JobBase, HostBase, LoadIndex, BaseResource, ClusterException, NoSuchHostError,
-           NoSuchJobError, NoSuchQueueError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError,
+           NoSuchJobError, NoSuchQueueError, ResourceDoesntExistError, JobSubmitError, ClusterInterfaceError, PermissionDeniedError,
            Status, Process, ResourceLimit, ConsumedResource]
