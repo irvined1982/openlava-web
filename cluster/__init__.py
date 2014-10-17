@@ -675,6 +675,16 @@ class ConsumedResource:
         self.limit = None
         self.unit = None
 
+    def str(self):
+        s = "%s: %s" % (self.name, self.value)
+        if self.unit:
+            s += "%s" % self.unit
+
+        if self.limit:
+            s += " (%s)" % self.limit
+
+        return s
+
     def json_attributes(self):
         return ['name', 'value', 'limit', 'unit']
 
