@@ -1915,6 +1915,8 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
@@ -1936,6 +1938,8 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
 
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
@@ -1959,6 +1963,8 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
@@ -1980,6 +1986,8 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
 
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
@@ -2003,6 +2011,8 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
@@ -2025,6 +2035,8 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        Example::
+
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
@@ -2045,6 +2057,8 @@ class Job(JobBase):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        Example::
 
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
@@ -2069,7 +2083,7 @@ class Job(JobBase):
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         Example::
-        
+
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
@@ -2077,7 +2091,7 @@ class Job(JobBase):
             u'/home/irvined'
 
         :return: Home Directory
-        :rtype str
+        :rtype: str
 
         """
         
@@ -2281,6 +2295,7 @@ class Job(JobBase):
             >>> job.kill()
 
         :return: None
+        :raises: PermissionDeniedError - If the user is an administrator for the job.
 
         """
         full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
@@ -2303,6 +2318,8 @@ class Job(JobBase):
             >>> job.resume()
 
         :return: None
+        :raises: PermissionDeniedError - If the user is an administrator for the job.
+
         """
         full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
         rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGSTOP)
@@ -2327,6 +2344,8 @@ class Job(JobBase):
             >>> job.requeue()
 
         :return: None
+        :raises: PermissionDeniedError - If the user is an administrator for the job.
+
         """
         rq = lsblib.JobRequeue()
         rq.jobId = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
@@ -2363,6 +2382,8 @@ class Job(JobBase):
             >>> job.resume()
 
         :return: None
+        :raises: PermissionDeniedError - If the user is an administrator for the job.
+
         """
         full_job_id = lsblib.create_job_id(job_id=self.job_id, array_index=self.array_index)
         rc = lsblib.lsb_signaljob(full_job_id, lsblib.SIGCONT)

@@ -110,6 +110,7 @@ html_theme_options = {
         ("Demo", "https://openlava.ay60dxg.com/", True),
     ],
     'navbar_class': "navbar navbar-inverse",
+    'navbar_sidebarrel': False,
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
