@@ -111,6 +111,7 @@ html_theme_options = {
     ],
     'navbar_class': "navbar navbar-inverse",
     'navbar_sidebarrel': False,
+    'navbar_fixed_top': "false",
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme

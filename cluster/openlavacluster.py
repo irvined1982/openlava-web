@@ -2091,6 +2091,7 @@ class Job(JobBase):
             u'/home/irvined'
 
         :return: Home Directory
+
         :rtype: str
 
         """
@@ -2454,56 +2455,58 @@ class Job(JobBase):
         :param queue_name:
             The name of the queue to submit the job into, if none, the default queue is used.
 
-        :param requested_hosts
+        :param requested_hosts:
             A string containing the list of hosts separated by a space that the user wishes the job to run on.
 
-        :param resource_request
+        :param resource_request:
             A string containing the resource request criteria.
 
-        :param host_specification
+        :param host_specification:
             A string defining the host specification that must be used
 
-        :param dependency_conditions
+        :param dependency_conditions:
             A string defining the dependency conditions
 
-        :param signal_value
+        :param signal_value:
             The signal value to send to the job when its termination deadline is reached.
 
-        :param input_file
+        :param input_file:
             Job input file to use.
 
-        :param output_file
+        :param output_file:
             Job output file to use.
 
-        :param error_file
+        :param error_file:
             Job error file to use.
 
-        :param checkpoint_period
+        :param checkpoint_period:
             Number of seconds in between checkpoint operations
 
-        :param checkpoint_directory
+        :param checkpoint_directory:
             Directory to store checkpoint data
 
-        :param email_user
+        :param email_user:
             Email address to send job updates to.
 
-        :param project_name
+        :param project_name:
             Name of project to submit to
 
-        :param max_requested_slots
+        :param max_requested_slots:
             Max number of slots to use
 
-        :param login_shell
+        :param login_shell:
             Login shell to use
 
-        :param user_priority
+        :param user_priority:
             User given priority for the job.
 
         :return:
             List of Job objects.  If the job was an array job, then the list will contain multiple elements with the
             same job id, but different array_indexes, if the job was not an array job, then the list will contain only
             a single element.
+
         :rtype: list
+
         """
         initialize()
         options = 0
