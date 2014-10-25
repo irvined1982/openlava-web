@@ -67,19 +67,19 @@ class TestConsumedResource(unittest.TestCase):
         c = ConsumedResource(name="MyRes", value=100, unit="BogoUnits")
         self.assertEqual(c.name, "MyRes")
         self.assertEqual(c.value, 100)
-        self.assertIsEqual(c.unit, "BogoUnits")
+        self.assertEqual(c.unit, "BogoUnits")
         self.assertIsNone(c.limit)
 
         c = ConsumedResource(name="MyRes", value=100, limit=120, unit="BogoUnits")
         self.assertEqual(c.name, "MyRes")
         self.assertEqual(c.value, 100)
-        self.assertIsEqual(c.unit, "BogoUnits")
-        self.assertIsEqual(c.limit, 120)
+        self.assertEqual(c.unit, "BogoUnits")
+        self.assertEqual(c.limit, 120)
 
         c = ConsumedResource(name="MyRes", value=100, limit=101)
         self.assertEqual(c.name, "MyRes")
         self.assertEqual(c.value, 100)
-        self.assertIsEqual(c.limit, 101)
+        self.assertEqual(c.limit, 101)
         self.assertIsNone(c.unit)
 
 
