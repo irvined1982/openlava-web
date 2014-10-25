@@ -53,7 +53,7 @@ Install the Openlava python bindings.::
     $ python setup.py install
 
 Download Openlava-Web
---------------------
+---------------------
 
 Use git to checkout `Openlava-Web <https://github.com/irvined1982/openlava-web>`_.::
 
