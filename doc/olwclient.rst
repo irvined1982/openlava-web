@@ -10,6 +10,9 @@ remote client, or javascript implements the same interface, albeit with slightly
 Local
 ^^^^^
 
+.. autosummary::
+    cluster.openlavacluster.Job
+
 .. autoclass:: cluster.openlavacluster.Job
     :members:
 
