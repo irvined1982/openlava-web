@@ -191,7 +191,7 @@ class TestJob(unittest.TestCase):
             self.skipTest("Job no longer running")
 
         job.requeue(hold=True)
-        time.sleep(15)
+        time.sleep(45) # Takes a while, first state is exit...
         job = Job(job_id=job.job_id, array_index=job.array_index)
         self.assertTrue(job.is_suspended)
         job.kill()
