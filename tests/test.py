@@ -16,11 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with python-cluster.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
-import doctest
 import time
 import os
 import urllib
-import cluster.openlavacluster
 from cluster.openlavacluster import Job
 from cluster import ConsumedResource
 
@@ -49,9 +47,9 @@ class TestWebServer(unittest.TestCase):
             self.assertTrue(self.check_content_type(response, "application/json"))
     
     @staticmethod
-    def check_content_type(response, type):
+    def check_content_type(response, c_type):
         for header in response.info().headers:
-            if header.startswith("Content-Type") and not header.startswith("Content-Type: %s" % type):
+            if header.startswith("Content-Type") and not header.startswith("Content-Type: %s" % c_type):
                 print "Actual CT: %s" % header
                 return False
         return True
@@ -94,79 +92,109 @@ class TestJob(unittest.TestCase):
     def test_job_submit(self):
         jobs = Job.submit(requested_slots=1, command="sleep 1000")
         self.assertIs(len(jobs), 1, msg="Submitting one job returns 1 item")
-        self.job_actions_test(jobs[0])
+        self.job_state_test(jobs[0])
 
     def test_job_submit_array(self):
         jobs = Job.submit(job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="sleep 20")
         self.assertIs(len(jobs), 100, msg="Submitting one job returns 1 item")
         for job in jobs[:5]:
-            self.job_actions_test(job)
+            self.job_state_test(job)
 
-    def job_actions_test(self, job):
+    def job_state_test(self, job):
         self.assertIsInstance(job.is_completed, bool)
-        # self.assertIsInstance(job.is_failed, bool)
-        # self.assertIsInstance(job.is_pending, bool)
-        # self.assertIsInstance(job.is_running, bool)
-        # self.assertIsInstance(job.is_suspended, bool)
-        # count = 0
-        # if job.is_completed:
-        #     count += 1
-        #
-        # if job.is_failed:
-        #     count += 1
-        #
-        # if job.is_pending:
-        #     count += 1
-        #
-        # if job.is_running:
-        #     count += 1
-        #
-        # if job.is_suspended:
-        #     count += 1
-        #
-        # self.assertIs(count, 1, msg="Only one active job mode per time.")
-        # if job.is_pending or job.is_running:
-        #     job.suspend()
-        #     time.sleep(10)
-        #     j2 = Job(job_id=job.job_id, array_index=job.array_index)
-        #     self.assertEqual(j2.job_id, job.job_id)
-        #     self.assertEqual(j2.array_index, job.array_index)
-        #     self.assertEqual(j2.is_suspended, True)
-        #     job = j2
-        #
-        # if job.is_suspended:
-        #     job.resume()
-        #     time.sleep(10)
-        #     j2 = Job(job_id=job.job_id, array_index=job.array_index)
-        #     self.assertEqual(j2.job_id, job.job_id)
-        #     self.assertEqual(j2.array_index, job.array_index)
-        #     self.assertEqual(j2.is_suspended, False)
-        #     job = j2
-        #
-        # if job.is_pending or job.is_running:
-        #     job.kill()
-        #     time.sleep(10)
-        #     j2 = Job(job_id=job.job_id, array_index=job.array_index)
-        #     self.assertEqual(j2.job_id, job.job_id)
-        #     self.assertEqual(j2.array_index, job.array_index)
-        #     self.assertEqual(j2.was_killed, True)
-        #     job = j2
+        self.assertIsInstance(job.is_failed, bool)
+        self.assertIsInstance(job.is_pending, bool)
+        self.assertIsInstance(job.is_running, bool)
+        self.assertIsInstance(job.is_suspended, bool)
+        count = 0
+        if job.is_completed:
+            count += 1
 
+        if job.is_failed:
+            count += 1
 
+        if job.is_pending:
+            count += 1
 
-"""
-Create job with each individual argument, check that job matches.
+        if job.is_running:
+            count += 1
 
-Kill job, check job is killed
+        if job.is_suspended:
+            count += 1
 
-Check server, for each job available, check normal request, ajax request.
+        self.assertIs(count, 1, msg="Only one active job mode per time.")
 
-"""
+    def test_job_kill(self):
+        jobs = Job.submit(requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        # kill the job
+        job.kill()
 
+        # Wait for the job to actually die
+        time.sleep(15)
 
-def load_tests(loader, tests, ignore):
-    #tests.addTests(doctest.DocTestSuite(cluster.openlavacluster))
-    return tests
+        job = Job(job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_completed or job.is_failed or job.was_killed)
+
+    def test_job_suspend(self):
+        jobs = Job.submit(requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        job.suspend()
+        time.sleep(15)
+        job = Job(job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_suspended)
+        job.kill()
+
+    def test_job_resume(self):
+        jobs = Job.submit(requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        job.suspend()
+        time.sleep(15)
+        job = Job(job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_suspended)
+        job.resume()
+        time.sleep(15)
+        job = Job(job_id=job.job_id, array_index=job.array_index)
+        self.assertFalse(job.is_suspended)
+        job.kill()
+
+    def test_job_requeue(self):
+        jobs = Job.submit(requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        while job.is_pending:
+            time.sleep(1)
+            job = Job(job_id=job.job_id, array_index=job.array_index)
+
+        if not job.is_running:
+            self.skipTest("Job no longer running")
+
+        start_time = job.start_time
+        job.requeue(hold=False)
+        time.sleep(15)
+        job = Job(job_id=job.job_id, array_index=job.array_index)
+        if job.is_pending:
+            # Passed
+            job.kill()
+            return None
+
+        self.assertNotEqual(job.start_time, start_time)
+        job.kill()
+
+    def test_job_requeue_hold(self):
+        jobs = Job.submit(requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        while job.is_pending:
+            time.sleep(1)
+            job = Job(job_id=job.job_id, array_index=job.array_index)
+
+        if not job.is_running:
+            self.skipTest("Job no longer running")
+
+        job.requeue(hold=True)
+        time.sleep(15)
+        job = Job(job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_pending)
+        job.kill()
 
 if __name__ == '__main__':
     unittest.main()
