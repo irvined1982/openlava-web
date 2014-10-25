@@ -50,7 +50,7 @@ class TestWebServer(unittest.TestCase):
     
     @staticmethod
     def check_content_type(response, type):
-        for header in response.info.headers:
+        for header in response.info().headers:
             if header.startswith("Content-Type") and not header.endswith("%s\r\n" % type):
                 return False
         return True
