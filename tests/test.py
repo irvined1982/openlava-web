@@ -40,6 +40,7 @@ class TestWebServer(unittest.TestCase):
             response = urllib.urlopen("%s/job/%d/" % (base_url, job.job_id))
             self.assertTrue(self.check_content_type(response, "text/html"))
             response = urllib.urlopen("%s/job/%d/?json=1" % (base_url, job.job_id))
+            print "URL: %s/job/%d/?json=1" % (base_url, job.job_id)
             self.assertTrue(self.check_content_type(response, "application/json"))
             response = urllib.urlopen("%s/job/%d/%d" % (base_url, job.job_id, job.array_index))
             self.assertTrue(self.check_content_type(response, "text/html"))

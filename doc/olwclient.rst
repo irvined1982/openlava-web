@@ -10,11 +10,13 @@ remote client, or javascript implements the same interface, albeit with slightly
 Local
 ^^^^^
 
-.. autosummary::
-    cluster.openlavacluster.Job
+The local Job class uses openlava.lsblib to communicate with the Openlava Job Scheduler.  The current host must be
+part of an openlava cluster, although it does not need to be a job server.  cluster.openlavacluster.Job implements the
+cluster.JobBase interface.
 
 .. autoclass:: cluster.openlavacluster.Job
     :members:
+
 
 Client
 ^^^^^^
