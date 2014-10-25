@@ -52,6 +52,7 @@ class TestWebServer(unittest.TestCase):
     def check_content_type(response, type):
         for header in response.info().headers:
             if header.startswith("Content-Type") and not header.endswith("%s\r\n" % type):
+                print "Actual CT: %s" % header
                 return False
         return True
 
