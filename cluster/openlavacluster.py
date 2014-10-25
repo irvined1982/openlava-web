@@ -2883,9 +2883,7 @@ class Job(JobBase):
 class Resource(BaseResource):
     def __init__(self, res):
         if isinstance(res, lslib.ResItem):
-            super(Resource, self).__init__(res.name)
-            self._name = res.name
-            self._description = res.des
+            super(Resource, self).__init__(res.name, res.des)
             self._type = res.valueType
             self._order = res.orderType
             self._interval = res.interval

@@ -555,9 +555,7 @@ class LoadIndex:
 class BaseResource(object):
     def __init__(self, name, description=""):
         self._name = unicode(name)
-        self._value = value
         self._description = unicode(description)
-        raise NotImplementedError
 
     @property
     def name(self):
