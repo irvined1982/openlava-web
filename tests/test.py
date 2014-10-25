@@ -56,7 +56,6 @@ class TestWebServer(unittest.TestCase):
         return True
 
 
-
 class TestConsumedResource(unittest.TestCase):
     def test_creation(self):
         c = ConsumedResource(name="MyRes", value=100)
@@ -82,6 +81,7 @@ class TestConsumedResource(unittest.TestCase):
         self.assertEqual(c.value, 100)
         self.assertIsEqual(c.limit, 101)
         self.assertIsNone(c.unit)
+
 
 class TestJob(unittest.TestCase):
 
@@ -166,7 +166,6 @@ Check server, for each job available, check normal request, ajax request.
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(cluster.openlavacluster))
     return tests
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -769,7 +769,15 @@ class Job(JobBase):
 
     .. py:attribute:: cluster_type
 
-        The type of cluster, defines the scheduling environment being used under the hood.
+        The type of cluster, defines the scheduling environment being used under the hood.  This is always
+        a short string giving the name of the scheduler, for example for openlava, it will return openlava, for
+        Sun Grid Engine, it will return sge, etc.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> Job.cluster_type
+            'openlava'
 
         :return: Scheduler type
         :rtype: str
@@ -778,12 +786,30 @@ class Job(JobBase):
 
         The array index of the job, 0 for non-array jobs.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> j=Job(job_id=9707)
+            >>> j.job_id
+            9707
+            >>> j.array_index
+            0
+
         :return: Array Index
         :rtype: int
 
     .. py:attribute:: job_id
 
         Numerical Job ID of the job, not including the array index.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Job
+            >>> j=Job(job_id=9707)
+            >>> j.job_id
+            9707
+            >>> j.array_index
+            0
 
         :return: Job ID
         :rtype: int
