@@ -93,7 +93,7 @@ class TestJob(unittest.TestCase):
     def test_job_submit(self):
         jobs = Job.submit(requested_slots=1, command="sleep 1000")
         self.assertIs(len(jobs), 1, msg="Submitting one job returns 1 item")
-        self.test_job_actions(jobs[0])
+        self.job_actions_test(jobs[0])
 
     def test_job_submit_array(self):
         jobs = Job.submit(job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="sleep 20")
