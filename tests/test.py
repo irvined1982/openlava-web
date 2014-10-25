@@ -164,7 +164,7 @@ Check server, for each job available, check normal request, ajax request.
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(cluster.openlavacluster))
+    #tests.addTests(doctest.DocTestSuite(cluster.openlavacluster))
     return tests
 
 if __name__ == '__main__':
