@@ -99,9 +99,9 @@ class TestJob(unittest.TestCase):
         jobs = Job.submit(job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="sleep 20")
         self.assertIs(len(jobs), 100, msg="Submitting one job returns 1 item")
         for job in jobs[:5]:
-            self.test_job_actions(job)
+            self.job_actions_test(job)
 
-    def test_job_actions(self, job):
+    def job_actions_test(self, job):
         self.assertIsInstance(job.is_completed, bool)
         # self.assertIsInstance(job.is_failed, bool)
         # self.assertIsInstance(job.is_pending, bool)
