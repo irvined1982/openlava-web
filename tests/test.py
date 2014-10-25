@@ -26,7 +26,7 @@ from cluster import ConsumedResource
 
 
 class TestWebServer(unittest.TestCase):
-    @unittest.skipUnless(base_url = os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
     def test_job_urls(self):
         base_url = os.environ.get("OLWEB_URL", None)
         if not base_url:
