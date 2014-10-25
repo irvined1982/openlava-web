@@ -24,9 +24,16 @@ initialized_openlava = False
 _memoized = {}
 
 
+class OpenLavaError(ClusterException):
+    """
+    Exception raised when OpenLava encounters an error (lslib error....)
+    """
+    pass
+
+
 def get_id_tuple(f, args, kwargs, mark=object()):
     """
-    Some quick'n'dirty way to generate a unique key for an specific call.
+    Some quick and nasty way to generate a unique key for an specific call when memoizing.
     """
     l = [id(f)]
     for arg in args:
@@ -51,6 +58,12 @@ def memoize(f):
 
 
 def initialize():
+    """
+    Initializes the OpenLava C API if it has not already been initialized.
+
+    :return: None
+
+    """
     global initialized_openlava
     if initialized_openlava is False:
         if lsblib.lsb_init("Openlava Cluster Interface") != 0:
@@ -60,6 +73,15 @@ def initialize():
 
 
 def raise_cluster_exception(code, message):
+    """
+    Raises an appropriate exception based on the value of lsblibs error code.
+
+    :param code: lsblib error code
+    :param message: User generated message.
+    :return: None
+    :raises: ClusterException, or child class based on the value of code.
+
+    """
     messages = {
         0: "No error",
         1: "No matching job found",
@@ -236,7 +258,7 @@ class Cluster(ClusterBase):
         return Job.get_job_list()
 
     def resources(self):
-        """Returns an array of resources that are part of thecluster"""
+        """Returns an array of resources that are part of the cluster"""
         cluster_info = lslib.ls_info()
         if cluster_info is None:
             raise OpenLavaError(lslib.ls_sysmsg())
@@ -265,12 +287,14 @@ class Cluster(ClusterBase):
         return User.get_user_list()
 
 
-class OpenLavaError(ClusterException):
-    pass
-
-
 class NumericStatus(Status):
-    def json_attributes(self):
+    states = {}
+    """
+    Dictionary of possible states, will be reimplemented by each child class
+    """
+
+    @staticmethod
+    def json_attributes():
         return ['name', 'description', 'status', 'friendly']
 
     def __init__(self, status):
@@ -299,14 +323,33 @@ class NumericStatus(Status):
 
     @property
     def name(self):
+        """
+        Gets the name of the status, this is generally the name of the constant defined in the Openlava header
+        file.
+
+        :return: Status Name
+        :rtype: str
+
+        """
         try:
             return u"%s" % self.states[self._status]['name']
         except KeyError:
             return 'UNKNOWN'
 
-
     @property
     def description(self):
+        """
+        Gets the description of the status, this is the human readable description of the status, it is generally
+        the human readable description defined in the openlava header file.
+
+        .. note:
+
+            Descriptions may be empty.
+
+        :return: Description of the status.
+        :rtype: str
+
+        """
         try:
             return u'%s' % self.states[self._status]['description']
         except KeyError:
@@ -314,17 +357,41 @@ class NumericStatus(Status):
 
     @property
     def status(self):
+        """
+        Returns the status code, this is the numeric value of the code. This is generally the value of the constant
+        defined in the openlava header file.
+
+        :return: The status code
+        :rtype: int
+
+        """
         return self._status
 
     @property
     def friendly(self):
+        """
+        A friendly name for the status, this is a short, human readable name.
+
+        :return: Human readable status name
+        :rtype: str
+
+        """
         try:
             return u"%s" % self.states[self._status]['friendly']
-        except:
+        except IndexError:
             return u"Undetermined: %s" % self._status
 
     @classmethod
     def get_status_list(cls, mask):
+        """
+        Performs a bitwise comparison on the given mask and each status defined in statuses and returns a list of
+        objects that match.
+
+        :param mask: numeric value to compare statuses with
+        :return: List of matching statuses
+        :rtype: list
+
+        """
         statuses = []
         for key in cls.states.keys():
             if (key & mask) == key:
@@ -617,6 +684,18 @@ class HostStatus(NumericStatus):
 
 
 class JobStatus(NumericStatus):
+    """
+    Each job has a status, its status defines what stage of the workflow the job is in.  Jobs can have only a single
+    status at any given time.  Based on the status, other attributes/methods may or not be available or have usable
+    data.
+
+
+
+    .. todo:
+
+        Define each state that may occur.  Include inherited members from NumericStatus.
+
+    """
     states = {
         0x00: {
             'friendly': "Null",
@@ -682,8 +761,6 @@ class JobStatus(NumericStatus):
             contact with the master batch daemon (mbatchd).",
         },
     }
-    """states has the following options..."""
-
 
 
 class Job(JobBase):
@@ -775,7 +852,12 @@ class Job(JobBase):
     @property
     def consumed_resources(self):
         """
-        List of ConsumedResource objects
+        Openlava keeps track of various resources that are consumed by the job, these are returned as a list
+        of ConsumedResource objects, one for each resource consumed.
+
+        .. todo:
+
+            Add link to ConsumedResource class
 
         Example::
 
@@ -834,7 +916,8 @@ class Job(JobBase):
             Job <9591> is submitted to default queue <normal>.
             >>> job.dependency_condition
             u''
-            >>> job2 = Job.submit(command="sleep 500", dependency_conditions="done(%s)" % job.job_id, requested_slots=1)[0]
+            >>> job2 = Job.submit(command="sleep 500", dependency_conditions="done(%s)" % job.job_id, \
+            requested_slots=1)[0]
             Job <9592> is submitted to default queue <normal>.
             >>> job2.dependency_condition
             u'done(9591)'
@@ -930,7 +1013,6 @@ class Job(JobBase):
         Example::
 
             >>> from cluster.openlavacluster import Job
-            >>> import time
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -967,7 +1049,7 @@ class Job(JobBase):
             >>> from cluster.openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
-            >>> .input_file_name
+            >>> job.input_file_name
             u'/dev/null'
             >>>
 
@@ -3069,7 +3151,6 @@ class Queue(SingleArgMemoized):
     def __unicode__(self):
         return u"%s" % self.__str__()
 
-
     @property
     def total_jobs(self):
         self.update_job_count()
@@ -3748,8 +3829,7 @@ class Host(SingleArgMemoized, HostBase):
 class ExecutionHost(Host):
     """
     Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots_for_job
-    attribute
-    indicating how many slots (Processors) are allocated to the job.
+    attribute indicating how many slots (Processors) are allocated to the job.
 
     """
     def __init__(self, host_name, num_slots_for_job=1):
@@ -3766,14 +3846,20 @@ class ExecutionHost(Host):
         """
 
         Host.__init__(self, host_name)
-        #: The number of slots that are allocated to the job
+
         self.num_slots_for_job = num_slots_for_job
+        """
+        The number of slots that are allocated to the job.
+        """
 
     def __str__(self):
         return "%s:%s" % (self.host_name, self.num_slots_for_job)
 
     def __unicode__(self):
         return u"%s" % self.__str__()
+
+    def __repr__(self):
+        return self.__str__()
 
     def json_attributes(self):
         attribs = Host.json_attributes(self)

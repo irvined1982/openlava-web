@@ -121,3 +121,7 @@ Exceptions
 
 .. autoclass:: cluster.JobSubmitError
     :members:
+
+.. autoclass:: cluster.openlavacluster.ClusterException
+    :members:
+

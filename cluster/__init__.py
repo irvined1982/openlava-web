@@ -53,7 +53,7 @@ class ClusterBase:
                 host_list.append(host)
         return host_list
 
-    def resources(self, resource_name=None, host_name=None, user_name=None):
+    def resources(self):
         raise NotImplementedError
 
     @property
@@ -575,6 +575,9 @@ class BaseResource(object):
 
 
 class ClusterException(Exception):
+    """
+    Base class for exceptions relating to cluster classes.
+    """
     def get_class(self):
         return u"%s" % self.__class__
 
@@ -597,29 +600,56 @@ class ClusterException(Exception):
 
 
 class NoSuchHostError(ClusterException):
+    """
+    Raised when the requested host does not exist in the job scheduling environment, or it is not visible/accessible
+    by the current user.
+    """
     pass
 
 class NoSuchJobError(ClusterException):
+    """
+    Raised when the requested job does not exist in the job scheduling environment.  This can happen when the
+    job has been completed, and the scheduler has purged the job from the active jobs.
+    """
     pass
 
 class NoSuchQueueError(ClusterException):
+    """
+    Raised when the requested queue does not exist in the job scheduling environment, or it is not visible/accessible
+    by the current user.
+    """
     pass
 
 class NoSuchUserError(ClusterException):
+    """
+    Raised when the requested user does not exist in the job scheduling environment.
+    """
     pass
 
 class ResourceDoesntExistError(ClusterException):
+    """
+    Raised when the requested resource does not exist in the job scheduling environment.
+    """
     pass
 
 class ClusterInterfaceError(ClusterException):
+    """
+    Raised when the underlying API call fails, for example due to a network fault, or the job scheduler
+    being unavailable.
+    """
     pass
 
 class PermissionDeniedError(ClusterException):
+    """
+    Raised when the current user does not have sufficiant privilages to perform for requested operation
+    """
     pass
 
 class JobSubmitError(ClusterException):
+    """
+    Raised when a job cannot be submitted
+    """
     pass
-
 
 class Status:
     pass
@@ -690,11 +720,74 @@ class ResourceLimit:
 
 
 class ConsumedResource:
+    """
+    Schedulers may keep track of various resources that are consumed by jobs, users, etc.  This class is used to store
+    the name, value and any limits imposed on the resource that is being consumed.
+
+    Example::
+
+        >>> from cluster import ConsumedResource
+        >>> c=ConsumedResource(name="MyTestResource", value=100, limit=200, unit="bogoVals")
+        >>> c
+        MyTestResource: 100bogoVals (200)
+        >>> c.value
+        100
+        >>> c.limit
+        200
+        >>> c.unit
+        'bogoVals'
+        >>> c=ConsumedResource(name="MyTestResource", value=100, unit="bogoVals")
+        >>> c
+        MyTestResource: 100bogoVals
+        >>> c.value
+        100
+        >>> c.limit
+        None
+        >>> c.unit
+        'bogoVals'
+        >>> c=ConsumedResource(name="MyTestResource", value=100, limit=200)
+        >>> c
+        MyTestResource: 100 (200)
+        >>> c.value
+        100
+        >>> c.limit
+        200
+        >>> c.unit
+        None
+
+    .. todo:
+
+        Add return types and check documentation for class.
+
+    """
+
     def __init__(self, name, value, limit=None, unit=None):
+        """
+        :param name: Name of consumed resource
+        :param value: Value of consumed resource
+        :param limit: Optional limit for resource
+        :param unit: Optional unit name
+        """
+
         self.name = name
+        """
+        The name of the consumed resource.
+        """
+
         self.value = value
-        self.limit = None
-        self.unit = None
+        """
+        The current value of the consumed resource.
+        """
+
+        self.limit = limit
+        """
+        The limit specified for the resource, may be None, if the resource does not have a limit.
+        """
+
+        self.unit = unit
+        """
+        The unit of measurement for the resource, may be None, if the unit cannot be determined.
+        """
 
     def __str__(self):
         s = "%s: %s" % (self.name, self.value)
@@ -712,7 +805,8 @@ class ConsumedResource:
     def __repr__(self):
         return self.__str__()
 
-    def json_attributes(self):
+    @staticmethod
+    def json_attributes():
         return ['name', 'value', 'limit', 'unit']
 
 

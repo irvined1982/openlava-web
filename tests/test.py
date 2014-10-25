@@ -16,9 +16,72 @@
 # You should have received a copy of the GNU General Public License
 # along with python-cluster.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
+import doctest
 import time
+import os
+import urllib
+import cluster.openlavacluster
 from cluster.openlavacluster import Job
+from cluster import ConsumedResource
 
+
+class TestWebServer(unittest.TestCase):
+    @unittest.skipUnless(base_url = os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
+    def test_job_urls(self):
+        base_url = os.environ.get("OLWEB_URL", None)
+        if not base_url:
+            return
+        base_url.rstrip("/")
+
+        response = urllib.urlopen("%s/jobs/" % base_url)
+        self.assertTrue(self.check_content_type(response, "text/html"))
+        response = urllib.urlopen("%s/jobs/?json=1" % base_url)
+        self.assertTrue(self.check_content_type(response, "application/json"))
+
+        for job in Job.get_job_list():
+            response = urllib.urlopen("%s/job/%d" % (base_url, job.job_id, job.array_index))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/job/%d?json=1" % (base_url, job.job_id, job.array_index))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+            response = urllib.urlopen("%s/job/%d/%d" % (base_url, job.job_id, job.array_index))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/job/%d/%d?json=1" % (base_url, job.job_id, job.array_index))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+    
+    @staticmethod
+    def check_content_type(response, type):
+        for header in response.info.headers:
+            if header.startswith("Content-Type") and not header.endswith("%s\r\n" % type):
+                return False
+        return True
+
+
+
+class TestConsumedResource(unittest.TestCase):
+    def test_creation(self):
+        c = ConsumedResource(name="MyRes", value=100)
+        self.assertEqual(c.name, "MyRes")
+        self.assertEqual(c.value, 100)
+        self.assertIsNone(c.unit)
+        self.assertIsNone(c.limit)
+
+        c = ConsumedResource(name="MyRes", value=100, unit="BogoUnits")
+        self.assertEqual(c.name, "MyRes")
+        self.assertEqual(c.value, 100)
+        self.assertIsEqual(c.unit, "BogoUnits")
+        self.assertIsNone(c.limit)
+
+        c = ConsumedResource(name="MyRes", value=100, limit=120, unit="BogoUnits")
+        self.assertEqual(c.name, "MyRes")
+        self.assertEqual(c.value, 100)
+        self.assertIsEqual(c.unit, "BogoUnits")
+        self.assertIsEqual(c.limit, 120)
+
+        c = ConsumedResource(name="MyRes", value=100, limit=101)
+        self.assertEqual(c.name, "MyRes")
+        self.assertEqual(c.value, 100)
+        self.assertIsEqual(c.limit, 101)
+        self.assertIsNone(c.unit)
 
 class TestJob(unittest.TestCase):
 
@@ -87,6 +150,23 @@ class TestJob(unittest.TestCase):
             self.assertEqual(j2.array_index, job.array_index)
             self.assertEqual(j2.was_killed, True)
             job = j2
+
+
+
+"""
+Create job with each individual argument, check that job matches.
+
+Kill job, check job is killed
+
+Check server, for each job available, check normal request, ajax request.
+
+"""
+
+
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(cluster.openlavacluster))
+    return tests
+
 
 if __name__ == '__main__':
     unittest.main()
