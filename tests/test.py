@@ -90,12 +90,12 @@ class TestJob(unittest.TestCase):
             self.assertIsInstance(job, Job)
 
     def test_job_submit(self):
-        jobs = Job.submit(requested_slots=1, command="sleep 1000")
+        jobs = Job.submit(requested_slots=1, command="hostname")
         self.assertIs(len(jobs), 1, msg="Submitting one job returns 1 item")
         self.job_state_test(jobs[0])
 
     def test_job_submit_array(self):
-        jobs = Job.submit(job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="sleep 20")
+        jobs = Job.submit(job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="hostname")
         self.assertIs(len(jobs), 100, msg="Submitting one job returns 1 item")
         for job in jobs[:5]:
             self.job_state_test(job)
@@ -193,7 +193,7 @@ class TestJob(unittest.TestCase):
         job.requeue(hold=True)
         time.sleep(15)
         job = Job(job_id=job.job_id, array_index=job.array_index)
-        self.assertTrue(job.is_pending)
+        self.assertTrue(job.is_suspended)
         job.kill()
 
 if __name__ == '__main__':
