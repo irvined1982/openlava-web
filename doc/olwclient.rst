@@ -63,15 +63,18 @@ Job Status
 
 .. autoclass:: cluster.openlavacluster.JobStatus
     :members:
+    :inherited-members:
 
 Job Options
 -----------
 
 .. autoclass:: cluster.openlavacluster.SubmitOption
     :members:
+    :inherited-members:
 
 .. autoclass:: cluster.openlavacluster.Submit2Option
     :members:
+    :inherited-members:
 
 Host Classes
 ------------
@@ -88,6 +91,7 @@ Local
 
 .. autoclass:: cluster.openlavacluster.ExecutionHost
     :members:
+    :inherited-members:
 
 Client
 ^^^^^^
