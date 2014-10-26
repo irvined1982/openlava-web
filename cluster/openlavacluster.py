@@ -340,7 +340,7 @@ class NumericStatus(Status):
     def description(self):
         """
         Gets the description of the status, this is the human readable description of the status, it is generally
-        the human readable description defined in the openlava header file.
+        the human readable description defined in the `Openlava <http://www.openlava.org/>`_ header file.
 
         .. note:
 
@@ -359,7 +359,7 @@ class NumericStatus(Status):
     def status(self):
         """
         Returns the status code, this is the numeric value of the code. This is generally the value of the constant
-        defined in the openlava header file.
+        defined in the `Openlava <http://www.openlava.org/>`_ header file.
 
         :return: The status code
         :rtype: int
@@ -770,8 +770,8 @@ class Job(JobBase):
     .. py:attribute:: cluster_type
 
         The type of cluster, defines the scheduling environment being used under the hood.  This is always
-        a short string giving the name of the scheduler, for example for openlava, it will return openlava, for
-        Sun Grid Engine, it will return sge, etc.
+        a short string giving the name of the scheduler, for example for `Openlava <http://www.openlava.org/>`_,
+        it will return openlava, for Sun Grid Engine, it will return sge, etc.
 
         Example::
 
@@ -878,8 +878,8 @@ class Job(JobBase):
     @property
     def consumed_resources(self):
         """
-        Openlava keeps track of various resources that are consumed by the job, these are returned as a list
-        of :py:class:`cluster.ConsumedResource` objects, one for each resource consumed.
+        `Openlava <http://www.openlava.org/>`_ keeps track of various resources that are consumed by the job, these are
+        returned as a list of :py:class:`cluster.ConsumedResource` objects, one for each resource consumed.
 
         .. todo:
 
@@ -889,21 +889,20 @@ class Job(JobBase):
 
             >>> from cluster.openlavacluster import Job
             >>> import time
-            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
-            Job <9581> is submitted to default queue <normal>.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0] # doctest: +ELLIPSIS
+            Job <...> is submitted to default queue <normal>.
             >>> while not job.is_running:
             ...  job=Job(job_id=job.job_id)
             ...  time.sleep(1)
             >>> for r in job.consumed_resources:
-            ...  print r
-            ...
-            Resident Memory: 1860
-            Virtual Memory: 32216
-            User Time: 0:00:00
-            System Time: 0:00:00
+            ...  print r # doctest: +ELLIPSIS
+            Resident Memory: ...
+            Virtual Memory: ...
+            User Time: ...
+            System Time: ...
             Num Active Processes: 1
 
-        :return: List of ConsumedResource Objects
+        :return: List of :py:class:`cluster.ConsumedResource` Objects
 
         """
         
@@ -963,7 +962,8 @@ class Job(JobBase):
 
         .. note::
 
-            If no email address was specified, openlava may still email the owner of the job if so configured.
+            If no email address was specified, `Openlava <http://www.openlava.org/>`_ may still email the
+            owner of the job if so configured.
 
         Example::
 
@@ -1361,8 +1361,8 @@ class Job(JobBase):
     @property
     def pending_reasons(self):
         """
-        Text string explaining why the job is pending.  These are the human readable reasons that Openlava has for not
-        executing the job at present.
+        Text string explaining why the job is pending.  These are the human readable reasons that
+        `Openlava <http://www.openlava.org/>`_ has for not executing the job at present.
 
         Example::
 
@@ -1454,8 +1454,8 @@ class Job(JobBase):
     def processes(self):
         """
         Array of process objects for each process started by the job.  This only includes processes that Openlava
-        is aware of, processes that are started independently of openlava will not be included. Generally this only
-        includes the primary process on the primary host and any child processes.
+        is aware of, processes that are started independently of `Openlava <http://www.openlava.org/>`_ will
+        not be included. Generally this only includes the primary process on the primary host and any child processes.
 
         Example::
 
@@ -1612,18 +1612,18 @@ class Job(JobBase):
     @property
     def submission_host(self):
         """
-        Host object corresponding to the host that the job was submitted from.
+        :py:class:`Host` object corresponding to the host that the job was submitted from.
 
         Example::
 
             >>> from cluster.openlavacluster import Job
-            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
-            Job <9581> is submitted to default queue <normal>.
+            >>> job = Job.submit(command="sleep 500", requested_slots=1)[0] # doctest: +ELLIPSIS
+            Job <...> is submitted to default queue <...>.
             >>> job.submission_host
-            u'master'
+            u'...'
 
-        :return: Submit Host object
-        :rtype: Host
+        :return: Submit :py:class:`Host` object
+        :rtype: :py:class:`Host`
 
         """
         
@@ -2249,10 +2249,10 @@ class Job(JobBase):
         :param job_id: Numeric Job ID.
         :param array_index: Array index of the job.
 
-        When job is None (Default) then makes a connection to the openlava server using the openlava API, and
-        requests information abou the job with the specified job_id and array index.  If the job exists, then the
-        job is created and returned.  If the job doesnt exist, or there is an error with the API call, an exception
-        is raised.
+        When job is None (Default) then makes a connection to the `Openlava <http://www.openlava.org/>`_
+        server using the `Openlava <http://www.openlava.org/>`_ API, and requests information about the job with
+        the specified job_id and array index.  If the job exists, then the job is created and returned.  If the job
+        doesnt exist, or there is an error with the API call, an exception is raised.
 
         :raises NoSuchJobError: When the job doesnt exist
         :raises ClusterException: When the LSB call fails.
