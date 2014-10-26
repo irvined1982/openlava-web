@@ -587,7 +587,7 @@ class ClusterException(Exception):
         }
         for f in self._extras:
             fields[f] = getattr(self, f)
-        return json.dumps(fields)
+        return json.dumps(fields, sort_keys=True, indent=4)
 
     def __init__(self, message, **kwargs):
         Exception.__init__(self, message)

@@ -1022,10 +1022,12 @@ class JobStatus(NumericStatus):
 
 class Job(JobBase):
     """
-    Get information about, and manipulate jobs on remote server.
+    Get information about, and manipulate jobs using lsblib to communicate with an openlava server.
+    The current host must be part of an `Openlava <http://www.openlava.org/>`_ cluster, although it does not
+    need to be a job server.
 
     .. contents:: :depth: 2
-    
+
     .. py:attribute:: cluster_type
 
         The type of cluster, defines the scheduling environment being used under the hood.  This is always

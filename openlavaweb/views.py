@@ -53,7 +53,7 @@ def create_js_success(data=None, message=""):
         'data': data,
         'message': message,
     }
-    return HttpResponse(json.dumps(data, cls=ClusterEncoder),
+    return HttpResponse(json.dumps(data, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
 
 
@@ -61,7 +61,7 @@ def create_js_success(data=None, message=""):
 def queue_list(request):
     queue_list = Queue.get_queue_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(queue_list, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(queue_list, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     return render(request, 'openlavaweb/queue_list.html', {"queue_list": queue_list})
 
@@ -72,7 +72,7 @@ def queue_view(request, queue_name):
     except ValueError:
         raise Http404("Queue not found")
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(queue, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(queue, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     return render(request, 'openlavaweb/queue_detail.html', {"queue": queue }, )
 
@@ -114,7 +114,7 @@ def execute_queue_close(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.close()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -157,7 +157,7 @@ def execute_queue_open(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.open()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -200,7 +200,7 @@ def execute_queue_inactivate(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.inactivate()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -243,7 +243,7 @@ def execute_queue_activate(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.activate()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -257,7 +257,7 @@ def host_view(request, host_name):
         raise Http404("Host not found")
 
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(host, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(host, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     return render(request, 'openlavaweb/host_detail.html', {"host": host}, )
 
@@ -303,7 +303,7 @@ def execute_host_close(request, queue, host_name):
         h.close()
 
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -346,7 +346,7 @@ def execute_host_open(request, queue, host_name):
         h = Host(host_name)
         h.open()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -356,7 +356,7 @@ def execute_host_open(request, queue, host_name):
 def host_list(request):
     host_list = Host.get_host_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(host_list, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(host_list, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
 
     paginator = Paginator(host_list, 25)
@@ -373,7 +373,7 @@ def host_list(request):
 def user_list(request):
     user_list = User.get_user_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(user_list, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(user_list, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     paginator = Paginator(user_list, 25)
     page = request.GET.get('page')
@@ -392,7 +392,7 @@ def user_view(request, user_name):
     except ValueError:
         raise Http404("User not found")
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(user, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(user, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     return render(request, 'openlavaweb/user_detail.html', {"oluser": user}, )
 
@@ -436,7 +436,7 @@ def execute_job_kill(request, queue, job_id, array_index):
         job = Job(job_id=job_id, array_index=array_index)
         job.kill()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(create_js_success("Job Killed"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_list")))
     except Exception as e:
@@ -481,52 +481,7 @@ def execute_job_suspend(request, queue, job_id, array_index):
         job = Job(job_id=job_id, array_index=array_index)
         job.suspend()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
-        else:
-            queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
-    except Exception as e:
-        queue.put(e)
-
-
-@login_required
-def job_suspend(request, job_id, array_index=0):
-    job_id = int(job_id)
-    array_index = int(array_index)
-    if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json", None):
-        try:
-            q = MPQueue()
-            kwargs = {
-                'job_id': job_id,
-                'array_index': array_index,
-                'request': request,
-                'queue': q,
-            }
-            p = MPProcess(target=execute_job_suspend, kwargs=kwargs)
-            p.start()
-            p.join()
-            rc = q.get(False)
-            if isinstance(rc, Exception):
-                raise rc
-            else:
-                return rc
-        except ClusterException as e:
-            if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
-            else:
-                return render(request, 'openlavaweb/exception.html', {'exception': e})
-    else:
-        job = Job(job_id=job_id, array_index=array_index)
-        return render(request, 'openlavaweb/job_suspend_confirm.html', {"object": job})
-
-
-def execute_job_suspend(request, queue, job_id, array_index):
-    try:
-        user_id = pwd.getpwnam(request.user.username).pw_uid
-        os.setuid(user_id)
-        job = Job(job_id=job_id, array_index=array_index)
-        job.suspend()
-        if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(create_js_success(message="Job suspended"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
     except Exception as e:
@@ -571,7 +526,7 @@ def execute_job_resume(request, queue, job_id, array_index):
         job = Job(job_id=job_id, array_index=array_index)
         job.resume()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(create_js_success(message="Job Resumed"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
     except Exception as e:
@@ -621,7 +576,7 @@ def execute_job_requeue(request, queue, job_id, array_index, hold):
         job = Job(job_id=job_id, array_index=array_index)
         job.requeue(hold=hold)
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}), content_type="application/json"))
+            queue.put(create_js_success(message="Job Requeued"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
     except Exception as e:
@@ -770,12 +725,12 @@ class ClusterEncoder(json.JSONEncoder):
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
-    return HttpResponse(json.dumps({'cookie': get_token(request)}), content_type="application/json")
+    return HttpResponse(json.dumps({'cookie': get_token(request)}, sort_keys=True, indent=4), content_type="application/json")
 
 def system_view(request):
     cluster = Cluster()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(cluster, sort_keys=True, indent=3, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(cluster, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type="application/json")
 
     return render(request, 'openlavaweb/system_view.html', {'cluster': cluster})
@@ -809,7 +764,7 @@ def system_overview_hosts(request):
         nvstates.append(
             {'label':k, 'value': v}
         )
-    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder), content_type="application/json")
 
 def system_overview_jobs(request):
     cluster=Cluster()
@@ -825,7 +780,7 @@ def system_overview_jobs(request):
         nvstates.append(
             {'label':k, 'value': v}
         )
-    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder), content_type="application/json")
 
 def system_overview_slots(request):
     cluster=Cluster()
@@ -842,7 +797,7 @@ def system_overview_slots(request):
         nvstates.append(
             {'label':k, 'value': v}
         )
-    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=3, cls=ClusterEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder), content_type="application/json")
 
 
 @csrf_exempt
@@ -871,7 +826,7 @@ def ajax_login(request):
             'status': "Fail",
             'description': "Unable to authenticate",
         }
-    return HttpResponse(json.dumps(res), content_type="application/json")
+    return HttpResponse(json.dumps(res, sort_keys=True, indent=4), content_type="application/json")
 
 def job_view(request, job_id, array_index=0):
     """
@@ -1074,7 +1029,7 @@ class OLWSubmit(forms.Form):
             logger.debug("Returned from Post Submit")
             if ajax_args:
                 logger.debug("Generating job ajax list...")
-                d = json.dumps(jobs, cls=ClusterEncoder)
+                d = json.dumps(jobs, sort_keys=True, indent=4, cls=ClusterEncoder)
                 logger.debug("Generated job ajax list...")
                 return HttpResponse(d, content_type='application/json')
             return HttpResponseRedirect(reverse("olw_job_view_array", args=[jobs[0].job_id, jobs[0].array_index]))
