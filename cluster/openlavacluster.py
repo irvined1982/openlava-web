@@ -409,7 +409,7 @@ class Submit2Option(NumericStatus):
     job name have been used.
 
 
-.. list-table:: Valid Options
+    .. list-table:: Valid Options
         :header-rows: 1
 
         * - Value

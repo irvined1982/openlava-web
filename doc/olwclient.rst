@@ -62,13 +62,16 @@ Job Status
 ----------
 
 .. autoclass:: cluster.openlavacluster.JobStatus
+    :members:
 
 Job Options
 -----------
 
 .. autoclass:: cluster.openlavacluster.SubmitOption
+    :members:
 
 .. autoclass:: cluster.openlavacluster.Submit2Option
+    :members:
 
 Host Classes
 ------------
