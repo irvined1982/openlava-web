@@ -3275,6 +3275,7 @@ class Resource(BaseResource):
         """
         return self._order
 
+    @property
     def interval(self):
         """
         The interval that resources are updated
@@ -3286,6 +3287,7 @@ class Resource(BaseResource):
 
         return datetime.timedelta(seconds=self._interval)
 
+    @property
     def flags(self):
         """
         Any flags that are set on the resource.
@@ -3851,7 +3853,7 @@ class Host(SingleArgMemoized, HostBase):
 
         :return: hostname
         :rtype: str
-        
+
     .. py:attribute:: host_name
 
         The host name of the host.
