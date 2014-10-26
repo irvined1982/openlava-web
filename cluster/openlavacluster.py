@@ -1089,8 +1089,6 @@ class Job(JobBase):
     The current host must be part of an `Openlava <http://www.openlava.org/>`_ cluster, although it does not
     need to be a job server.
 
-    .. contents:: :depth: 2
-
     .. py:attribute:: cluster_type
 
         The type of cluster, defines the scheduling environment being used under the hood.  This is always
@@ -4789,7 +4787,7 @@ class Host(SingleArgMemoized, HostBase):
             >>> host=Host.get_host_list()[0]
             >>> host.num_system_suspended_jobs
             0
-            
+
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
