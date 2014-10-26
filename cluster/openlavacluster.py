@@ -400,6 +400,77 @@ class NumericStatus(Status):
 
 
 class Submit2Option(NumericStatus):
+    """
+    When a job is submitted, it may be submitted with options that define job behavior.
+    :py:class:`cluster.openlavacluster.SubmitOption` and :py:class:`cluster.openlavacluster.Submit2Option` are used
+    to specify which options are enabled for a job.
+
+    These may be to define the job behavior such as host exclusivity, or to specify that other fields, such as
+    job name have been used.
+
+
+.. list-table:: Valid Options
+        :header-rows: 1
+
+        * - Value
+          - Friendly Name
+          - Name
+          - Description
+        * - 0x01
+          - SUB2_HOLD
+          - SUB2_HOLD
+          -
+        * - 0x02
+          - SUB2_MODIFY_CMD
+          - SUB2_MODIFY_CMD
+          -
+        * - 0x04
+          - SUB2_BSUB_BLOCK
+          - SUB2_BSUB_BLOCK
+          -
+        * - 0x08
+          - SUB2_HOST_NT
+          - SUB2_HOST_NT
+          -
+        * - 0x10
+          - SUB2_HOST_UX
+          - SUB2_HOST_UX
+          -
+        * - 0x20
+          - SUB2_QUEUE_CHKPNT
+          - SUB2_QUEUE_CHKPNT
+          -
+        * - 0x40
+          - SUB2_QUEUE_RERUNNABLE
+          - SUB2_QUEUE_RERUNNABLE
+          -
+        * - 0x80
+          - SUB2_IN_FILE_SPOOL
+          - SUB2_IN_FILE_SPOOL
+          -
+        * - 0x100
+          - SUB2_JOB_CMD_SPOOL
+          - SUB2_JOB_CMD_SPOOL
+          -
+        * - 0x200
+          - SUB2_JOB_PRIORITY
+          - SUB2_JOB_PRIORITY
+          -
+        * - 0x400
+          - SUB2_USE_DEF_PROCLIMIT
+          - SUB2_USE_DEF_PROCLIMIT
+          -
+        * - 0x800
+          - SUB2_MODIFY_RUN_JOB
+          - SUB2_MODIFY_RUN_JOB
+          -
+        * - 0x1000
+          - SUB2_MODIFY_PEND_JOB
+          - SUB2_MODIFY_PEND_JOB
+          -
+
+    """
+
     states = {
         0x01: {
             'name': 'SUB2_HOLD',
@@ -470,6 +541,139 @@ class Submit2Option(NumericStatus):
 
 
 class SubmitOption(NumericStatus):
+    """
+    When a job is submitted, it may be submitted with options that define job behavior.
+    :py:class:`cluster.openlavacluster.SubmitOption` and :py:class:`cluster.openlavacluster.Submit2Option` are used
+    to specify which options are enabled for a job.
+
+    These may be to define the job behavior such as host exclusivity, or to specify that other fields, such as
+    job name have been used.
+
+    .. list-table:: Valid Statuses
+        :header-rows: 1
+
+        * - Value
+          - Friendly Name
+          - Name
+          - Description
+        * - 0x01
+          - SUB_JOB_NAME
+          - Job submitted with name
+          - Submitted with a job name
+        * - 0x02
+          - SUB_QUEUE
+          - Job submitted with queue
+          -
+        * - 0x04
+          - SUB_HOST
+          - SUB_HOST
+          -
+        * - 0x08
+          - SUB_IN_FILE
+          - Job Submitted with input file
+          -
+        * - 0x10
+          - SUB_OUT_FILE
+          - Job submitted with output file
+          -
+        * - 0x20
+          - SUB_ERR_FILE
+          - Job submitted with error file
+          -
+        * - 0x40
+          - SUB_EXCLUSIVE
+          - Job submitted to run exclusively
+          -
+        * - 0x80
+          - SUB_NOTIFY_END
+          - SUB_NOTIFY_END
+          -
+        * - 0x100
+          - SUB_NOTIFY_BEGIN
+          - SUB_NOTIFY_BEGIN
+          -
+        * - 0x200
+          - SUB_USER_GROUP
+          - SUB_USER_GROUP
+          -
+        * - 0x400
+          - SUB_CHKPNT_PERIOD
+          - Job submitted with checkpoint period
+          -
+        * - 0x800
+          - SUB_CHKPNT_DIR
+          - Job submitted with checkpoint directory
+          -
+        * - 0x1000
+          - SUB_RESTART_FORCE
+          - SUB_RESTART_FORCE
+          -
+        * - 0x2000
+          - SUB_RESTART
+          - SUB_RESTART
+          -
+        * - 0x4000
+          - SUB_RERUNNABLE
+          - Job submitted as rerunnable
+          -
+        * - 0x8000
+          - SUB_WINDOW_SIG
+          - SUB_WINDOW_SIG
+          -
+        * - 0x10000
+          - SUB_HOST_SPEC
+          - Job submitted with host spec
+          -
+        * - 0x20000
+          - SUB_DEPEND_COND
+          - Job submitted with depend conditions
+          -
+        * - 0x40000
+          - SUB_RES_REQ
+          - Job submitted with resource request
+          -
+        * - 0x80000
+          - SUB_OTHER_FILES
+          - SUB_OTHER_FILES
+          -
+        * - 0x100000
+          - SUB_PRE_EXEC
+          - Job submitted with pre exec script
+          -
+        * - 0x200000
+          - SUB_LOGIN_SHELL
+          - Job submitted with login shell
+          -
+        * - 0x400000
+          - SUB_MAIL_USER
+          - Job submitted to email user
+          -
+        * - 0x800000
+          - SUB_MODIFY
+          - SUB_MODIFY
+          -
+        * - 0x1000000
+          - SUB_MODIFY_ONCE
+          - SUB_MODIFY_ONCE
+          -
+        * - 0x2000000
+          - SUB_PROJECT_NAME
+          - Job submitted to project
+          -
+        * - 0x4000000
+          - SUB_INTERACTIVE
+          - Job submitted as interactive
+          -
+        * - 0x8000000
+          - SUB_PTY
+          - SUB_PTY
+          -
+        * - 0x10000000
+          - SUB_PTY_SHELL
+          - SUB_PTY_SHELL
+          -
+
+    """
     states = {
         0x01: {
             'name': 'SUB_JOB_NAME',
@@ -1105,7 +1309,8 @@ class Job(JobBase):
             ...  print ex
             comp00:1
 
-        :returns: List of ExecutionHost objects, one for each host the job is executing on.
+        :returns: List of :py:class:cluster.openlavacluster.ExecutionHost` objects, one for each host the job
+        is executing on.
         :rtype: list
 
         """
@@ -1382,10 +1587,15 @@ class Job(JobBase):
     @property
     def options(self):
         """
-        List of JobOptions for the job
+        Job options control the behavior of the job and specify additional scheduling criteria being used to
+        schedule and execute the job.  They may have been explicitly set by the user, or an esub, or implicity
+        by specifying a command line argument.
+
+        Job options is list containing :py:class:`cluster.openlavacluster.SubmitOptions` and
+        :py:class:`cluster.openlavacluster.Submit2Options`, that are active for the job.
 
         :return: List of JobOptions
-        :rtype: list
+        :rtype: List
 
         """
         
@@ -3905,8 +4115,9 @@ class Host(SingleArgMemoized, HostBase):
 
 class ExecutionHost(Host):
     """
-    Execution Hosts are hosts that are executing jobs, a subclass of Host, they have the additional num_slots_for_job
-    attribute indicating how many slots (Processors) are allocated to the job.
+    Execution Hosts are hosts that are executing jobs, a subclass of :py:class:cluster.openlavacluster.Host`,
+    they have the additional num_slots_for_job attribute indicating how many slots (Processors) are allocated
+    to the job.
 
     """
     def __init__(self, host_name, num_slots_for_job=1):
