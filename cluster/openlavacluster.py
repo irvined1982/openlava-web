@@ -3230,6 +3230,15 @@ class Resource(BaseResource):
 
     """
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "%s" % self.name
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
+    
     def __init__(self, res):
         """
         Creates a new resource instance
@@ -3853,6 +3862,10 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.name
+            u'...'
 
         :return: hostname
         :rtype: str
@@ -3861,12 +3874,22 @@ class Host(SingleArgMemoized, HostBase):
 
         The host name of the host.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :return: hostname
         :rtype: str
 
     .. py:attribute:: description
 
         The description given to the host by the cluster administrators.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :return: Host description
         :rtype: str
@@ -3882,11 +3905,16 @@ class Host(SingleArgMemoized, HostBase):
 
     def __repr__(self):
         return self.__str__()
-    
+
     @classmethod
     def get_host_list(cls):
         """
         Get all hosts that are part of the cluster.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :return: List of :py:class:`cluster.openlavacluster.Host` Objects, one for each host on the cluster.
         :rtype: list
@@ -3919,6 +3947,11 @@ class Host(SingleArgMemoized, HostBase):
         """
         Opens the host, when a host is closed, it will no longer accept new jobs.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :return: 0 on success
         :raises: :py:exc:`cluster.openlavacluster.ClusterException` when host cannot be opened.
 
@@ -3932,6 +3965,11 @@ class Host(SingleArgMemoized, HostBase):
         """
         Closes the host, when a host is closed, it will no longer accept new jobs.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :return: 0 on success
         :raises: :py:exc:`cluster.openlavacluster.ClusterException` when host cannot be closed.
 
@@ -3944,6 +3982,11 @@ class Host(SingleArgMemoized, HostBase):
     def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
         """
         Returns matching jobs on the host.  By default, returns all jobs that are executing on the host.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :param job_id: Only return jobs matching the specified job id.
         :param job_name: Only return jobs matching the specified job name.
@@ -3975,6 +4018,12 @@ class Host(SingleArgMemoized, HostBase):
         The dict has three fields, names, short_names, and values, each a list of the same length.  Names
         contains a list of field names, short_names contains a shorter version of the name, and values contains
         the corresponding value of the field.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
 
         :returns: dictionary of load index dictionaries
         :rtype: dictionary
@@ -4123,6 +4172,11 @@ class Host(SingleArgMemoized, HostBase):
         Gets the host administrators.  Host administrators can perform any action on the host.
         This does not imply they are actual superusers on the physical systems.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :returns: Array of usernames
         :rtype: array
         :raise: OpenLavaError on failure
@@ -4134,6 +4188,11 @@ class Host(SingleArgMemoized, HostBase):
     def is_busy(self):
         """
         Returns True if the host is busy.  Busy is defined as a host that is running jobs.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :return: True if the host is busy.
         :rtype: bool
@@ -4156,6 +4215,11 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns True if the host is down. Down is defined as not being available to the scheduler.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :return: True if the host is down.
         :rtype: bool
 
@@ -4169,6 +4233,11 @@ class Host(SingleArgMemoized, HostBase):
     def is_closed(self):
         """
         Returns True if the host is closed for new jobs.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :return: True if the host is closed.
         :rtype: bool
@@ -4184,6 +4253,11 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns True if the host supports checkpointing.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :return: True if checkpoint support is enabled
         :rtype: bool
 
@@ -4195,6 +4269,11 @@ class Host(SingleArgMemoized, HostBase):
     def host_model(self):
         """
         String containing host model information
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :return: Host model name
         :rtype: str
@@ -4208,6 +4287,11 @@ class Host(SingleArgMemoized, HostBase):
         """
         String containing host type information.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+
         :return: Host Type
         :rtype: str
 
@@ -4219,6 +4303,11 @@ class Host(SingleArgMemoized, HostBase):
     def resources(self):
         """
         Gets a list of resources that are available on this host.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
 
         :return: List of :py:class:`cluster.openlavacluster.Resource` objects
         :rtype: :py:class:`cluster.openlavacluster.Resource`
@@ -4232,6 +4321,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the maximum number of jobs that may execute on this host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_jobs
+            2
+
         :return: Maximum number of jobs
         :rtype: int
 
@@ -4242,7 +4338,17 @@ class Host(SingleArgMemoized, HostBase):
     @property
     def max_processors(self):
         """
-        Returns the maximum number of processors (Job Slots) available on the host for all jobs
+        Returns the maximum number of processors (Job Slots) available on the host for all jobs.
+
+        .. note::
+            If max_slots is greater than max_processors, then there will be contention for physical cores.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_processors
+            1
 
         :return: Max processors (Slots)
         :rtype: int
@@ -4256,7 +4362,14 @@ class Host(SingleArgMemoized, HostBase):
         """
         Max Ram that can be consumed by jobs, in Kb
 
-        :return: Max Ram (Kb)
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_ram
+            992
+
+        :return: Max Ram (Mb)
         :rtype: int
 
         """
@@ -4267,6 +4380,16 @@ class Host(SingleArgMemoized, HostBase):
     def max_slots(self):
         """
         Returns the maximum number of scheduling slots that may be consumed on this host
+
+        .. note::
+            If max_slots is greater than max_processors, then there will be contention for physical cores.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_slots
+            2
 
         :return: Max slots
         :rtype: int
@@ -4280,7 +4403,14 @@ class Host(SingleArgMemoized, HostBase):
         """
         Max swap space that may be consumed by jobs on this host
 
-        :return: Max Swap Space (Kb)
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_swap
+            509
+
+        :return: Max Swap Space (Mb)
         :rtype: int
         """
         self._update_hostinfo()
@@ -4291,7 +4421,14 @@ class Host(SingleArgMemoized, HostBase):
         """
         Max swap space that may be consumed by jobs on this host
 
-        :return: Max Swap (Kb)
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_tmp
+            64002
+
+        :return: Max Swap (Mb)
         :rtype: int
 
         """
@@ -4302,6 +4439,13 @@ class Host(SingleArgMemoized, HostBase):
     def num_reserved_slots(self):
         """
         Returns the number of scheduling slots that are reserved
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_reserved_slots
+            0
 
         :return: Number of reserved slots
         :rtype: int
@@ -4315,6 +4459,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the number of concurent jobs that are executing on the host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_running_jobs
+            0
+
         :return: Job count
         :rtype: int
 
@@ -4326,6 +4477,13 @@ class Host(SingleArgMemoized, HostBase):
     def num_running_slots(self):
         """
         Returns the total number of scheduling slots that are consumed on this host
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_running_slots
+            0
 
         :return: slot count
         :rtype: int
@@ -4339,6 +4497,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the number of jobs that are suspended on this host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_suspended_jobs
+            0
+
         :return: Suspended job count
         :rtype: int
 
@@ -4351,6 +4516,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the number of scheduling slots that are suspended on this host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_suspended_slots
+            0
+
         :return: suspended slot count
         :rtype: int
         """
@@ -4361,6 +4533,13 @@ class Host(SingleArgMemoized, HostBase):
     def run_windows(self):
         """
         Openlava run windows that are defined in the hosts configuration
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.run_windows
+            u'-'
 
         .. note::
 
@@ -4379,6 +4558,13 @@ class Host(SingleArgMemoized, HostBase):
         Hosts can have one or more statuses that apply.  Statuses indicate the condition of the host, such as its
         availability, and health.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.statuses
+            [HOST_STAT_OK]
+
         :return: List of statuses that apply to hist host
         :rtype: list of :py:class:`cluster.openlavacluster.JobStatus` objects
 
@@ -4390,6 +4576,13 @@ class Host(SingleArgMemoized, HostBase):
     def total_jobs(self):
         """
         Returns the total number of jobs that are running on this host, including suspended jobs.
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.total_jobs
+            0
 
         :return: running job count
         :rtype: int
@@ -4403,6 +4596,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the total number of slots that are consumed on this host, including those from  suspended jobs.
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.total_slots
+            0
+
         :return: consumed slot count
         :rtype: int
 
@@ -4415,12 +4615,19 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the CPU factor of the host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.cpu_factor
+            100.0
+
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
         :return: CPU Factor of the host
-        :rtype: bool
+        :rtype: float
 
         """
         return lslib.ls_gethostfactor(self.name)
@@ -4429,6 +4636,13 @@ class Host(SingleArgMemoized, HostBase):
     def is_server(self):
         """
         True if host is an openlava server (as opposed to submission host)
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.is_server
+            True
 
         .. note::
 
@@ -4446,6 +4660,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Openlava specific: Returns the number of physical disks installed in the machine
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_disks
+            0
+
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
@@ -4461,6 +4682,13 @@ class Host(SingleArgMemoized, HostBase):
     def num_user_suspended_jobs(self):
         """
         Returns the number of jobs that have been suspended by the user on this host
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_user_suspended_jobs
+            0
 
         .. note::
 
@@ -4478,6 +4706,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the number of scheduling slots that have been suspended by the user on this host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_user_suspended_slots
+            0
+
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
@@ -4494,6 +4729,12 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns the number of jobs that have been suspended by the system on this host
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_system_suspended_jobs
+            0
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
@@ -4509,6 +4750,13 @@ class Host(SingleArgMemoized, HostBase):
     def num_system_suspended_slots(self):
         """
         Returns the number of scheduling slots that have been suspended by the system on this host
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.num_system_suspended_slots
+            0
 
         .. note::
 
@@ -4526,6 +4774,13 @@ class Host(SingleArgMemoized, HostBase):
         """
         Returns true if the host supports kernel checkpointing
 
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.has_kernel_checkpoint_copy
+            False
+
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
@@ -4541,6 +4796,13 @@ class Host(SingleArgMemoized, HostBase):
     def max_slots_per_user(self):
         """
         Returns the maximum slots that a user can occupy on the host
+
+        Example::
+
+            >>> from cluster.openlavacluster import Host
+            >>> host=Host.get_host_list()[0]
+            >>> host.max_slots_per_user
+            2147483647
 
         .. note::
 
@@ -4560,6 +4822,13 @@ class ExecutionHost(Host):
     they have the additional num_slots_for_job attribute indicating how many slots (Processors) are allocated
     to the job.
 
+    .. py:attribute:: num_slots_for_job
+
+        The number of slots that are allocated to the job.
+
+        :return: Slots consumed by job
+        :rtype: int
+
     """
     def __init__(self, host_name, num_slots_for_job=1):
         """
@@ -4577,9 +4846,6 @@ class ExecutionHost(Host):
         Host.__init__(self, host_name)
 
         self.num_slots_for_job = num_slots_for_job
-        """
-        The number of slots that are allocated to the job.
-        """
 
     def __str__(self):
         return "%s:%s" % (self.host_name, self.num_slots_for_job)
