@@ -879,7 +879,7 @@ class Job(JobBase):
     def consumed_resources(self):
         """
         Openlava keeps track of various resources that are consumed by the job, these are returned as a list
-        of ConsumedResource objects, one for each resource consumed.
+        of :py:class:`ConsumedResource` objects, one for each resource consumed.
 
         .. todo:
 
