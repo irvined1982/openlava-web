@@ -63,6 +63,13 @@ Job Status
 
 .. autoclass:: cluster.openlavacluster.JobStatus
 
+Job Options
+-----------
+
+.. autoclass:: cluster.openlavacluster.SubmitOption
+
+.. autoclass:: cluster.openlavacluster.Submit2Option
+
 Host Classes
 ------------
 
