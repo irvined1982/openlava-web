@@ -1309,7 +1309,7 @@ class Job(JobBase):
             ...  print ex
             comp00:1
 
-        :returns: List of :py:class:cluster.openlavacluster.ExecutionHost` objects, one for each host the job
+        :returns: List of :py:class:`cluster.openlavacluster.ExecutionHost` objects, one for each host the job
         is executing on.
         :rtype: list
 
@@ -4115,7 +4115,7 @@ class Host(SingleArgMemoized, HostBase):
 
 class ExecutionHost(Host):
     """
-    Execution Hosts are hosts that are executing jobs, a subclass of :py:class:cluster.openlavacluster.Host`,
+    Execution Hosts are hosts that are executing jobs, a subclass of :py:class:`cluster.openlavacluster.Host`,
     they have the additional num_slots_for_job attribute indicating how many slots (Processors) are allocated
     to the job.
 
