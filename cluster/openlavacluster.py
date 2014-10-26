@@ -3890,6 +3890,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.host_name
+            u'...'
 
         :return: hostname
         :rtype: str
@@ -3902,6 +3904,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.description
+            u''
 
         :return: Host description
         :rtype: str
@@ -3927,6 +3931,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> Host.get_host_list()
+            [master, comp00, comp01, comp02, comp03, comp04]
 
         :return: List of :py:class:`cluster.openlavacluster.Host` Objects, one for each host on the cluster.
         :rtype: list
@@ -3963,6 +3969,14 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.open()
+            Traceback (most recent call last):
+              File "<stdin>", line 1, in <module>
+              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 3974, in open
+                raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name)
+              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 231, in raise_cluster_exception
+                raise e("%s: %s" % (message, messages[code]), code=code)
+            cluster.PermissionDeniedError: Unable to open host: master: User permission denied
 
         :return: 0 on success
         :raises: :py:exc:`cluster.openlavacluster.ClusterException` when host cannot be opened.
@@ -3981,6 +3995,14 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.close()
+            Traceback (most recent call last):
+              File "<stdin>", line 1, in <module>
+              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 3992, in close
+                raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
+              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 231, in raise_cluster_exception
+                raise e("%s: %s" % (message, messages[code]), code=code)
+            cluster.PermissionDeniedError: Unable to close host: master: User permission denied
 
         :return: 0 on success
         :raises: :py:exc:`cluster.openlavacluster.ClusterException` when host cannot be closed.
@@ -3999,6 +4021,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.jobs()
+            [9790]
 
         :param job_id: Only return jobs matching the specified job id.
         :param job_name: Only return jobs matching the specified job name.
