@@ -353,7 +353,38 @@ def execute_queue_activate(request, queue, queue_name):
         queue.put(e)
 
 
+def host_list(request):
+    """
+    Returns a list of hosts
+
+    :param request: Request object
+    :return: HTML rendered page of hosts, or AJAX list of host objects
+
+    """
+    hosts = Host.get_host_list()
+    if request.is_ajax() or request.GET.get("json", None):
+        create_js_success(data=hosts)
+
+    paginator = Paginator(hosts, 25)
+    page = request.GET.get('page')
+    try:
+        hosts = paginator.page(page)
+    except PageNotAnInteger:
+        hosts = paginator.page(1)
+    except EmptyPage:
+        hosts = paginator.page(paginator.num_pages)
+    return render(request, 'openlavaweb/host_list.html', {"host_list": hosts})
+
+
 def host_view(request, host_name):
+    """
+    Shows host details
+
+    :param request: Request object
+    :param host_name: name of host to show
+    :return: HTML rendered page of host infomration, or JSON Host object
+
+    """
     try:
         host = Host(host_name)
     except NoSuchHostError:
@@ -367,6 +398,14 @@ def host_view(request, host_name):
 
 @login_required
 def host_close(request, host_name):
+    """
+    Closes a host
+
+    :param request: Request object
+    :param host_name: Host object
+    :return:
+
+    """
     host_name = str(host_name)
     if request.GET.get('confirm', None) or request.is_ajax() or request.GET.get("json", None):
         try:
@@ -406,8 +445,7 @@ def execute_host_close(request, queue, host_name):
         h.close()
 
         if request.is_ajax():
-            queue.put(
-                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(create_js_success())
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -450,28 +488,14 @@ def execute_host_open(request, queue, host_name):
         h = Host(host_name)
         h.open()
         if request.is_ajax():
-            queue.put(
-                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(create_js_success())
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
         queue.put(e)
 
 
-def host_list(request):
-    hosts = Host.get_host_list()
-    if request.is_ajax() or request.GET.get("json", None):
-        create_js_success(data=hosts)
 
-    paginator = Paginator(hosts, 25)
-    page = request.GET.get('page')
-    try:
-        hosts = paginator.page(page)
-    except PageNotAnInteger:
-        hosts = paginator.page(1)
-    except EmptyPage:
-        hosts = paginator.page(paginator.num_pages)
-    return render(request, 'openlavaweb/host_list.html', {"host_list": hosts})
 
 
 def user_list(request):

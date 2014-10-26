@@ -19,7 +19,7 @@ import unittest
 import time
 import os
 import urllib
-from cluster.openlavacluster import Job
+from cluster.openlavacluster import Job, Host
 from cluster import ConsumedResource
 
 
@@ -45,7 +45,40 @@ class TestWebServer(unittest.TestCase):
             self.assertTrue(self.check_content_type(response, "text/html"))
             response = urllib.urlopen("%s/job/%d/%d?json=1" % (base_url, job.job_id, job.array_index))
             self.assertTrue(self.check_content_type(response, "application/json"))
-    
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
+    def test_host_urls(self):
+        base_url = os.environ.get("OLWEB_URL", None)
+        if not base_url:
+            return
+        base_url.rstrip("/")
+        response = urllib.urlopen("%s/hosts/" % base_url)
+        self.assertTrue(self.check_content_type(response, "text/html"))
+        response = urllib.urlopen("%s/hosts/?json=1" % base_url)
+        self.assertTrue(self.check_content_type(response, "application/json"))
+
+        for host in Host.get_host_list():
+            response = urllib.urlopen("%s/hosts/%s" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s?json=1" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+            response = urllib.urlopen("%s/hosts/%s/close" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s/open" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s/close?confirm=True" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s/open?confirm=True" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s/close" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s/open" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/hosts/%s/close?json=True" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+            response = urllib.urlopen("%s/hosts/%s/open?json=True" % (base_url, host.host_name))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+
     @staticmethod
     def check_content_type(response, c_type):
         for header in response.info().headers:
@@ -80,6 +113,17 @@ class TestConsumedResource(unittest.TestCase):
         self.assertEqual(c.value, 100)
         self.assertEqual(c.limit, 101)
         self.assertIsNone(c.unit)
+
+
+class TestHost(unittest.TestCase):
+    def test_host_list(self):
+        for host in Host.get_host_list():
+            self.assertIsInstance(host, Host)
+
+    def test_host_get(self):
+        for h in Host.get_host_list():
+            host = Host(host_name=h.host_name)
+            self.assertEqual(host.host_name, h.host_name)
 
 
 class TestJob(unittest.TestCase):
@@ -191,7 +235,7 @@ class TestJob(unittest.TestCase):
             self.skipTest("Job no longer running")
 
         job.requeue(hold=True)
-        time.sleep(45) # Takes a while, first state is exit...
+        time.sleep(45)  # Takes a while, first state is exit...
         job = Job(job_id=job.job_id, array_index=job.array_index)
         self.assertTrue(job.is_suspended)
         job.kill()
