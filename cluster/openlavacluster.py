@@ -1024,6 +1024,8 @@ class Job(JobBase):
     """
     Get information about, and manipulate jobs on remote server.
 
+    .. contents:: :depth: 2
+    
     .. py:attribute:: cluster_type
 
         The type of cluster, defines the scheduling environment being used under the hood.  This is always
@@ -1830,8 +1832,8 @@ class Job(JobBase):
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
 
-        :returns: Resource Limits
-        :rtype: list of ResourceLimit objects
+        :returns: All applicable :py:class:`cluster.ResourceLimit`s for the job.
+        :rtype: list of :py:class:`cluster.ResourceLimit` objects
 
         """
         

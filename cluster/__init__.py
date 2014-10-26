@@ -716,12 +716,38 @@ class Process:
 
 
 class ResourceLimit:
+    """
+    Resource limits are limits on the amount of resource usage of a Job, Queue, Host or User.  Resource
+    Limits may be specified by the user, or as an administator through the scheduler configuration.
+
+    .. py:attribute:: name
+
+        The name of the resource
+
+    .. py:attribute:: soft_limit
+
+        The soft limit of the resource, when this limit is reached, an action is performed on the job, usually
+        this is is in the form of a non-fatal signal being sent to the job.
+
+    .. py:attribute:: hard_limit
+
+        The hard limit of the resource, when this limit is reached, the job is terminated.
+
+    .. py:attribute:: description
+
+        A description of the resource limit
+
+    .. py:attribute:: unit
+
+        The unit of measurement
+
+    """
     def __init__(self, name, soft_limit, hard_limit, description=None, unit=None):
-        self.name = name
-        self.soft_limit = soft_limit
-        self.hard_limit = hard_limit
-        self.description = description
-        self.unit = unit
+        self.name = str(name)
+        self.soft_limit = str(soft_limit)
+        self.hard_limit = str(hard_limit)
+        self.description = str(description)
+        self.unit = str(unit)
 
     def json_attributes(self):
         return ['name', 'soft_limit', 'hard_limit', 'description', 'unit']
