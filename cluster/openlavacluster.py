@@ -1388,8 +1388,10 @@ class Job(JobBase):
             ...  print ex
             comp00:1
 
-        :returns: List of :py:class:`cluster.openlavacluster.ExecutionHost` objects, one for each host the job
-        is executing on.
+        :returns:
+            List of :py:class:`cluster.openlavacluster.ExecutionHost` objects, one for each host the job
+            is executing on.
+
         :rtype: list
 
         """
@@ -1909,7 +1911,7 @@ class Job(JobBase):
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
 
-        :returns: All applicable :py:class:`cluster.ResourceLimit`s for the job.
+        :returns: All applicable :py:class:`cluster.ResourceLimit` objects for the job.
         :rtype: list of :py:class:`cluster.ResourceLimit` objects
 
         """
@@ -4787,6 +4789,7 @@ class Host(SingleArgMemoized, HostBase):
             >>> host=Host.get_host_list()[0]
             >>> host.num_system_suspended_jobs
             0
+            
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
