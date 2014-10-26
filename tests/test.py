@@ -74,10 +74,6 @@ class TestWebServer(unittest.TestCase):
             self.assertTrue(self.check_content_type(response, "text/html"))
             response = urllib.urlopen("%s/hosts/%s/open" % (base_url, host.host_name))
             self.assertTrue(self.check_content_type(response, "text/html"))
-            response = urllib.urlopen("%s/hosts/%s/close?json=True" % (base_url, host.host_name))
-            self.assertTrue(self.check_content_type(response, "application/json"))
-            response = urllib.urlopen("%s/hosts/%s/open?json=True" % (base_url, host.host_name))
-            self.assertTrue(self.check_content_type(response, "application/json"))
 
     @staticmethod
     def check_content_type(response, c_type):
@@ -93,14 +89,14 @@ class TestConsumedResource(unittest.TestCase):
         c = ConsumedResource(name="MyRes", value=100)
         self.assertEqual(c.name, "MyRes")
         self.assertEqual(c.value, '100')
-        self.assertIsNone(c.unit)
-        self.assertIsNone(c.limit)
+        self.assertEqual(c.limit, 'None')
+        self.assertEqual(c.unit, 'None')
 
         c = ConsumedResource(name="MyRes", value=100, unit="BogoUnits")
         self.assertEqual(c.name, "MyRes")
         self.assertEqual(c.value, '100')
         self.assertEqual(c.unit, "BogoUnits")
-        self.assertIsNone(c.limit)
+        self.assertEqual(c.limit, 'None')
 
         c = ConsumedResource(name="MyRes", value=100, limit=120, unit="BogoUnits")
         self.assertEqual(c.name, "MyRes")
@@ -112,7 +108,7 @@ class TestConsumedResource(unittest.TestCase):
         self.assertEqual(c.name, "MyRes")
         self.assertEqual(c.value, '100')
         self.assertEqual(c.limit, '101')
-        self.assertIsNone(c.unit)
+        self.assertEqual(c.unit, 'None')
 
 
 class TestHost(unittest.TestCase):
