@@ -1141,6 +1141,18 @@ class Job(JobBase):
     """
     cluster_type = "openlava"
 
+    def __repr__(self):
+        s = "%s" % self.job_id
+        if self.array_index > 0:
+            s += "[%s]" % self.array_index
+        return s
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
+
     @property
     def admins(self):
         """
@@ -3238,7 +3250,7 @@ class Resource(BaseResource):
 
     def __unicode__(self):
         return u"%s" % self.__str__()
-    
+
     def __init__(self, res):
         """
         Creates a new resource instance
@@ -4176,6 +4188,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.admins
+            [u'openlava']
 
         :returns: Array of usernames
         :rtype: array
@@ -4193,6 +4207,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.is_busy
+            False
 
         :return: True if the host is busy.
         :rtype: bool
@@ -4219,6 +4235,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.is_down
+            False
 
         :return: True if the host is down.
         :rtype: bool
@@ -4238,6 +4256,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.is_closed
+            False
 
         :return: True if the host is closed.
         :rtype: bool
@@ -4257,6 +4277,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.has_checkpoint_support
+            True
 
         :return: True if checkpoint support is enabled
         :rtype: bool
@@ -4274,6 +4296,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.host_model
+            u'IntelI5'
 
         :return: Host model name
         :rtype: str
@@ -4291,6 +4315,8 @@ class Host(SingleArgMemoized, HostBase):
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
+            >>> host.host_type
+            u'linux'
 
         :return: Host Type
         :rtype: str
@@ -4307,7 +4333,9 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>>
+            >>> host.resources
+            [foo]
 
         :return: List of :py:class:`cluster.openlavacluster.Resource` objects
         :rtype: :py:class:`cluster.openlavacluster.Resource`
