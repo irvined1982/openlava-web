@@ -1650,10 +1650,10 @@ class Job(JobBase):
     @property
     def status(self):
         """
-        :py:class:`JobStatus` object that defines the current status of the job.
+        :py:class:`cluster.openlavacluster.JobStatus` object that defines the current status of the job.
 
         :return: Job Status
-        :rtype: :py:class:`JobStatus`
+        :rtype: :py:class:`cluster.openlavacluster.JobStatus`
 
         """
         
@@ -1665,7 +1665,7 @@ class Job(JobBase):
     @property
     def submission_host(self):
         """
-        :py:class:`Host` object corresponding to the host that the job was submitted from.
+        :py:class:`cluster.Host` object corresponding to the host that the job was submitted from.
 
         Example::
 
@@ -1675,8 +1675,8 @@ class Job(JobBase):
             >>> job.submission_host
             u'...'
 
-        :return: Submit :py:class:`Host` object
-        :rtype: :py:class:`Host`
+        :return: Submit :py:class:`cluster.Host` object
+        :rtype: :py:class:`cluster.Host`
 
         """
         
