@@ -1591,8 +1591,8 @@ class Job(JobBase):
         schedule and execute the job.  They may have been explicitly set by the user, or an esub, or implicity
         by specifying a command line argument.
 
-        Job options is list containing :py:class:`cluster.openlavacluster.SubmitOptions` and
-        :py:class:`cluster.openlavacluster.Submit2Options`, that are active for the job.
+        Job options is list containing :py:class:`cluster.openlavacluster.SubmitOption` and
+        :py:class:`cluster.openlavacluster.Submit2Option`, that are active for the job.
 
         :return: List of JobOptions
         :rtype: List
