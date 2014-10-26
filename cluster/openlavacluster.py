@@ -3891,7 +3891,7 @@ class Host(SingleArgMemoized, HostBase):
         of host associated with the cluster, they may be submit hosts, execution hosts, clients, etc.
 
         :param host_name: The name of the host to lookup
-        :raises: :py:exception:`NoSuchHostError`
+        :raises: :py:exc:`NoSuchHostError`
         """
         initialize()
         self._lsb_update_time = 0
@@ -3908,7 +3908,7 @@ class Host(SingleArgMemoized, HostBase):
         Opens the host, when a host is closed, it will no longer accept new jobs.
 
         :return: 0 on success
-        :raises: :py:exception:`cluster.openlavacluster.ClusterException` when host cannot be opened.
+        :raises: :py:exc:`cluster.openlavacluster.ClusterException` when host cannot be opened.
 
         """
         rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
@@ -3921,7 +3921,7 @@ class Host(SingleArgMemoized, HostBase):
         Closes the host, when a host is closed, it will no longer accept new jobs.
 
         :return: 0 on success
-        :raises: :py:exception:`cluster.openlavacluster.ClusterException` when host cannot be closed.
+        :raises: :py:exc:`cluster.openlavacluster.ClusterException` when host cannot be closed.
 
         """
         rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_CLOSE)
