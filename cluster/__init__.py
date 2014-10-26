@@ -753,9 +753,33 @@ class ConsumedResource:
         >>> c.unit
         None
 
-    .. todo:
+    .. py:attribute:: name
 
-        Add return types and check documentation for class.
+        The name of the consumed resource.
+
+        :return: name of resource
+        :rtype: str
+
+    .. py:attribute:: value
+
+        The current value of the consumed resource.
+
+        :return: value of resource
+        :rtype: str
+
+    .. py:attribute:: limit
+
+        The limit specified for the resource, may be None, if the resource does not have a limit.
+
+        :return: limit of resource consumption
+        :rtype: str
+
+    .. py:attribute:: unit
+
+        The unit of measurement for the resource, may be None, if the unit cannot be determined.
+
+        :return: unit of measurement
+        :rtype: str
 
     """
 
@@ -767,25 +791,10 @@ class ConsumedResource:
         :param unit: Optional unit name
         """
 
-        self.name = name
-        """
-        The name of the consumed resource.
-        """
-
-        self.value = value
-        """
-        The current value of the consumed resource.
-        """
-
-        self.limit = limit
-        """
-        The limit specified for the resource, may be None, if the resource does not have a limit.
-        """
-
-        self.unit = unit
-        """
-        The unit of measurement for the resource, may be None, if the unit cannot be determined.
-        """
+        self.name = str(name)
+        self.value = str(value)
+        self.limit = str(limit)
+        self.unit = str(unit)
 
     def __str__(self):
         s = "%s: %s" % (self.name, self.value)
