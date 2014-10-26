@@ -57,6 +57,12 @@ Consumed resources represent resources that have been consumed by a given job.
 .. autoclass:: cluster.ConsumedResource
     :members:
 
+Processees
+----------
+
+.. autoclass:: cluster.Process
+    :members:
+
 
 Job Status
 ----------

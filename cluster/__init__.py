@@ -675,6 +675,25 @@ class UserBase:
 
 
 class Process:
+    """
+    Processes represent executing processes that are part of a job.  Where supported the scheduler may
+    keep track of processes spawned by the job.  Information about the process is returned in Process
+    classes.
+
+    .. py:attribute:: hostname
+
+        The name of the host that the process is running on.  This may not be available if the scheduler does not
+        track which hosts start which process.
+
+    .. py:attribute:: process_id
+
+        The numerical ID of the running process.
+
+    .. py:attribute:: extras
+
+        A list of extra field names that are available
+
+    """
     def __init__(self, hostname, process_id, **kwargs):
         self.hostname = hostname
         self.process_id = process_id

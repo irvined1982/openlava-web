@@ -1730,7 +1730,7 @@ class Job(JobBase):
             >>> job.processes
             [None:23987]
 
-        :return: Array of Process objects
+        :return: Array of :py:class:`cluster.Process` objects
         :rtype: list
 
         """
