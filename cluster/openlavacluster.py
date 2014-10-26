@@ -3851,6 +3851,9 @@ class Host(SingleArgMemoized, HostBase):
 
         The host name of the host.
 
+        Example::
+
+
         :return: hostname
         :rtype: str
 
@@ -3871,6 +3874,15 @@ class Host(SingleArgMemoized, HostBase):
     """
     cluster_type = "openlava"
 
+    def __str__(self):
+        return self.host_name
+
+    def __unicode__(self):
+        return u"%s" % self.host_name
+
+    def __repr__(self):
+        return self.__str__()
+    
     @classmethod
     def get_host_list(cls):
         """
