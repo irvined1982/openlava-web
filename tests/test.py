@@ -170,7 +170,7 @@ class TestJob(unittest.TestCase):
 
         start_time = job.start_time
         job.requeue(hold=False)
-        time.sleep(15)
+        time.sleep(45)
         job = Job(job_id=job.job_id, array_index=job.array_index)
         if job.is_pending:
             # Passed
