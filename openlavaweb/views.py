@@ -19,25 +19,29 @@ import json
 import os
 import pwd
 import logging
-
 import datetime
 from multiprocessing import Process as MPProcess
 from multiprocessing import Queue as MPQueue
 from multiprocessing import log_to_stderr
+
+# noinspection PyPackageRequirements
 from django import forms
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from cluster import ClusterException, NoSuchJobError
-from cluster.openlavacluster import Cluster, Host, Job, Queue, User, ExecutionHost
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
-from openlava import lsblib
 from django.conf import settings
+
+from cluster import ClusterException, NoSuchJobError
+from cluster.openlavacluster import Cluster, Host, Job, Queue, User, ExecutionHost, NoSuchHostError
+# noinspection PyUnresolvedReferences
+from openlava import lsblib
+
 
 def create_js_success(data=None, message=""):
     """
@@ -54,16 +58,15 @@ def create_js_success(data=None, message=""):
         'message': message,
     }
     return HttpResponse(json.dumps(data, sort_keys=True, indent=4, cls=ClusterEncoder),
-                            content_type='application/json')
-
+                        content_type='application/json')
 
 
 def queue_list(request):
-    queue_list = Queue.get_queue_list()
+    queues = Queue.get_queue_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(queue_list, sort_keys=True, indent=4, cls=ClusterEncoder),
+        return HttpResponse(json.dumps(queues, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
-    return render(request, 'openlavaweb/queue_list.html', {"queue_list": queue_list})
+    return render(request, 'openlavaweb/queue_list.html', {"queue_list": queues})
 
 
 def queue_view(request, queue_name):
@@ -74,7 +77,7 @@ def queue_view(request, queue_name):
     if request.is_ajax() or request.GET.get("json", None):
         return HttpResponse(json.dumps(queue, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
-    return render(request, 'openlavaweb/queue_detail.html', {"queue": queue }, )
+    return render(request, 'openlavaweb/queue_detail.html', {"queue": queue}, )
 
 
 @login_required
@@ -114,7 +117,8 @@ def execute_queue_close(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.close()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(
+                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -157,7 +161,8 @@ def execute_queue_open(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.open()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(
+                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -200,7 +205,8 @@ def execute_queue_inactivate(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.inactivate()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(
+                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -243,7 +249,8 @@ def execute_queue_activate(request, queue, queue_name):
         q = Queue(queue=queue_name)
         q.activate()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(
+                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_queue_view", kwargs={'queue_name': queue_name})))
     except Exception as e:
@@ -303,7 +310,8 @@ def execute_host_close(request, queue, host_name):
         h.close()
 
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(
+                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -346,7 +354,8 @@ def execute_host_open(request, queue, host_name):
         h = Host(host_name)
         h.open()
         if request.is_ajax():
-            queue.put(HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
+            queue.put(
+                HttpResponse(json.dumps({'status': "OK"}, sort_keys=True, indent=4), content_type="application/json"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -354,36 +363,34 @@ def execute_host_open(request, queue, host_name):
 
 
 def host_list(request):
-    host_list = Host.get_host_list()
+    hosts = Host.get_host_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(host_list, sort_keys=True, indent=4, cls=ClusterEncoder),
-                            content_type='application/json')
+        create_js_success(data=hosts)
 
-    paginator = Paginator(host_list, 25)
+    paginator = Paginator(hosts, 25)
     page = request.GET.get('page')
     try:
-        host_list = paginator.page(page)
+        hosts = paginator.page(page)
     except PageNotAnInteger:
-        host_list = paginator.page(1)
+        hosts = paginator.page(1)
     except EmptyPage:
-        host_list = paginator.page(paginator.num_pages)
-    return render(request, 'openlavaweb/host_list.html', {"host_list": host_list})
+        hosts = paginator.page(paginator.num_pages)
+    return render(request, 'openlavaweb/host_list.html', {"host_list": hosts})
 
 
 def user_list(request):
-    user_list = User.get_user_list()
+    users = User.get_user_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(user_list, sort_keys=True, indent=4, cls=ClusterEncoder),
-                            content_type='application/json')
-    paginator = Paginator(user_list, 25)
+        create_js_success(data=users)
+    paginator = Paginator(users, 25)
     page = request.GET.get('page')
     try:
-        user_list = paginator.page(page)
+        users = paginator.page(page)
     except PageNotAnInteger:
-        user_list = paginator.page(1)
+        users = paginator.page(1)
     except EmptyPage:
-        user_list = paginator.page(paginator.num_pages)
-    return render(request, 'openlavaweb/user_list.html', {"user_list": user_list})
+        users = paginator.page(paginator.num_pages)
+    return render(request, 'openlavaweb/user_list.html', {"user_list": users})
 
 
 def user_view(request, user_name):
@@ -395,7 +402,6 @@ def user_view(request, user_name):
         return HttpResponse(json.dumps(user, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     return render(request, 'openlavaweb/user_detail.html', {"oluser": user}, )
-
 
 
 @login_required
@@ -582,16 +588,18 @@ def execute_job_requeue(request, queue, job_id, array_index, hold):
     except Exception as e:
         queue.put(e)
 
+
 def execute_get_output_path(request, queue, job_id, array_index):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
         job = Job(job_id=job_id, array_index=array_index)
-        path=job.get_output_path()
+        path = job.get_output_path()
         if path:
             queue.put(path)
     except Exception as e:
         queue.put(e)
+
 
 def job_error(request, job_id, array_index=0):
     job_id = int(job_id)
@@ -607,19 +615,19 @@ def job_error(request, job_id, array_index=0):
         p = MPProcess(target=execute_get_output_path, kwargs=kwargs)
         p.start()
         p.join()
-        try:
+        if q.empty():
+            path = None
+        else:
             path = q.get(False) + ".err"
-        except MPQueue.Empty:
-            path=None
 
         if isinstance(path, Exception):
             raise path
 
         if path and os.path.exists(path):
-            f=open(path,'r')
+            f = open(path, 'r')
             return HttpResponse(f, mimetype="text/plain")
         else:
-            return HttpResponse("Not Available", mimetype=="text/plain")
+            return HttpResponse("Not Available", content_type="text/plain")
 
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
@@ -642,15 +650,15 @@ def job_output(request, job_id, array_index=0):
         p = MPProcess(target=execute_get_output_path, kwargs=kwargs)
         p.start()
         p.join()
-        try:
+        if q.empty():
+            path = None
+        else:
             path = q.get(False) + ".out"
-        except:
-            path=None
 
         if isinstance(path, Exception):
             raise path
         if path and os.path.exists(path):
-            f=open(path,'r')
+            f = open(path, 'r')
             return HttpResponse(f, mimetype="text/plain")
         else:
             return HttpResponse("Not Available", mimetype="text/plain")
@@ -663,7 +671,8 @@ def job_output(request, job_id, array_index=0):
 
 
 class ClusterEncoder(json.JSONEncoder):
-    def check(self, obj):
+    @staticmethod
+    def check(obj):
         if isinstance(obj, ExecutionHost):
             return {
                 'type': "ExecutionHost",
@@ -704,8 +713,7 @@ class ClusterEncoder(json.JSONEncoder):
         if isinstance(obj, datetime.timedelta):
             return obj.total_seconds()
 
-        d = {}
-        d['type'] = obj.__class__.__name__
+        d = {'type': obj.__class__.__name__}
         for name in obj.json_attributes():
             value = getattr(obj, name)
             if hasattr(value, '__call__'):
@@ -719,13 +727,11 @@ class ClusterEncoder(json.JSONEncoder):
         return d
 
 
-
-
-
-
 @ensure_csrf_cookie
 def get_csrf_token(request):
-    return HttpResponse(json.dumps({'cookie': get_token(request)}, sort_keys=True, indent=4), content_type="application/json")
+    return HttpResponse(json.dumps({'cookie': get_token(request)}, sort_keys=True, indent=4),
+                        content_type="application/json")
+
 
 def system_view(request):
     cluster = Cluster()
@@ -736,9 +742,10 @@ def system_view(request):
     return render(request, 'openlavaweb/system_view.html', {'cluster': cluster})
 
 
+# noinspection PyUnusedLocal
 def system_overview_hosts(request):
-    cluster=Cluster()
-    states={
+    cluster = Cluster()
+    states = {
         'Down': 0,
         'Full': 0,
         'In Use': 0,
@@ -759,32 +766,38 @@ def system_overview_hosts(request):
         else:
             states['Empty'] += 1
 
-    nvstates=[]
-    for k,v in states.iteritems():
+    nvstates = []
+    for k, v in states.iteritems():
         nvstates.append(
-            {'label':k, 'value': v}
+            {'label': k, 'value': v}
         )
-    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder),
+                        content_type="application/json")
 
+
+# noinspection PyUnusedLocal
 def system_overview_jobs(request):
-    cluster=Cluster()
-    states={}
+    cluster = Cluster()
+    states = {}
 
     for job in cluster.jobs():
         try:
             states[job.status.friendly] += 1
         except KeyError:
             states[job.status.friendly] = 1
-    nvstates=[]
-    for k,v in states.iteritems():
+    nvstates = []
+    for k, v in states.iteritems():
         nvstates.append(
-            {'label':k, 'value': v}
+            {'label': k, 'value': v}
         )
-    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder),
+                        content_type="application/json")
 
+
+# noinspection PyUnusedLocal
 def system_overview_slots(request):
-    cluster=Cluster()
-    states={}
+    cluster = Cluster()
+    states = {}
 
     for job in cluster.jobs():
         try:
@@ -792,12 +805,13 @@ def system_overview_slots(request):
         except KeyError:
             states[job.status.friendly] = job.requested_slots
 
-    nvstates=[]
-    for k,v in states.iteritems():
+    nvstates = []
+    for k, v in states.iteritems():
         nvstates.append(
-            {'label':k, 'value': v}
+            {'label': k, 'value': v}
         )
-    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder), content_type="application/json")
+    return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder),
+                        content_type="application/json")
 
 
 @csrf_exempt
@@ -805,28 +819,19 @@ def ajax_login(request):
     try:
         data = json.loads(request.body)
         user = authenticate(username=data['username'], password=data['password'])
-    except:
-        response = HttpResponse()
-        response.status_code = 400
-        return response
+    except ValueError:
+        return HttpResponseBadRequest()
+    except KeyError:
+        return HttpResponseBadRequest()
     if user:
         if user.is_active:
             login(request, user)
-            res = {
-                'status': "OK",
-                'description': "Success"
-            }
+            return create_js_success(message="User logged in")
         else:
-            res = {
-                'status': 'Fail',
-                'description': "User is inactive"
-            }
+            return HttpResponseForbidden()
     else:
-        res = {
-            'status': "Fail",
-            'description': "Unable to authenticate",
-        }
-    return HttpResponse(json.dumps(res, sort_keys=True, indent=4), content_type="application/json")
+        return HttpResponseForbidden()
+
 
 def job_view(request, job_id, array_index=0):
     """
@@ -846,21 +851,19 @@ def job_view(request, job_id, array_index=0):
     """
     job_id = int(job_id)
     array_index = int(array_index)
-    assert(array_index >= 0)
+    assert (array_index >= 0)
     try:
         job = Job(job_id=job_id, array_index=array_index)
         if request.is_ajax() or request.GET.get("json", None):
             return create_js_success(data=job)
         else:
             return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
-
-    except ClusterException as e:
+    except NoSuchJobError as e:
         if request.is_ajax() or request.GET.get("json", None):
             return HttpResponse(e.to_json(), content_type='application/json')
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
-
-    except NoSuchJobError as e:
+    except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
             return HttpResponse(e.to_json(), content_type='application/json')
         else:
@@ -892,7 +895,7 @@ def get_job_list(request, job_id=0):
 
     :param ?job_state:
         Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
-        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administrator,
         "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
         currently suspended.
 
@@ -904,7 +907,7 @@ def get_job_list(request, job_id=0):
         rendered HTML page listing each job.  Pages are paginated using a paginator.
 
     """
-    job_id=int(job_id)
+    job_id = int(job_id)
     if job_id != 0:
         # Get a list of active elements of the specified job.
         job_list = Job.get_job_list(job_id=job_id, array_index=-1)
@@ -914,7 +917,8 @@ def get_job_list(request, job_id=0):
         host_name = request.GET.get('host_name', "")
         job_state = request.GET.get('job_state', 'ACT')
         job_name = request.GET.get('job_name', "")
-        job_list = Job.get_job_list(user_name=user_name, queue_name=queue_name, host_name=host_name, job_state=job_state,
+        job_list = Job.get_job_list(user_name=user_name, queue_name=queue_name, host_name=host_name,
+                                    job_state=job_state,
                                     job_name=job_name)
 
     if request.is_ajax() or request.GET.get("json", None):
@@ -931,12 +935,13 @@ def get_job_list(request, job_id=0):
         job_list = paginator.page(paginator.num_pages)
     return render(request, 'openlavaweb/job_list.html', {"job_list": job_list, })
 
+
 @login_required
 def job_submit(request, form_class="JobSubmitForm"):
     logger = log_to_stderr()
     logger.debug("Starting sub")
     ajax_args = None
-    form = None
+
     for cls in OLWSubmit.__subclasses__():
         if form_class == cls.__name__:
             form_class = cls
@@ -960,10 +965,10 @@ def job_submit(request, form_class="JobSubmitForm"):
             form = form_class()
             return render(request, 'openlavaweb/job_submit.html', {'form': form})
 
-
     # Process the actual form.
     q = MPQueue()
-    p = MPProcess(target=execute_job_submit, kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form':form})
+    p = MPProcess(target=execute_job_submit,
+                  kwargs={'queue': q, 'request': request, 'ajax_args': ajax_args, 'submit_form': form})
     p.start()
     rc = q.get(True)
     p.join()
@@ -996,23 +1001,21 @@ def execute_job_submit(request, queue, ajax_args, submit_form):
         queue.put(e)
 
 
-
 class OLWSubmit(forms.Form):
     """Openlava job submission form, redirects the user to the first job, or if ajax, dumps all jobs"""
-    name="basesubmit"
-    friendly_name="Base Submit"
+    name = "basesubmit"
+    friendly_name = "Base Submit"
     # If this needs to be treated as a formset, set to true so the
     # template knows to iterate through each form etc.
-    is_formset=False
+    is_formset = False
 
     def get_name(self):
         return self.__class__.__name__
 
-    def submit(self, ajax_args = None):
+    def submit(self, ajax_args=None):
         logger = log_to_stderr()
         logger.setLevel(logging.DEBUG)
         logger.debug("Entering OLWSubmit submit")
-        kwargs = None
         if ajax_args:
             kwargs = ajax_args
         else:
@@ -1036,36 +1039,37 @@ class OLWSubmit(forms.Form):
         except Exception as e:
             return e
 
-    def _get_args(selfs):
+    def _get_args(self):
         """Return all arguments for job submission.  For normal simple web submission forms, this is all that is needed
         simply parse the form data and return a dict which will be passed to Job.submit()"""
         raise NotImplemented()
 
+    # noinspection PyMethodMayBeStatic
     def _pre_submit(self):
         """Called before the job is submitted, run as the user who is submitting the job."""
         return None
 
-    def _post_submit(self, job):
-        """Called after the job has been submitted, Job is the newly submitted job."""
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def _post_submit(self, job_list):
+        """Called after the job has been submitted, job_list is a list of Job Objects that have been submitted"""
         return None
 
 
 class JobSubmitForm(OLWSubmit):
     friendly_name = "Generic Job"
 
-
     def _get_args(self):
         kwargs = {}
         if 'options' in self.cleaned_data:
             opt = 0
             for i in self.cleaned_data['options']:
-                opt = opt | int(i)
+                opt |= int(i)
             kwargs['options'] = opt
 
         if 'options2' in self.cleaned_data:
             opt = 0
             for i in self.cleaned_data['options2']:
-                opt = opt | int(i)
+                opt |= int(i)
             kwargs['options2'] = opt
 
         for field, value in self.cleaned_data.items():
@@ -1075,7 +1079,7 @@ class JobSubmitForm(OLWSubmit):
                 kwargs[field] = value
         return kwargs
 
-    #transfer files
+    # transfer files
     #rlimits
 
     # options....
@@ -1097,7 +1101,7 @@ class JobSubmitForm(OLWSubmit):
     job_name = forms.CharField(max_length=512, required=False)
     queues = [(u'', u'Default')]
     for q in Queue.get_queue_list():
-        queues.append([q.name, q.name])
+        queues.append((q.name, q.name))
     queue_name = forms.ChoiceField(choices=queues, required=False)
     hosts = []
     for h in Host.get_host_list():
@@ -1138,18 +1142,16 @@ class SimpleJobSubmitForm(OLWSubmit):
     command = forms.CharField(widget=forms.Textarea, max_length=512)
     queues = [(u'', u'Default')]
     for q in Queue.get_queue_list():
-        queues.append([q.name, q.name])
+        queues.append((q.name, q.name))
     queue_name = forms.ChoiceField(choices=queues, required=False)
-
-
-
 
 
 class ConsumeResourcesJob(OLWSubmit):
     friendly_name = "Consume Resources"
 
     job_name = forms.CharField(max_length=512, required=False)
-    requested_slots = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1, help_text="How many processors to execute on")
+    requested_slots = forms.ChoiceField(choices=[(x, x) for x in xrange(1, 6)], initial=1,
+                                        help_text="How many processors to execute on")
     run_time = forms.IntegerField(min_value=1, initial=120, help_text="How many seconds to execute for")
 
     memory_size = forms.IntegerField(min_value=1, initial=128, help_text="How many MB to consume")
@@ -1159,7 +1161,7 @@ class ConsumeResourcesJob(OLWSubmit):
 
     queues = [(u'', u'Default')]
     for q in Queue.get_queue_list():
-        queues.append([q.name, q.name])
+        queues.append((q.name, q.name))
     queue_name = forms.ChoiceField(choices=queues, required=False)
 
     def _get_args(self):
@@ -1174,12 +1176,12 @@ class ConsumeResourcesJob(OLWSubmit):
 
         try:
             mpi_command = settings.MPIRUN_COMMAND
-        except:
+        except AttributeError:
             mpi_command = "mpirun"
 
         try:
             command = settings.CONSUME_RESOURCES_COMMAND
-        except:
+        except AttributeError:
             command = "consumeResources.py"
 
         if self.cleaned_data['consume_cpu']:
@@ -1199,11 +1201,12 @@ class ConsumeResourcesJob(OLWSubmit):
         return kwargs
 
 
+# noinspection PyUnusedLocal
 def submit_form_context(request):
-    clses=[]
+    clses = []
     for cls in OLWSubmit.__subclasses__():
         clses.append({
-            'url':reverse("olw_job_submit_class", args=[cls.__name__]),
-            'name':cls.friendly_name,
+            'url': reverse("olw_job_submit_class", args=[cls.__name__]),
+            'name': cls.friendly_name,
         })
     return {'submit_form_classes': clses}
