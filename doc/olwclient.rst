@@ -120,6 +120,19 @@ JavaScript
     :param host_name: The name of the host to load
     :param num_slots_for_job: The number of slots allocated to the job
 
+Host Statuses
+-------------
+
+.. autoclass:: cluster.openlavacluster.HostStatus
+    :members:
+    :inherited-members:
+
+Cluster Resources
+-----------------
+
+.. autoclass:: cluster.openlavacluster.Resource
+    :members:
+    :inherited-members:
 
 Exceptions
 ----------

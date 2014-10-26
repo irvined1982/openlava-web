@@ -58,10 +58,15 @@ class ClusterBase:
 
     @property
     def admins(self):
-        '''Get a list of cluster administators.  The usernames listed are superusers on the scheduling system and can perform any action to jobs, queues, nodes etc.
+        """
+
+        Get a list of cluster administrators.  The usernames listed are superusers on the scheduling system
+        and can perform any action to jobs, queues, nodes etc.
+
         :return: List of user names that are super users on the cluster
         :rtype: array
-        '''
+
+        """
         raise NotImplementedError
 
 
@@ -472,7 +477,6 @@ class HostBase:
     def max_slots(self):
         '''Returns the maximum number of scheduling slots that may be consumed on this host'''
         raise NotImplementedError
-
 
     @property
     def max_swap(self):

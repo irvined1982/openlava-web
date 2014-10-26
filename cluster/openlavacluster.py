@@ -824,6 +824,69 @@ class SubmitOption(NumericStatus):
 
 
 class HostStatus(NumericStatus):
+    """
+    Hosts can have one or more statuses that apply.  Statuses indicate the condition of the host, such as its
+    availability, and health.
+
+    The following statuses are available
+
+    .. list-table:: Valid Statuses
+        :header-rows: 1
+
+        * - Value
+          - Friendly Name
+          - Name
+          - Description
+        * - 0x00
+          - HOST_STAT_OK
+          - Ok
+          - Ready to accept and run jobs.
+        * - 0x01
+          - HOST_STAT_BUSY
+          - Busy
+          - The host load is greater than a scheduling threshold.  In this status, no new job will be scheduled to
+            run on this host.
+        * - 0x02
+          - HOST_STAT_WIND
+          - Dispatch Window Closed
+          - The host dispatch window is closed.  In this status, no new job will be accepted.
+        * - 0x04
+          - HOST_STAT_DISABLED
+          - Disabled by Administrator
+          - The host has been disabled by the LSF administrator and will not accept jobs.  In this status,
+            no new job will be scheduled to run on this host.
+        * - 0x08
+          - HOST_STAT_LOCKED
+          - Locked
+          - The host is locked by a exclusive task.  In this status, no new job will be scheduled to
+            run on this host.
+        * - 0x10
+          - HOST_STAT_FULL
+          - Full
+          - Great than job limit.  The host has reached its job limit. In this status, no new job will
+            be scheduled to run on this host.
+        * - 0x20
+          - HOST_STAT_UNREACH
+          - Unreachable
+          - The sbatchd on this host is unreachable.
+        * - 0x40
+          - HOST_STAT_UNAVAIL
+          - Unavailable
+          - The LIM and sbatchd on this host are unavailable.
+        * - 0x80
+          - HOST_STAT_NO_LIM
+          - No LIM
+          - The host is running an sbatchd but not a LIM.
+        * - 0x100
+          - HOST_STAT_EXCLUSIVE
+          - Exclusive
+          - Running exclusive job.
+        * - 0x200
+          - HOST_STAT_LOCKED_MASTER
+          - Locked by Master LIM
+          - Lim locked by master LIM.
+
+    """
     states = {
         0x0: {
             'friendly': 'Ok',
@@ -3148,7 +3211,33 @@ class Job(JobBase):
 
 
 class Resource(BaseResource):
+    """
+    The scheduler may track resources that can be consumed by jobs, this class represents such a resource.
+
+    .. py:attribute:: name
+
+        The name of the resource
+
+        :returns: resource name
+        :rtype: str
+
+    .. py:attribute:: description
+
+        The description of the resource, if defined.
+
+        :returns: resource description
+        :rtype: str
+
+    """
+
     def __init__(self, res):
+        """
+        Creates a new resource instance
+
+        :param lslib.ResItem: res - lsblib resource item to populate data from
+
+        """
+
         if isinstance(res, lslib.ResItem):
             super(Resource, self).__init__(res.name, res.des)
             self._type = res.valueType
@@ -3164,16 +3253,47 @@ class Resource(BaseResource):
 
     @property
     def type(self):
+        """
+        The resource type
+
+        :return: resource type
+        :rtype: str
+
+        """
+
         return self._type[3:].capitalize()
 
     @property
     def order(self):
+        """
+        The ordering of the resource, resources either Increment when their are consumed, or decrement when
+        being consumed.
+
+        :return: Inc or Dec
+        :rtype: str
+
+        """
         return self._order
 
     def interval(self):
+        """
+        The interval that resources are updated
+
+        :return: timedelta object of interval period
+        :rtype: timedelta
+
+        """
+
         return datetime.timedelta(seconds=self._interval)
 
     def flags(self):
+        """
+        Any flags that are set on the resource.
+
+        :return: Resource Flags
+        :rtype: str
+
+        """
         return self._flags
 
     @staticmethod
@@ -3718,12 +3838,35 @@ class User(SingleArgMemoized, UserBase):
 
 class Host(SingleArgMemoized, HostBase):
     """
-    Retrieve Host information and perform administrative actions on hosts on the cluster.
+    Retrieve Host information and perform administrative actions on hosts on the cluster.  Hosts are any kind
+    of host associated with the cluster, they may be submit hosts, execution hosts, clients, etc.
 
+    .. py:data:: cluster_type
+
+        The type of cluster this host object is associated with.
+
+    .. py:attribute:: name
+
+        The host name of the host.
+
+        :return: hostname
+        :rtype: str
+        
+    .. py:attribute:: host_name
+
+        The host name of the host.
+
+        :return: hostname
+        :rtype: str
+
+    .. py:attribute:: description
+
+        The description given to the host by the cluster administrators.
+
+        :return: Host description
+        :rtype: str
 
     """
-
-    #: Type of cluster this host object is for.
     cluster_type = "openlava"
 
     @classmethod
@@ -3731,7 +3874,7 @@ class Host(SingleArgMemoized, HostBase):
         """
         Get all hosts that are part of the cluster.
 
-        :return: List of Host Objects, one for each host on the cluster.
+        :return: List of :py:class:`cluster.openlavacluster.Host` Objects, one for each host on the cluster.
         :rtype: list
         """
         initialize()
@@ -3741,6 +3884,13 @@ class Host(SingleArgMemoized, HostBase):
         return [cls(h.host) for h in hs]
 
     def __init__(self, host_name):
+        """
+        Retrieve Host information and perform administrative actions on hosts on the cluster.  Hosts are any kind
+        of host associated with the cluster, they may be submit hosts, execution hosts, clients, etc.
+
+        :param host_name: The name of the host to lookup
+        :raises: :py:exception:`NoSuchHostError`
+        """
         initialize()
         self._lsb_update_time = 0
         self._update_time = 0
@@ -3752,19 +3902,43 @@ class Host(SingleArgMemoized, HostBase):
             raise NoSuchHostError("Host: %s does not exist" % host_name)
 
     def open(self):
+        """
+        Opens the host, when a host is closed, it will no longer accept new jobs.
+
+        :return: 0 on success
+        :raises: :py:exception:`cluster.openlavacluster.ClusterException` when host cannot be opened.
+
+        """
         rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_OPEN)
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name)
 
     def close(self):
+        """
+        Closes the host, when a host is closed, it will no longer accept new jobs.
+
+        :return: 0 on success
+        :raises: :py:exception:`cluster.openlavacluster.ClusterException` when host cannot be closed.
+
+        """
         rc = lsblib.lsb_hostcontrol(self.name, lsblib.HOST_CLOSE)
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
 
     def jobs(self, job_id=0, job_name="", user="all", queue="", options=0):
-        """Return jobs on this host"""
+        """
+        Returns matching jobs on the host.  By default, returns all jobs that are executing on the host.
+
+        :param job_id: Only return jobs matching the specified job id.
+        :param job_name: Only return jobs matching the specified job name.
+        :param user: Only return jobs belonging to the specified user.
+        :param queue: Only return jobs belonging to the specified queue.
+        :param options: Unused.
+        :return: List of :py:class:`cluster.openlavacluster.Job` objects
+
+        """
         num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=user, queue=queue, host=self.host_name,
                                           options=options)
         jobs = []
@@ -3779,7 +3953,18 @@ class Host(SingleArgMemoized, HostBase):
         return jobs
 
     def load_information(self):
-        """Return load information on the host"""
+        """
+        Return load information on the host.  Load information is a collection of available metrics that describe
+        the current load of the host.  Such as the CPU usage, memory consumption, and available disk space.  These
+        vary based on the host type, operating system and scheduler.
+
+        The dict has three fields, names, short_names, and values, each a list of the same length.  Names
+        contains a list of field names, short_names contains a shorter version of the name, and values contains
+        the corresponding value of the field.
+
+        :returns: dictionary of load index dictionaries
+        :rtype: dictionary
+        """
         self._update_lsb_hostinfo()
 
         indexes = {
@@ -3920,10 +4105,26 @@ class Host(SingleArgMemoized, HostBase):
 
     @property
     def admins(self):
+        """
+        Gets the host administrators.  Host administrators can perform any action on the host.
+        This does not imply they are actual superusers on the physical systems.
+
+        :returns: Array of usernames
+        :rtype: array
+        :raise: OpenLavaError on failure
+
+        """
         return Cluster().admins
 
     @property
     def is_busy(self):
+        """
+        Returns True if the host is busy.  Busy is defined as a host that is running jobs.
+
+        :return: True if the host is busy.
+        :rtype: bool
+
+        """
         for s in self.statuses:
             busy = [
                 "HOST_STAT_BUSY",
@@ -3938,6 +4139,13 @@ class Host(SingleArgMemoized, HostBase):
 
     @property
     def is_down(self):
+        """
+        Returns True if the host is down. Down is defined as not being available to the scheduler.
+
+        :return: True if the host is down.
+        :rtype: bool
+
+        """
         for s in self.statuses:
             if s.name in ["HOST_STAT_UNREACH", "HOST_STAT_UNAVAIL", "HOST_STAT_NO_LIM", ]:
                 return True
@@ -3945,6 +4153,13 @@ class Host(SingleArgMemoized, HostBase):
 
     @property
     def is_closed(self):
+        """
+        Returns True if the host is closed for new jobs.
+
+        :return: True if the host is closed.
+        :rtype: bool
+
+        """
         for s in self.statuses:
             if s.name in ["HOST_STAT_WIND", "HOST_STAT_DISABLED", ]:
                 return True
@@ -3952,167 +4167,375 @@ class Host(SingleArgMemoized, HostBase):
 
     @property
     def has_checkpoint_support(self):
-        """True if the host supports checkpointing"""
+        """
+        Returns True if the host supports checkpointing.
+
+        :return: True if checkpoint support is enabled
+        :rtype: bool
+
+        """
         self._update_lsb_hostinfo()
         return self._has_checkpoint_support
 
     @property
     def host_model(self):
-        """String containing model information"""
+        """
+        String containing host model information
+
+        :return: Host model name
+        :rtype: str
+
+        """
+
         return self._model
 
     @property
     def host_type(self):
-        """String containing host type information"""
+        """
+        String containing host type information.
+
+        :return: Host Type
+        :rtype: str
+
+        """
+
         return lslib.ls_gethosttype(self.name)
 
     @property
     def resources(self):
-        """Array of resources available"""
+        """
+        Gets a list of resources that are available on this host.
+
+        :return: List of :py:class:`cluster.openlavacluster.Resource` objects
+        :rtype: :py:class:`cluster.openlavacluster.Resource`
+
+        """
         self._update_hostinfo()
         return self._resources
 
     @property
     def max_jobs(self):
-        """Returns the maximum number of jobs that may execute on this host"""
+        """
+        Returns the maximum number of jobs that may execute on this host
+
+        :return: Maximum number of jobs
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._max_jobs
 
     @property
     def max_processors(self):
-        """Maximum number of processors available on the host"""
+        """
+        Returns the maximum number of processors (Job Slots) available on the host for all jobs
+
+        :return: Max processors (Slots)
+        :rtype: int
+
+        """
         self._update_hostinfo()
         return self._max_processors
 
     @property
     def max_ram(self):
-        """Max Ram"""
+        """
+        Max Ram that can be consumed by jobs, in Kb
+
+        :return: Max Ram (Kb)
+        :rtype: int
+
+        """
         self._update_hostinfo()
         return self._max_ram
 
     @property
     def max_slots(self):
-        """Returns the maximum number of scheduling slots that may be consumed on this host"""
+        """
+        Returns the maximum number of scheduling slots that may be consumed on this host
+
+        :return: Max slots
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._max_slots
 
     @property
     def max_swap(self):
-        """Max swap space"""
+        """
+        Max swap space that may be consumed by jobs on this host
+
+        :return: Max Swap Space (Kb)
+        :rtype: int
+        """
         self._update_hostinfo()
         return self._max_swap
 
     @property
     def max_tmp(self):
-        """Max tmp space"""
+        """
+        Max swap space that may be consumed by jobs on this host
+
+        :return: Max Swap (Kb)
+        :rtype: int
+
+        """
         self._update_hostinfo()
         return self._max_tmp
 
     @property
     def num_reserved_slots(self):
-        """Returns the number of scheduling slots that are reserved"""
+        """
+        Returns the number of scheduling slots that are reserved
+
+        :return: Number of reserved slots
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._num_reserved_slots
 
     @property
     def num_running_jobs(self):
-        """Returns the nuber of jobs that are executing on the host"""
+        """
+        Returns the number of concurent jobs that are executing on the host
+
+        :return: Job count
+        :rtype: int
+
+        """
         self._update_job_count()
         return self._num_running_jobs
 
     @property
     def num_running_slots(self):
-        """Returns the total number of scheduling slots that are consumed on this host"""
+        """
+        Returns the total number of scheduling slots that are consumed on this host
+
+        :return: slot count
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._num_running_slots
 
     @property
     def num_suspended_jobs(self):
-        """Returns the number of jobs that are suspended on this host"""
+        """
+        Returns the number of jobs that are suspended on this host
+
+        :return: Suspended job count
+        :rtype: int
+
+        """
         self._update_job_count()
         return self._num_suspended_jobs
 
     @property
     def num_suspended_slots(self):
-        """Returns the number of scheduling slots that are suspended on this host"""
+        """
+        Returns the number of scheduling slots that are suspended on this host
+
+        :return: suspended slot count
+        :rtype: int
+        """
         self._update_lsb_hostinfo()
         return self._num_suspended_jobs
 
     @property
     def run_windows(self):
-        """Run Windows"""
+        """
+        Openlava run windows that are defined in the hosts configuration
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: Run Windows
+        :rtype: str
+
+        """
         self._update_lsb_hostinfo()
         return self._run_windows
 
     @property
     def statuses(self):
-        """Array of statuses that apply to the host"""
+        """
+        Hosts can have one or more statuses that apply.  Statuses indicate the condition of the host, such as its
+        availability, and health.
+
+        :return: List of statuses that apply to hist host
+        :rtype: list of :py:class:`cluster.openlavacluster.JobStatus` objects
+
+        """
         self._update_lsb_hostinfo()
         return HostStatus.get_status_list(self._status)
 
     @property
     def total_jobs(self):
-        """Returns the total number of jobs that are running on this host, including suspended jobs."""
+        """
+        Returns the total number of jobs that are running on this host, including suspended jobs.
+
+        :return: running job count
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._total_jobs
 
     @property
     def total_slots(self):
-        """Returns the total number of slots that are consumed on this host, including those from  suspended jobs."""
+        """
+        Returns the total number of slots that are consumed on this host, including those from  suspended jobs.
+
+        :return: consumed slot count
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._total_slots
 
-    #Openlava Only
     @property
     def cpu_factor(self):
-        """Openlava Specific - returns the CPU factor of the host"""
+        """
+        Returns the CPU factor of the host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: CPU Factor of the host
+        :rtype: bool
+
+        """
         return lslib.ls_gethostfactor(self.name)
 
     @property
     def is_server(self):
-        """True if host is an openlava server (as opposed to submission host)"""
+        """
+        True if host is an openlava server (as opposed to submission host)
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: True if host can run jobs
+        :rtype: bool
+
+        """
         self._update_hostinfo()
         return self._is_server
 
     @property
     def num_disks(self):
-        """Openlava specific: Returns the number of physical disks installed in the machine"""
+        """
+        Openlava specific: Returns the number of physical disks installed in the machine
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: Num physical disks
+        :rtype: int
+
+        """
         self._update_hostinfo()
         return self._num_disks
 
     @property
     def num_user_suspended_jobs(self):
-        """Returns the number of jobs that have been suspended by the user on this host"""
+        """
+        Returns the number of jobs that have been suspended by the user on this host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: user suspended job count
+        :rtype: int
+
+        """
         self._update_job_count()
         return self._num_user_suspended_jobs
 
     @property
     def num_user_suspended_slots(self):
-        """Returns the number of scheduling slots that have been suspended by the user on this host"""
+        """
+        Returns the number of scheduling slots that have been suspended by the user on this host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: user suspened slot count
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._num_user_suspended_slots
 
     @property
     def num_system_suspended_jobs(self):
-        """Returns the number of jobs that have been suspended by the system on this host"""
+        """
+        Returns the number of jobs that have been suspended by the system on this host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: system suspended job count
+        :rtype: int
+
+        """
         self._update_job_count()
         return self._num_system_suspended_jobs
 
     @property
     def num_system_suspended_slots(self):
-        """Returns the number of scheduling slots that have been suspended by the system on this host"""
+        """
+        Returns the number of scheduling slots that have been suspended by the system on this host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: system suspended slot count
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._num_system_suspended_slots
 
     @property
     def has_kernel_checkpoint_copy(self):
-        """Returns true if the host supports kernel checkpointing"""
+        """
+        Returns true if the host supports kernel checkpointing
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: True if kernel can checkpoint
+        :rtype: bool
+
+        """
         self._update_lsb_hostinfo()
         return self._has_kernel_checkpoint_support
 
     @property
     def max_slots_per_user(self):
-        """Returns the maximum slots that a user can occupy on the host"""
+        """
+        Returns the maximum slots that a user can occupy on the host
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return: Max slots per user
+        :rtype: int
+
+        """
         self._update_lsb_hostinfo()
         return self._max_slots_per_user
 
