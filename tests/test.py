@@ -92,26 +92,26 @@ class TestConsumedResource(unittest.TestCase):
     def test_creation(self):
         c = ConsumedResource(name="MyRes", value=100)
         self.assertEqual(c.name, "MyRes")
-        self.assertEqual(c.value, 100)
+        self.assertEqual(c.value, '100')
         self.assertIsNone(c.unit)
         self.assertIsNone(c.limit)
 
         c = ConsumedResource(name="MyRes", value=100, unit="BogoUnits")
         self.assertEqual(c.name, "MyRes")
-        self.assertEqual(c.value, 100)
+        self.assertEqual(c.value, '100')
         self.assertEqual(c.unit, "BogoUnits")
         self.assertIsNone(c.limit)
 
         c = ConsumedResource(name="MyRes", value=100, limit=120, unit="BogoUnits")
         self.assertEqual(c.name, "MyRes")
-        self.assertEqual(c.value, 100)
+        self.assertEqual(c.value, '100')
         self.assertEqual(c.unit, "BogoUnits")
-        self.assertEqual(c.limit, 120)
+        self.assertEqual(c.limit, '120')
 
         c = ConsumedResource(name="MyRes", value=100, limit=101)
         self.assertEqual(c.name, "MyRes")
-        self.assertEqual(c.value, 100)
-        self.assertEqual(c.limit, 101)
+        self.assertEqual(c.value, '100')
+        self.assertEqual(c.limit, '101')
         self.assertIsNone(c.unit)
 
 
@@ -122,7 +122,7 @@ class TestHost(unittest.TestCase):
 
     def test_host_get(self):
         for h in Host.get_host_list():
-            host = Host(host_name=h.host_name)
+            host = Host(h.host_name)
             self.assertEqual(host.host_name, h.host_name)
 
 

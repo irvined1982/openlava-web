@@ -19,7 +19,6 @@ cluster.JobBase interface.
 .. autoclass:: cluster.openlavacluster.Job
     :members:
 
-
 Client
 ^^^^^^
 

@@ -363,7 +363,7 @@ def host_list(request):
     """
     hosts = Host.get_host_list()
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_success(data=hosts)
+        return create_js_success(data=hosts)
 
     paginator = Paginator(hosts, 25)
     page = request.GET.get('page')
@@ -391,8 +391,7 @@ def host_view(request, host_name):
         raise Http404("Host not found")
 
     if request.is_ajax() or request.GET.get("json", None):
-        return HttpResponse(json.dumps(host, sort_keys=True, indent=4, cls=ClusterEncoder),
-                            content_type='application/json')
+        return create_js_success(host)
     return render(request, 'openlavaweb/host_detail.html', {"host": host}, )
 
 
@@ -495,9 +494,6 @@ def execute_host_open(request, queue, host_name):
         queue.put(e)
 
 
-
-
-
 def user_list(request):
     users = User.get_user_list()
     if request.is_ajax() or request.GET.get("json", None):
@@ -522,7 +518,6 @@ def user_view(request, user_name):
         return HttpResponse(json.dumps(user, sort_keys=True, indent=4, cls=ClusterEncoder),
                             content_type='application/json')
     return render(request, 'openlavaweb/user_detail.html', {"oluser": user}, )
-
 
 
 def system_view(request):
@@ -604,9 +599,6 @@ def system_overview_slots(request):
         )
     return HttpResponse(json.dumps(nvstates, sort_keys=True, indent=4, cls=ClusterEncoder),
                         content_type="application/json")
-
-
-
 
 
 def get_job_list(request, job_id=0):
@@ -709,6 +701,7 @@ def job_view(request, job_id, array_index=0):
             return HttpResponse(e.to_json(), content_type='application/json')
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
+
 
 def execute_get_output_path(request, queue, job_id, array_index):
     """

@@ -2867,7 +2867,7 @@ class Job(JobBase):
         return lsblib.lsb_peekjob(full_job_id)
 
     @classmethod
-    def submit(cls, **kwargs):
+    def submit(cls, command, **kwargs):
         """
         Submits a job into the cluster.
 
@@ -3080,10 +3080,10 @@ class Job(JobBase):
             options = options | fields[k]['options']
             options2 = options2 | fields[k]['options2']
 
-        s.command = kwargs['command']
-        options = s.options | options
+        s.command = command
+        options |= s.options
         s.options = options
-        options2 = s.options2 | options2
+        options2 |= s.options2
         s.options2 = options2
         if s.maxNumProcessors < s.numProcessors:
             s.maxNumProcessors = s.numProcessors
@@ -3623,7 +3623,7 @@ class Queue(SingleArgMemoized):
         return False
 
     @property
-    def is_despatching_jobs(self):
+    def is_dispatching_jobs(self):
         for state in self.statuses:
             if state.name == "QUEUE_STAT_ACTIVE":
                 return True
@@ -3721,7 +3721,7 @@ class Queue(SingleArgMemoized):
             'resume_condition',
             'stop_condition',
             'is_accepting_jobs',
-            'is_despatching_jobs',
+            'is_dispatching_jobs',
             'jobs',
             'cluster_type',
         ]
@@ -3971,11 +3971,7 @@ class Host(SingleArgMemoized, HostBase):
             >>> host=Host.get_host_list()[0]
             >>> host.open()
             Traceback (most recent call last):
-              File "<stdin>", line 1, in <module>
-              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 3974, in open
-                raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open host: %s" % self.name)
-              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 231, in raise_cluster_exception
-                raise e("%s: %s" % (message, messages[code]), code=code)
+              ...
             cluster.PermissionDeniedError: Unable to open host: master: User permission denied
 
         :return: 0 on success
@@ -3997,11 +3993,7 @@ class Host(SingleArgMemoized, HostBase):
             >>> host=Host.get_host_list()[0]
             >>> host.close()
             Traceback (most recent call last):
-              File "<stdin>", line 1, in <module>
-              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 3992, in close
-                raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close host: %s" % self.name)
-              File "/usr/local/lib/python2.7/dist-packages/django_openlavaweb-1.0-py2.7.egg/cluster/openlavacluster.py", line 231, in raise_cluster_exception
-                raise e("%s: %s" % (message, messages[code]), code=code)
+              ...
             cluster.PermissionDeniedError: Unable to close host: master: User permission denied
 
         :return: 0 on success
@@ -4053,16 +4045,33 @@ class Host(SingleArgMemoized, HostBase):
 
         The dict has three fields, names, short_names, and values, each a list of the same length.  Names
         contains a list of field names, short_names contains a shorter version of the name, and values contains
-        the corresponding value of the field.
+        the corresponding value of the field.  A value of -1 is unlimited.
 
         Example::
 
             >>> from cluster.openlavacluster import Host
             >>> host=Host.get_host_list()[0]
-
+            >>> for i in range(len(info['names'])):
+            ...     values = ""
+            ...     for v in info['values']:
+            ...         values += "%s(%s) " % (v['values'][i], v['name'])
+            ...     print "%s(%s): %s" % (info['names'][i], info['short_names'][i], values)
+            ...
+            15s Load(r15s): 0.0599999427795(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            1m Load(r1m): 0.039999961853(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            15m Load(r15m): 0.0499999523163(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Avg CPU Utilization(ut): 0.0759999975562(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Paging Rate (Pages/Sec)(pg): 0.0(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Disk IO Rate (MB/Sec)(io): 0.0(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Num Users(ls): 3.0(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Idle Time(it): 1.0(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Tmp Space (MB)(tmp): 54141.0(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Free Swap (MB)(swp): 507.03125(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
+            Free Memory (MB)(mem): 625.3515625(Actual Load) -1(Stop Dispatching Load) -1(Stop Executing Load)
 
         :returns: dictionary of load index dictionaries
         :rtype: dictionary
+
         """
         self._update_lsb_hostinfo()
 
@@ -4071,7 +4080,7 @@ class Host(SingleArgMemoized, HostBase):
                       "Disk IO Rate (MB/Sec)", "Num Users", "Idle Time", "Tmp Space (MB)", "Free Swap (MB)",
                       "Free Memory (MB)"],
             'short_names': ['r15s', 'r1m', 'r15m', 'ut', 'pg', 'io', 'ls', 'it', 'tmp', 'swp', 'mem'],
-            'values': []
+            'values': [],
         }
 
         indexes['values'].append({
@@ -4357,7 +4366,6 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>>
             >>> host.resources
             [foo]
 
