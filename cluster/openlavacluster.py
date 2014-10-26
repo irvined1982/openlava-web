@@ -689,12 +689,65 @@ class JobStatus(NumericStatus):
     status at any given time.  Based on the status, other attributes/methods may or not be available or have usable
     data.
 
+    .. list-table:: Valid Statuses
+       :header-rows: 1
 
-
-    .. todo:
-
-        Define each state that may occur.  Include inherited members from NumericStatus.
-
+       * - Value
+         - Friendly Name
+         - Name
+         - Description
+       * - 0x00
+         - Null
+         - JOB_STAT_NULL
+         - State null
+       * - 0x01
+         - Pending
+         - JOB_STAT_PEND
+         - The job is pending, i.e., it has not been dispatched yet.
+       * - 0x02
+         - Held
+         - JOB_STAT_PSUSP
+         - The pending job was suspended by its owner or the LSF system administrator.
+       * - 0x04
+         - Running
+         - JOB_STAT_RUN
+         - The job is running
+       * - 0x08
+         - Suspended by system
+         - JOB_STAT_SSUSP
+         - The running job was suspended by the system because an execution host was overloaded
+           or the queue run window closed.
+       * - 0x10
+         - Suspended by user
+         - JOB_STAT_USUSP
+         - The running job was suspended by its owner or the LSF system administrator.
+       * - 0x20
+         - Exited
+         - JOB_STAT_EXIT
+         -  The job has terminated with a non-zero status - it may have been aborted due to an
+            error in its execution, or killed by its owner or by the LSF system administrator.
+       * - 0x40
+         - Completed
+         - JOB_STAT_DONE
+         - The job has terminated with status 0
+       * - 0x80
+         - Process Completed
+         - JOB_STAT_PDONE
+         - Post job process done successfully.
+       * - 0x100
+         - Process Error
+         - JOB_STAT_PERR
+         - Post job process has error.
+       * - 0x200
+         - Waiting for execution
+         - JOB_STAT_WAIT
+         - Chunk job waiting its turn to exec.
+       * - 0x10000
+         - Unknown
+         - JOB_STAT_UNKWN
+         - The slave batch daemon (sbatchd) on the host on which the job is processed has lost
+           contact with the master batch daemon (mbatchd).
+        
     """
     states = {
         0x00: {
