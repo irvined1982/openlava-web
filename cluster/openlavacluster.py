@@ -747,7 +747,7 @@ class JobStatus(NumericStatus):
          - JOB_STAT_UNKWN
          - The slave batch daemon (sbatchd) on the host on which the job is processed has lost
            contact with the master batch daemon (mbatchd).
-        
+
     """
     states = {
         0x00: {
@@ -1650,10 +1650,10 @@ class Job(JobBase):
     @property
     def status(self):
         """
-        Job Status object that defines the current status of the job.
+        :py:class:`JobStatus` object that defines the current status of the job.
 
         :return: Job Status
-        :rtype: JobStatus
+        :rtype: :py:class:`JobStatus`
 
         """
         
