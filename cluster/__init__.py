@@ -563,17 +563,11 @@ class BaseResource(object):
 
     @property
     def name(self):
-        '''Host name of the host'''
         return self._name
 
     @property
     def description(self):
         return self._description
-
-
-    def jobs(self, job_id=None, job_name=None, user_name=None, job_state="all"):
-        '''Returns jobs that are running on the host'''
-        raise NotImplementedError
 
 
 class ClusterException(Exception):
