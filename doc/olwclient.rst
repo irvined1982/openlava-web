@@ -19,8 +19,12 @@ cluster.JobBase interface.
 .. autoclass:: cluster.openlavacluster.Job
     :members:
 
-Client
-^^^^^^
+Olwclient
+^^^^^^^^^
+
+Olwclient uses the RESTful interface to the olweb server to communicate with the scheduler.  Openlava-web is then
+responsible for connecting to the job scheduler and retrieving job information.  This is then serialized using JSON
+and sent back to the client.
 
 .. autoclass:: olwclient.Job
     :members:
