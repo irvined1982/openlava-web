@@ -140,6 +140,9 @@ Cluster Resources
 Exceptions
 ----------
 
+Local
+^^^^^
+
 .. autoclass:: cluster.ClusterException
     :members:
 
@@ -170,3 +173,14 @@ Exceptions
 .. autoclass:: cluster.openlavacluster.ClusterException
     :members:
 
+
+Client
+^^^^^^
+
+.. autoclass:: olwclient.RemoteServerError
+    :members:
+    :inherited-members:
+
+.. autoclass:: olwclient.AuthenticationError
+    :members:
+    :inherited-members:

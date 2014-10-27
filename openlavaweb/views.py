@@ -103,7 +103,7 @@ class ClusterEncoder(json.JSONEncoder):
         return d
 
 
-def create_js_success(data=None, message=""):
+def create_js_response(data=None, message="", response=None, is_failure=False):
     """
     Takes a json serializable object, and an optional message, and creates a standard json response document.
 
@@ -112,13 +112,19 @@ def create_js_success(data=None, message=""):
     :return: HttpResponse object
 
     """
+    if is_failure:
+        status = "FAIL"
+    else:
+        status = "OK"
     data = {
-        'status': "OK",
+        'status': status,
         'data': data,
         'message': message,
     }
-    return HttpResponse(json.dumps(data, sort_keys=True, indent=4, cls=ClusterEncoder),
-                        content_type='application/json')
+    if response is None:
+        response = HttpResponse
+    return response(json.dumps(data, sort_keys=True, indent=4, cls=ClusterEncoder),
+                    content_type='application/json')
 
 
 @ensure_csrf_cookie
@@ -127,10 +133,17 @@ def get_csrf_token(request):
     Returns the CSRF token to an AJAX client
 
     :param request: Request object
-    :return: AJAX response with CSRF token
+    :return:
+
+        Returns a JSON serialized dictionary containing a single item, called cookie, the value of which
+        is set to the CSRF token.
+
+        Example::
+
+
     """
-    return HttpResponse(json.dumps({'cookie': get_token(request)}, sort_keys=True, indent=4),
-                        content_type="application/json")
+
+    return create_js_response({'cookie': get_token(request)})
 
 
 @csrf_exempt
@@ -150,11 +163,11 @@ def ajax_login(request):
     if user:
         if user.is_active:
             login(request, user)
-            return create_js_success(message="User logged in")
+            return create_js_response(message="User logged in")
         else:
-            return HttpResponseForbidden()
+            return create_js_response(message="User is inactive", response=HttpResponseForbidden, is_failure=True)
     else:
-        return HttpResponseForbidden()
+        return create_js_response(message="Invalid username or password", response=HttpResponseForbidden, is_failure=True)
 
 
 def queue_list(request):
@@ -363,7 +376,7 @@ def host_list(request):
     """
     hosts = Host.get_host_list()
     if request.is_ajax() or request.GET.get("json", None):
-        return create_js_success(data=hosts)
+        return create_js_response(data=hosts)
 
     paginator = Paginator(hosts, 25)
     page = request.GET.get('page')
@@ -391,7 +404,7 @@ def host_view(request, host_name):
         raise Http404("Host not found")
 
     if request.is_ajax() or request.GET.get("json", None):
-        return create_js_success(host)
+        return create_js_response(host)
     return render(request, 'openlavaweb/host_detail.html', {"host": host}, )
 
 
@@ -444,7 +457,7 @@ def execute_host_close(request, queue, host_name):
         h.close()
 
         if request.is_ajax():
-            queue.put(create_js_success())
+            queue.put(create_js_response())
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -487,7 +500,7 @@ def execute_host_open(request, queue, host_name):
         h = Host(host_name)
         h.open()
         if request.is_ajax():
-            queue.put(create_js_success())
+            queue.put(create_js_response())
         else:
             queue.put(HttpResponseRedirect(reverse("olw_host_view", args=[host_name])))
     except Exception as e:
@@ -497,7 +510,7 @@ def execute_host_open(request, queue, host_name):
 def user_list(request):
     users = User.get_user_list()
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_success(data=users)
+        create_js_response(data=users)
     paginator = Paginator(users, 25)
     page = request.GET.get('page')
     try:
@@ -653,7 +666,7 @@ def get_job_list(request, job_id=0):
                                     job_name=job_name)
 
     if request.is_ajax() or request.GET.get("json", None):
-        return create_js_success(data=job_list)
+        return create_js_response(data=job_list)
 
     paginator = Paginator(job_list, 50)
     page = request.GET.get('page')
@@ -688,7 +701,7 @@ def job_view(request, job_id, array_index=0):
     try:
         job = Job(job_id=job_id, array_index=array_index)
         if request.is_ajax() or request.GET.get("json", None):
-            return create_js_success(data=job)
+            return create_js_response(data=job)
         else:
             return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
     except NoSuchJobError as e:
@@ -870,7 +883,7 @@ def execute_job_kill(request, queue, job_id, array_index):
         job = Job(job_id=job_id, array_index=array_index)
         job.kill()
         if request.is_ajax():
-            queue.put(create_js_success("Job Killed"))
+            queue.put(create_js_response("Job Killed"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_list")))
     except Exception as e:
@@ -932,7 +945,7 @@ def execute_job_suspend(request, queue, job_id, array_index):
         job = Job(job_id=job_id, array_index=array_index)
         job.suspend()
         if request.is_ajax():
-            queue.put(create_js_success(message="Job suspended"))
+            queue.put(create_js_response(message="Job suspended"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
     except Exception as e:
@@ -996,7 +1009,7 @@ def execute_job_resume(request, queue, job_id, array_index):
         job = Job(job_id=job_id, array_index=array_index)
         job.resume()
         if request.is_ajax():
-            queue.put(create_js_success(message="Job Resumed"))
+            queue.put(create_js_response(message="Job Resumed"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
     except Exception as e:
@@ -1066,7 +1079,7 @@ def execute_job_requeue(request, queue, job_id, array_index, hold):
         job = Job(job_id=job_id, array_index=array_index)
         job.requeue(hold=hold)
         if request.is_ajax():
-            queue.put(create_js_success(message="Job Requeued"))
+            queue.put(create_js_response(message="Job Requeued"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
     except Exception as e:
