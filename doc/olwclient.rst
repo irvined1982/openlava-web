@@ -43,45 +43,97 @@ Process Classes
 
 Process classes represent individual processes that are executing on a given host.
 
+Local
+^^^^^
 .. autoclass:: cluster.Process
+
+Olwclient
+^^^^^^^^^
+
+.. autoclass:: olwclient.Process
 
 Resource Limit Classes
 ----------------------
 
 Resource limits classes define resource limits that are imposed on a given job.
 
+Local
+^^^^^
+
 .. autoclass:: cluster.ResourceLimit
+    :members:
+
+Olwclient
+^^^^^^^^^
+
+.. autoclass:: olwclient.ResourceLimit
+    :members:
 
 Consumed Resources
 ------------------
 
 Consumed resources represent resources that have been consumed by a given job.
 
+Local
+^^^^^
+
 .. autoclass:: cluster.ConsumedResource
+    :members:
+
+Olwclient
+^^^^^^^^^
+.. autoclass:: olwclient.ConsumedResource
     :members:
 
 Processees
 ----------
 
+Local
+^^^^^
 .. autoclass:: cluster.Process
     :members:
 
+Olwclient
+^^^^^^^^^
+
+.. autoclass:: olwclient.Process
+    :members:
 
 Job Status
 ----------
 
+Local
+^^^^^
+
 .. autoclass:: cluster.openlavacluster.JobStatus
+    :members:
+    :inherited-members:
+
+Olwclient
+^^^^^^^^^
+
+.. autoclass:: olwclient.JobStatus
     :members:
     :inherited-members:
 
 Job Options
 -----------
 
+Local
+^^^^^
+
 .. autoclass:: cluster.openlavacluster.SubmitOption
     :members:
     :inherited-members:
 
 .. autoclass:: cluster.openlavacluster.Submit2Option
+    :members:
+    :inherited-members:
+
+Olwclient
+^^^^^^^^^
+
+.. autoclass:: olwclient.JobOption
     :members:
     :inherited-members:
 

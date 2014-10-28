@@ -171,6 +171,176 @@ class TestHost(unittest.TestCase):
             self.assertEqual(host.host_name, h.host_name)
 
 
+class TestRemoteJob(unittest.TestCase):
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_list(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        job_list = OLJob.get_job_list(connection)
+        for job in job_list:
+            self.assertIsInstance(job, OLJob)
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_submit(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, requested_slots=1, command="hostname")
+        self.assertIs(len(jobs), 1, msg="Submitting one job returns 1 item")
+        self.job_state_test(jobs[0])
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_submit_array(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="hostname")
+        self.assertIs(len(jobs), 100, msg="Submitting one job returns 1 item")
+        for job in jobs[:5]:
+            self.job_state_test(job)
+
+    def job_state_test(self, job):
+        self.assertIsInstance(job.is_completed, bool)
+        self.assertIsInstance(job.is_failed, bool)
+        self.assertIsInstance(job.is_pending, bool)
+        self.assertIsInstance(job.is_running, bool)
+        self.assertIsInstance(job.is_suspended, bool)
+        count = 0
+        if job.is_completed:
+            count += 1
+
+        if job.is_failed:
+            count += 1
+
+        if job.is_pending:
+            count += 1
+
+        if job.is_running:
+            count += 1
+
+        if job.is_suspended:
+            count += 1
+
+        self.assertIs(count, 1, msg="Only one active job mode per time.")
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_kill(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        # kill the job
+        job.kill()
+
+        # Wait for the job to actually die
+        time.sleep(15)
+
+        job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_completed or job.is_failed or job.was_killed)
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_suspend(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        job.suspend()
+        time.sleep(15)
+        job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_suspended)
+        job.kill()
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_resume(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        job.suspend()
+        time.sleep(15)
+        job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_suspended)
+        job.resume()
+        time.sleep(15)
+        job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+        self.assertFalse(job.is_suspended)
+        job.kill()
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_requeue(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        while job.is_pending:
+            time.sleep(1)
+            job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+
+        if not job.is_running:
+            self.skipTest("Job no longer running")
+
+        start_time = job.start_time
+        job.requeue(hold=False)
+        time.sleep(45)
+        job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+        if job.is_pending:
+            # Passed
+            job.kill()
+            return None
+
+        self.assertNotEqual(job.start_time, start_time)
+        job.kill()
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_job_requeue_hold(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
+        job = jobs.pop()
+        while job.is_pending:
+            time.sleep(1)
+            job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+
+        if not job.is_running:
+            self.skipTest("Job no longer running")
+
+        job.requeue(hold=True)
+        time.sleep(45)  # Takes a while, first state is exit...
+        job = OLJob(connection, job_id=job.job_id, array_index=job.array_index)
+        self.assertTrue(job.is_suspended)
+        job.kill()
+
+
 class TestJob(unittest.TestCase):
 
     def test_job_list(self):
