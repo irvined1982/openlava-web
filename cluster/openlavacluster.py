@@ -2101,7 +2101,8 @@ class Job(JobBase):
 
     @property
     def queue(self):
-        """The queue ob ject that this job is currently in.  This may have been modified by the scheduling system, or an
+        """
+        The queue ob ject that this job is currently in.  This may have been modified by the scheduling system, or an
         administrator.
 
         Example::
@@ -2121,7 +2122,8 @@ class Job(JobBase):
 
     @property
     def requested_hosts(self):
-        """An array of Host objects corresponding the the hosts that the user requested for this job.  If the user did
+        """
+        An array of Host objects corresponding the the hosts that the user requested for this job.  If the user did
         not request any hosts, then the list will be empty.
 
         Example::

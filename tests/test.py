@@ -21,6 +21,55 @@ import os
 import urllib
 from cluster.openlavacluster import Job, Host
 from cluster import ConsumedResource
+from olwclient import Job as OLJob, OpenLavaConnection
+
+
+class Cargs:
+    username = None
+    password = None
+    url = None
+
+
+class CompareWebLocal(unittest.TestCase):
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_job_list(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        remote_job_list = OLJob.get_job_list(connection)
+        local_job_list = Job.get_job_list()
+        local_jobs = set()
+        remote_jobs = set()
+        for job in local_job_list:
+            local_jobs.add(str(job))
+
+        for job in remote_job_list:
+            remote_jobs.add(str(job))
+
+        for job in local_jobs:
+            self.assertIn(job, remote_jobs)
+
+        for job in remote_jobs:
+            self.assertIn(job, local_jobs)
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_job_attributes(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        for local_job in Job.get_job_list():
+            remote_job = OLJob(connection, job_id=local_job.job_id, array_index=local_job.array_index)
+            local_job = Job(job_id=local_job.job_id, array_index=local_job.array_index)
+            for attr in local_job.json_attributes():
+                self.assertEqual(str(getattr(local_job, attr)), str(getattr(remote_job, attr)))
 
 
 class TestWebServer(unittest.TestCase):

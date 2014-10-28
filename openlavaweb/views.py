@@ -138,8 +138,15 @@ def get_csrf_token(request):
         Returns a JSON serialized dictionary containing a single item, called cookie, the value of which
         is set to the CSRF token.
 
-        Example::
+        Example Response::
 
+            {
+                "data": {
+                    "cookie": "Ca7mCejV7LKu1LN13bGtSaKZqCtHYGTp"
+                },
+                "message": "",
+                "status": "OK"
+            }
 
     """
 
@@ -149,9 +156,43 @@ def get_csrf_token(request):
 @csrf_exempt
 def ajax_login(request):
     """
-    Logs in an ajax client
+    Logs in an ajax client by allowing the client to upload the username/password combination.
+
+    .. todo: Check if this is a REALLY BAD IDEA?!?!?
+
+    The username password combo should be JSON serialized and sent as the POST data.
+
+    Example POST data::
+
+        {
+            "password": "topsecret",
+            "username": "bob"
+        }
+
     :param request:
     :return:
+
+    On success, returns a JSON serialized response with no data, and the message set to "User logged in"
+
+    Example Success Response::
+
+        {
+            "data": null,
+            "message": "User logged in",
+            "status": "OK"
+        }
+
+    On failure to authenticate, returns HTTP Error 403 not authenticated, the reason for the failure is specified
+    in the message.
+
+    Example Failure Response::
+
+        {
+            "data": null,
+            "message": "Invalid username or password",
+            "status": "FAIL"
+        }
+
     """
     try:
         data = json.loads(request.body)
@@ -649,6 +690,709 @@ def get_job_list(request, job_id=0):
     :return:
         If an ajax request, then returns an array of JSON Job objects that match the query. Otherwise returns a
         rendered HTML page listing each job.  Pages are paginated using a paginator.
+
+        Example JSON response::
+
+            {
+                "data": [
+                    {
+                        "admins": [
+                            "irvined",
+                            "openlava"
+                        ],
+                        "array_index": 0,
+                        "begin_time": 0,
+                        "checkpoint_directory": "",
+                        "checkpoint_period": 0,
+                        "cluster_type": "openlava",
+                        "command": "sleep 1000",
+                        "consumed_resources": [
+                            {
+                                "limit": "-1",
+                                "name": "Resident Memory",
+                                "type": "ConsumedResource",
+                                "unit": "KB",
+                                "value": "0"
+                            },
+                            {
+                                "limit": "-1",
+                                "name": "Virtual Memory",
+                                "type": "ConsumedResource",
+                                "unit": "KB",
+                                "value": "0"
+                            },
+                            {
+                                "limit": "-1",
+                                "name": "User Time",
+                                "type": "ConsumedResource",
+                                "unit": "None",
+                                "value": "0:00:00"
+                            },
+                            {
+                                "limit": "None",
+                                "name": "System Time",
+                                "type": "ConsumedResource",
+                                "unit": "None",
+                                "value": "0:00:00"
+                            },
+                            {
+                                "limit": "None",
+                                "name": "Num Active Processes",
+                                "type": "ConsumedResource",
+                                "unit": "Processes",
+                                "value": "0"
+                            }
+                        ],
+                        "cpu_factor": 0.0,
+                        "cpu_time": 0.0,
+                        "cwd": "openlava-web/tests",
+                        "dependency_condition": "",
+                        "email_user": "",
+                        "end_time": 0,
+                        "error_file_name": "/dev/null",
+                        "execution_cwd": "//master/home/irvined/openlava-web/tests",
+                        "execution_home_directory": "",
+                        "execution_hosts": [],
+                        "execution_user_id": 1000,
+                        "execution_user_name": "irvined",
+                        "host_specification": "",
+                        "input_file_name": "/dev/null",
+                        "is_completed": false,
+                        "is_failed": false,
+                        "is_pending": false,
+                        "is_running": false,
+                        "is_suspended": true,
+                        "job_id": 9767,
+                        "login_shell": "",
+                        "max_requested_slots": 1,
+                        "name": "sleep 1000",
+                        "options": [
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with queue",
+                                "name": "SUB_QUEUE",
+                                "status": 2,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted to project",
+                                "name": "SUB_PROJECT_NAME",
+                                "status": 33554432,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with output file",
+                                "name": "SUB_OUT_FILE",
+                                "status": 16,
+                                "type": "SubmitOption"
+                            }
+                        ],
+                        "output_file_name": "/dev/null",
+                        "parent_group": "/",
+                        "pending_reasons": " The job was suspended by the user while pending: 1 host;",
+                        "pre_execution_command": "",
+                        "predicted_start_time": 0,
+                        "priority": -1,
+                        "process_id": 11567,
+                        "processes": [],
+                        "project_names": [
+                            "default"
+                        ],
+                        "queue": {
+                            "name": "normal",
+                            "type": "Queue",
+                            "url": "/olweb/olw/queues/normal"
+                        },
+                        "requested_hosts": [],
+                        "requested_resources": "",
+                        "requested_slots": 1,
+                        "reservation_time": 0,
+                        "resource_usage_last_update_time": 1414241622,
+                        "runtime_limits": [
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "CPU Time",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "File Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Data Segment Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Stack Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Core Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "RSS Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Num Files",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Max Open Files",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Swap Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Run Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Process Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            }
+                        ],
+                        "service_port": 0,
+                        "start_time": 0,
+                        "status": {
+                            "description": "The pending job was suspended by its owner or the LSF system administrator.",
+                            "friendly": "Held",
+                            "name": "JOB_STAT_PSUSP",
+                            "status": 2,
+                            "type": "JobStatus"
+                        },
+                        "submission_host": {
+                            "name": "master",
+                            "type": "Host",
+                            "url": "/olweb/olw/hosts/master"
+                        },
+                        "submit_home_directory": "/home/irvined",
+                        "submit_time": 1414241607,
+                        "suspension_reasons": " The job was suspended by user;",
+                        "termination_signal": 0,
+                        "termination_time": 0,
+                        "type": "Job",
+                        "user_name": "irvined",
+                        "user_priority": -1,
+                        "was_killed": false
+                    },
+                    {
+                        "admins": [
+                            "irvined",
+                            "openlava"
+                        ],
+                        "array_index": 0,
+                        "begin_time": 0,
+                        "checkpoint_directory": "",
+                        "checkpoint_period": 0,
+                        "cluster_type": "openlava",
+                        "command": "sleep 1000",
+                        "consumed_resources": [
+                            {
+                                "limit": "-1",
+                                "name": "Resident Memory",
+                                "type": "ConsumedResource",
+                                "unit": "KB",
+                                "value": "0"
+                            },
+                            {
+                                "limit": "-1",
+                                "name": "Virtual Memory",
+                                "type": "ConsumedResource",
+                                "unit": "KB",
+                                "value": "0"
+                            },
+                            {
+                                "limit": "-1",
+                                "name": "User Time",
+                                "type": "ConsumedResource",
+                                "unit": "None",
+                                "value": "0:00:00"
+                            },
+                            {
+                                "limit": "None",
+                                "name": "System Time",
+                                "type": "ConsumedResource",
+                                "unit": "None",
+                                "value": "0:00:00"
+                            },
+                            {
+                                "limit": "None",
+                                "name": "Num Active Processes",
+                                "type": "ConsumedResource",
+                                "unit": "Processes",
+                                "value": "0"
+                            }
+                        ],
+                        "cpu_factor": 0.0,
+                        "cpu_time": 0.0,
+                        "cwd": "openlava-web/tests",
+                        "dependency_condition": "",
+                        "email_user": "",
+                        "end_time": 0,
+                        "error_file_name": "/dev/null",
+                        "execution_cwd": "//master/home/irvined/openlava-web/tests",
+                        "execution_home_directory": "",
+                        "execution_hosts": [],
+                        "execution_user_id": 1000,
+                        "execution_user_name": "irvined",
+                        "host_specification": "",
+                        "input_file_name": "/dev/null",
+                        "is_completed": false,
+                        "is_failed": false,
+                        "is_pending": false,
+                        "is_running": false,
+                        "is_suspended": true,
+                        "job_id": 9776,
+                        "login_shell": "",
+                        "max_requested_slots": 1,
+                        "name": "sleep 1000",
+                        "options": [
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with queue",
+                                "name": "SUB_QUEUE",
+                                "status": 2,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted to project",
+                                "name": "SUB_PROJECT_NAME",
+                                "status": 33554432,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with output file",
+                                "name": "SUB_OUT_FILE",
+                                "status": 16,
+                                "type": "SubmitOption"
+                            }
+                        ],
+                        "output_file_name": "/dev/null",
+                        "parent_group": "/",
+                        "pending_reasons": " The job was suspended by the user while pending: 1 host;",
+                        "pre_execution_command": "",
+                        "predicted_start_time": 0,
+                        "priority": -1,
+                        "process_id": 13254,
+                        "processes": [],
+                        "project_names": [
+                            "default"
+                        ],
+                        "queue": {
+                            "name": "normal",
+                            "type": "Queue",
+                            "url": "/olweb/olw/queues/normal"
+                        },
+                        "requested_hosts": [],
+                        "requested_resources": "",
+                        "requested_slots": 1,
+                        "reservation_time": 0,
+                        "resource_usage_last_update_time": 1414242212,
+                        "runtime_limits": [
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "CPU Time",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "File Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Data Segment Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Stack Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Core Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "RSS Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Num Files",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Max Open Files",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Swap Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Run Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Process Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            }
+                        ],
+                        "service_port": 0,
+                        "start_time": 0,
+                        "status": {
+                            "description": "The pending job was suspended by its owner or the LSF system administrator.",
+                            "friendly": "Held",
+                            "name": "JOB_STAT_PSUSP",
+                            "status": 2,
+                            "type": "JobStatus"
+                        },
+                        "submission_host": {
+                            "name": "master",
+                            "type": "Host",
+                            "url": "/olweb/olw/hosts/master"
+                        },
+                        "submit_home_directory": "/home/irvined",
+                        "submit_time": 1414242197,
+                        "suspension_reasons": " The job was suspended by user;",
+                        "termination_signal": 0,
+                        "termination_time": 0,
+                        "type": "Job",
+                        "user_name": "irvined",
+                        "user_priority": -1,
+                        "was_killed": false
+                    },
+                    {
+                        "admins": [
+                            "irvined",
+                            "openlava"
+                        ],
+                        "array_index": 0,
+                        "begin_time": 0,
+                        "checkpoint_directory": "",
+                        "checkpoint_period": 0,
+                        "cluster_type": "openlava",
+                        "command": "sleep 100",
+                        "consumed_resources": [
+                            {
+                                "limit": "-1",
+                                "name": "Resident Memory",
+                                "type": "ConsumedResource",
+                                "unit": "KB",
+                                "value": "0"
+                            },
+                            {
+                                "limit": "-1",
+                                "name": "Virtual Memory",
+                                "type": "ConsumedResource",
+                                "unit": "KB",
+                                "value": "0"
+                            },
+                            {
+                                "limit": "-1",
+                                "name": "User Time",
+                                "type": "ConsumedResource",
+                                "unit": "None",
+                                "value": "0:00:00"
+                            },
+                            {
+                                "limit": "None",
+                                "name": "System Time",
+                                "type": "ConsumedResource",
+                                "unit": "None",
+                                "value": "0:00:00"
+                            },
+                            {
+                                "limit": "None",
+                                "name": "Num Active Processes",
+                                "type": "ConsumedResource",
+                                "unit": "Processes",
+                                "value": "0"
+                            }
+                        ],
+                        "cpu_factor": 0.0,
+                        "cpu_time": 0.0,
+                        "cwd": "openlava-web/tests",
+                        "dependency_condition": "",
+                        "email_user": "",
+                        "end_time": 0,
+                        "error_file_name": "/dev/null",
+                        "execution_cwd": "//master/home/irvined/openlava-web/tests",
+                        "execution_home_directory": "",
+                        "execution_hosts": [],
+                        "execution_user_id": 1000,
+                        "execution_user_name": "irvined",
+                        "host_specification": "",
+                        "input_file_name": "/dev/null",
+                        "is_completed": false,
+                        "is_failed": false,
+                        "is_pending": false,
+                        "is_running": false,
+                        "is_suspended": true,
+                        "job_id": 9781,
+                        "login_shell": "",
+                        "max_requested_slots": 1,
+                        "name": "sleep 100",
+                        "options": [
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with queue",
+                                "name": "SUB_QUEUE",
+                                "status": 2,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted to project",
+                                "name": "SUB_PROJECT_NAME",
+                                "status": 33554432,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with output file",
+                                "name": "SUB_OUT_FILE",
+                                "status": 16,
+                                "type": "SubmitOption"
+                            },
+                            {
+                                "description": "",
+                                "friendly": "Job submitted with checkpoint period",
+                                "name": "SUB_CHKPNT_PERIOD",
+                                "status": 1024,
+                                "type": "SubmitOption"
+                            }
+                        ],
+                        "output_file_name": "/dev/null",
+                        "parent_group": "/",
+                        "pending_reasons": " The job was suspended by the user while pending: 1 host;",
+                        "pre_execution_command": "",
+                        "predicted_start_time": 0,
+                        "priority": -1,
+                        "process_id": 30160,
+                        "processes": [],
+                        "project_names": [
+                            "default"
+                        ],
+                        "queue": {
+                            "name": "normal",
+                            "type": "Queue",
+                            "url": "/olweb/olw/queues/normal"
+                        },
+                        "requested_hosts": [],
+                        "requested_resources": "",
+                        "requested_slots": 1,
+                        "reservation_time": 0,
+                        "resource_usage_last_update_time": 1414243932,
+                        "runtime_limits": [
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "CPU Time",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "File Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Data Segment Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Stack Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Core Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "RSS Size",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Num Files",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Max Open Files",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Swap Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "KB"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Run Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            },
+                            {
+                                "description": "None",
+                                "hard_limit": "-1",
+                                "name": "Process Limit",
+                                "soft_limit": "-1",
+                                "type": "ResourceLimit",
+                                "unit": "None"
+                            }
+                        ],
+                        "service_port": 0,
+                        "start_time": 0,
+                        "status": {
+                            "description": "The pending job was suspended by its owner or the LSF system administrator.",
+                            "friendly": "Held",
+                            "name": "JOB_STAT_PSUSP",
+                            "status": 2,
+                            "type": "JobStatus"
+                        },
+                        "submission_host": {
+                            "name": "master",
+                            "type": "Host",
+                            "url": "/olweb/olw/hosts/master"
+                        },
+                        "submit_home_directory": "/home/irvined",
+                        "submit_time": 1414243874,
+                        "suspension_reasons": " The job was suspended by user;",
+                        "termination_signal": 0,
+                        "termination_time": 0,
+                        "type": "Job",
+                        "user_name": "irvined",
+                        "user_priority": -1,
+                        "was_killed": false
+                    }
+                ],
+                "message": "",
+                "status": "OK"
+            }
 
     """
     job_id = int(job_id)
@@ -1182,7 +1926,6 @@ class OLWSubmit(forms.Form):
 
     def submit(self, ajax_args=None):
         logger = log_to_stderr()
-        logger.setLevel(logging.DEBUG)
         logger.debug("Entering OLWSubmit submit")
         if ajax_args:
             kwargs = ajax_args
@@ -1199,10 +1942,7 @@ class OLWSubmit(forms.Form):
             self._post_submit(jobs)
             logger.debug("Returned from Post Submit")
             if ajax_args:
-                logger.debug("Generating job ajax list...")
-                d = json.dumps(jobs, sort_keys=True, indent=4, cls=ClusterEncoder)
-                logger.debug("Generated job ajax list...")
-                return HttpResponse(d, content_type='application/json')
+                return create_js_response(jobs, message="Job Submitted")
             return HttpResponseRedirect(reverse("olw_job_view_array", args=[jobs[0].job_id, jobs[0].array_index]))
         except Exception as e:
             return e
