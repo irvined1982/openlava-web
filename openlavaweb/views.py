@@ -2139,7 +2139,7 @@ def exception_test(request):
     try:
         if exc_name:
             for ex in ClusterException.__subclasses__():
-                if ex.__class__.__name__ == exc_name:
+                if ex.__name__ == exc_name:
                     raise ex
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
