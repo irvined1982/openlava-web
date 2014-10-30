@@ -2146,4 +2146,4 @@ def exception_test(request):
             return handle_cluster_exception(e)
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
-    return render(request, 'openlava/exception_test.html', {'classes': [e.__name__ for e in ClusterException.__subclasses__()]})
+    return render(request, 'openlavaweb/exception_test.html', {'classes': [e.__name__ for e in ClusterException.__subclasses__()]})
