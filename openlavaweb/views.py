@@ -127,6 +127,25 @@ def create_js_response(data=None, message="", response=None, is_failure=False):
                     content_type='application/json')
 
 
+def handle_cluster_exception(e):
+    if e.http_response == "HttpResponseForbidden":
+        response = HttpResponseForbidden
+    elif e.http_response == "Http404":
+        response = Http404
+    elif e.http_response == "HttpResponseBadRequest":
+        response = HttpResponseBadRequest
+    else:
+        response = None
+
+    return create_js_response(
+        message=e.message,
+        data=e.json_response(),
+        response=response,
+        is_failure=True
+    )
+
+
+
 @ensure_csrf_cookie
 def get_csrf_token(request):
     """
@@ -252,7 +271,7 @@ def queue_close(request, queue_name):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -296,7 +315,7 @@ def queue_open(request, queue_name):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -340,7 +359,7 @@ def queue_inactivate(request, queue_name):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -384,7 +403,7 @@ def queue_activate(request, queue_name):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -482,7 +501,7 @@ def host_close(request, host_name):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -526,7 +545,7 @@ def host_open(request, host_name):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -1448,14 +1467,9 @@ def job_view(request, job_id, array_index=0):
             return create_js_response(data=job)
         else:
             return render(request, 'openlavaweb/job_detail.html', {"job": job, }, )
-    except NoSuchJobError as e:
-        if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
-        else:
-            return render(request, 'openlavaweb/exception.html', {'exception': e})
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
+            return handle_cluster_exception(e)
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
 
@@ -1522,7 +1536,7 @@ def job_error(request, job_id, array_index=0):
 
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
+            return handle_cluster_exception(e)
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
 
@@ -1566,7 +1580,7 @@ def job_output(request, job_id, array_index=0):
 
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
+            return handle_cluster_exception(e)
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
 
@@ -1603,7 +1617,7 @@ def job_kill(request, job_id, array_index=0):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -1665,7 +1679,7 @@ def job_suspend(request, job_id, array_index=0):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -1728,7 +1742,7 @@ def job_resume(request, job_id, array_index=0):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -1797,7 +1811,7 @@ def job_requeue(request, job_id, array_index=0):
                 return rc
         except ClusterException as e:
             if request.is_ajax() or request.GET.get("json", None):
-                return HttpResponse(e.to_json(), content_type='application/json')
+                return handle_cluster_exception(e)
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
@@ -1880,7 +1894,7 @@ def job_submit(request, form_class="JobSubmitForm"):
             return rc
     except ClusterException as e:
         if request.is_ajax() or request.GET.get("json", None):
-            return HttpResponse(e.to_json(), content_type='application/json')
+            return handle_cluster_exception(e)
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
 
@@ -2118,3 +2132,18 @@ def submit_form_context(request):
             'name': cls.friendly_name,
         })
     return {'submit_form_classes': clses}
+
+
+def exception_test(request):
+    exc_name = request.GET.get("exception", None)
+    try:
+        if exc_name:
+            for ex in ClusterException.__subclasses__():
+                if ex.__class__.name == exc_name:
+                    raise ex
+    except ClusterException as e:
+        if request.is_ajax() or request.GET.get("json", None):
+            return handle_cluster_exception(e)
+        else:
+            return render(request, 'openlavaweb/exception.html', {'exception': e})
+    return render(request, 'openlava/exception_test.html', {'classes': [e.__name__ for e in ClusterException.__subclasses__()]})

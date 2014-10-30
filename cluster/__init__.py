@@ -574,6 +574,9 @@ class ClusterException(Exception):
     """
     Base class for exceptions relating to cluster classes.
     """
+
+    http_response = None
+
     def get_class(self):
         return u"%s" % self.__class__
 
@@ -586,6 +589,13 @@ class ClusterException(Exception):
         for f in self._extras:
             fields[f] = getattr(self, f)
         return json.dumps(fields, sort_keys=True, indent=4)
+
+    def json_response(self):
+        data = {
+            'exception_class': self.__class__.__name__,
+            'message': self.message,
+        }
+        return data
 
     def __init__(self, message, **kwargs):
         Exception.__init__(self, message)
@@ -600,6 +610,7 @@ class NoSuchHostError(ClusterException):
     Raised when the requested host does not exist in the job scheduling environment, or it is not visible/accessible
     by the current user.
     """
+    http_response = "Http404"
     pass
 
 
@@ -608,6 +619,7 @@ class NoSuchJobError(ClusterException):
     Raised when the requested job does not exist in the job scheduling environment.  This can happen when the
     job has been completed, and the scheduler has purged the job from the active jobs.
     """
+    http_response = "Http404"
     pass
 
 
@@ -616,6 +628,7 @@ class NoSuchQueueError(ClusterException):
     Raised when the requested queue does not exist in the job scheduling environment, or it is not visible/accessible
     by the current user.
     """
+    http_response = "Http404"
     pass
 
 
@@ -623,6 +636,7 @@ class NoSuchUserError(ClusterException):
     """
     Raised when the requested user does not exist in the job scheduling environment.
     """
+    http_response = "Http404"
     pass
 
 
@@ -630,6 +644,7 @@ class ResourceDoesntExistError(ClusterException):
     """
     Raised when the requested resource does not exist in the job scheduling environment.
     """
+    http_response = "Http404"
     pass
 
 
@@ -645,6 +660,7 @@ class PermissionDeniedError(ClusterException):
     """
     Raised when the current user does not have sufficiant privilages to perform for requested operation
     """
+    http_response = "HttpResponseForbidden"
     pass
 
 

@@ -1,0 +1,6 @@
+{% extends "openlavaweb/base.html" %}
+{% block content %}
+{% for c in classes %}
+        <a href="?exception_name={{ c }}">{{ c }}</a><br>
+{%endfor%}
+{% endblock %}
