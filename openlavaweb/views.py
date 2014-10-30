@@ -2135,7 +2135,7 @@ def submit_form_context(request):
 
 
 def exception_test(request):
-    exc_name = request.GET.get("exception", None)
+    exc_name = request.GET.get("exception_name", None)
     try:
         if exc_name:
             for ex in ClusterException.__subclasses__():
