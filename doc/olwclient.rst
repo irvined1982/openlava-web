@@ -189,6 +189,36 @@ Cluster Resources
     :members:
     :inherited-members:
 
+Queue Classes
+---------------
+
+Queue classes represent individual queues that are configured as part of the cluster.
+
+Local
+^^^^^
+.. autoclass:: cluster.Queue
+
+Olwclient
+^^^^^^^^^
+
+.. autoclass:: olwclient.Queue
+
+Queue Statuses
+--------------
+
+Local
+^^^^^
+.. autoclass:: cluster.QueueStatus
+
+Queue Attributes
+----------------
+
+Local
+^^^^^
+.. autoclass:: cluster.QueueAttribute
+
+
+
 Exceptions
 ----------
 

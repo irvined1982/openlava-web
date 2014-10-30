@@ -602,12 +602,14 @@ class NoSuchHostError(ClusterException):
     """
     pass
 
+
 class NoSuchJobError(ClusterException):
     """
     Raised when the requested job does not exist in the job scheduling environment.  This can happen when the
     job has been completed, and the scheduler has purged the job from the active jobs.
     """
     pass
+
 
 class NoSuchQueueError(ClusterException):
     """
@@ -616,17 +618,20 @@ class NoSuchQueueError(ClusterException):
     """
     pass
 
+
 class NoSuchUserError(ClusterException):
     """
     Raised when the requested user does not exist in the job scheduling environment.
     """
     pass
 
+
 class ResourceDoesntExistError(ClusterException):
     """
     Raised when the requested resource does not exist in the job scheduling environment.
     """
     pass
+
 
 class ClusterInterfaceError(ClusterException):
     """
@@ -635,11 +640,13 @@ class ClusterInterfaceError(ClusterException):
     """
     pass
 
+
 class PermissionDeniedError(ClusterException):
     """
     Raised when the current user does not have sufficiant privilages to perform for requested operation
     """
     pass
+
 
 class JobSubmitError(ClusterException):
     """
@@ -711,6 +718,101 @@ class Process:
 
     def json_attributes(self):
         return ['hostname', 'process_id'] + self.extras
+
+
+class QueueBase(object):
+    cluster_type = "undefined"
+
+    def __str__(self):
+        return "%s" % self.name
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
+
+    @staticmethod
+    def json_attributes():
+        return [
+            'name',
+            'description',
+            'priority',
+            'max_jobs_per_user',
+            'max_slots_per_user',
+            'max_jobs_per_processor',
+            'max_slots_per_processor',
+            'allowed_users',
+            'allowed_hosts',
+            'runtime_limits',
+            'host_specification',
+            'attributes',
+            'statuses',
+            'max_slots',
+            'total_slots',
+            'num_running_slots',
+            'num_pending_slots',
+            'num_suspended_slots',
+            'num_reserved_slots',
+            'max_jobs',
+            'total_jobs',
+            'num_running_jobs',
+            'num_pending_jobs',
+            'num_suspended_jobs',
+            'admins',
+            'dispatch_windows',
+            'max_slots_per_job',
+            'max_jobs_per_host',
+            'max_slots_per_host',
+            'resource_requirements',
+            'min_slots_per_job',
+            'default_slots_per_job',
+            'checkpoint_data_directory',
+            'checkpoint_period',
+            'is_accepting_jobs',
+            'is_dispatching_jobs',
+            'jobs',
+            'cluster_type',
+        ]
+
+    @classmethod
+    def get_queue_list(cls):
+        raise NotImplementedError
+
+    def jobs(self, **kwargs):
+        raise NotImplementedError
+
+    def close(self):
+        """
+        Closes the queue, once closed no new jobs will be accepted.
+
+        :return:
+        """
+        raise NotImplementedError
+
+    def open(self):
+        """
+        Opens the queue, once open new jobs will be accepted.
+
+        :return:
+        """
+        raise NotImplementedError
+
+    def inactivate(self):
+        """
+        Inactivates the queue, when inactive jobs will no longer be dispatched.
+
+        :return:
+        """
+        raise NotImplementedError
+
+    def activate(self):
+        """
+        Activates the queue, when active, jobs will be dispatched to hosts for execution.
+
+        :return:
+        """
+        raise NotImplementedError
 
 
 class ResourceLimit:
@@ -860,6 +962,6 @@ class ConsumedResource:
         return ['name', 'value', 'limit', 'unit']
 
 
-__ALL__ = [UserBase, ClusterBase, JobBase, HostBase, LoadIndex, BaseResource, ClusterException, NoSuchHostError,
+__ALL__ = [UserBase, ClusterBase, JobBase, QueueBase, HostBase, LoadIndex, BaseResource, ClusterException, NoSuchHostError,
            NoSuchJobError, NoSuchQueueError, ResourceDoesntExistError, JobSubmitError, ClusterInterfaceError, PermissionDeniedError,
            Status, Process, ResourceLimit, ConsumedResource]

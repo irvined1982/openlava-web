@@ -19,7 +19,7 @@ import unittest
 import time
 import os
 import urllib
-from cluster.openlavacluster import Job, Host
+from cluster.openlavacluster import Job, Host, Queue
 from cluster import ConsumedResource
 from olwclient import Job as OLJob, OpenLavaConnection
 
@@ -95,6 +95,32 @@ class TestWebServer(unittest.TestCase):
             response = urllib.urlopen("%s/job/%d/%d?json=1" % (base_url, job.job_id, job.array_index))
             self.assertTrue(self.check_content_type(response, "application/json"))
 
+
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
+    def test_queue_urls(self):
+        base_url = os.environ.get("OLWEB_URL", None)
+        if not base_url:
+            return
+        base_url.rstrip("/")
+        response = urllib.urlopen("%s/queues/" % base_url)
+        self.assertTrue(self.check_content_type(response, "text/html"))
+        response = urllib.urlopen("%s/queues/?json=1" % base_url)
+        self.assertTrue(self.check_content_type(response, "application/json"))
+        for q in Queue.get_queue_list():
+            response = urllib.urlopen("%s/queues/%s" % (base_url, q.name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/queues/%s?json=1" % (base_url, q.name))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+            response = urllib.urlopen("%s/queues/%s/close" % (base_url, q.name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/queues/%s/open" % (base_url, q.name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/queues/%s/activate" % (base_url, q.name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/queues/%s/inactivate" % (base_url, q.name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
     def test_host_urls(self):
         base_url = os.environ.get("OLWEB_URL", None)
@@ -169,6 +195,17 @@ class TestHost(unittest.TestCase):
         for h in Host.get_host_list():
             host = Host(h.host_name)
             self.assertEqual(host.host_name, h.host_name)
+
+
+class TestQueue(unittest.TestCase):
+    def test_queue_list(self):
+        for queue in Queue.get_queue_list():
+            self.assertIsInstance(queue, Queue)
+
+    def test_queue_get(self):
+        for q in Queue.get_queue_list():
+            queue = Queue(q.name)
+            self.assertEqual(q.name, queue.name)
 
 
 class TestRemoteJob(unittest.TestCase):

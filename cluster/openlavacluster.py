@@ -49,12 +49,41 @@ def memoize(f):
     """
     Some basic memoizer
     """
+
     def memoized(*args, **kwargs):
         key = get_id_tuple(f, args, kwargs)
         if key not in _memoized:
             _memoized[key] = f(*args, **kwargs)
         return _memoized[key]
+
     return memoized
+
+
+class SingleArgMemoized(object):
+    _memoized = {}
+
+    def __new__(cls, arg):
+        key = (cls, arg)
+        if key in SingleArgMemoized._memoized:
+            return SingleArgMemoized._memoized[key]
+        else:
+            ob = object.__new__(cls)
+            SingleArgMemoized._memoized[key] = ob
+            return ob
+
+    @staticmethod
+    def get_id_tuple(cls, args, kwargs):
+        """
+        Some quick'n'dirty way to generate a unique key for an specific call.
+        """
+        l = [cls]
+        for arg in args:
+            l.append(arg)
+
+        for k, v in kwargs:
+            l.append(k)
+            l.append(v)
+        return hash
 
 
 def initialize():
@@ -1187,7 +1216,7 @@ class Job(JobBase):
         :return: Earliest start time of the job as integer since the Epoch (UTC)
 
         """
-        
+
         return self._begin_time
 
     @property
@@ -1206,7 +1235,7 @@ class Job(JobBase):
         :return: Command as string
 
         """
-        
+
         return self._command
 
     @property
@@ -1239,7 +1268,7 @@ class Job(JobBase):
         :return: List of :py:class:`cluster.ConsumedResource` Objects
 
         """
-        
+
         return self._consumed_resources
 
     @property
@@ -1259,7 +1288,7 @@ class Job(JobBase):
         :rtype: float
 
         """
-        
+
         return self._cpu_time
 
     @property
@@ -1285,7 +1314,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._dependency_condition
 
     @property
@@ -1311,7 +1340,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._email_user
 
     @property
@@ -1342,7 +1371,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._end_time
 
     @property
@@ -1362,7 +1391,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._error_file_name
 
     @property
@@ -1420,7 +1449,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._input_file_name
 
     @property
@@ -1634,7 +1663,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._max_requested_slots
 
     @property
@@ -1660,14 +1689,14 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._name
 
     @property
     def options(self):
         """
         Job options control the behavior of the job and specify additional scheduling criteria being used to
-        schedule and execute the job.  They may have been explicitly set by the user, or an esub, or implicity
+        schedule and execute the job.  They may have been explicitly set by the user, or an esub, or implicitly
         by specifying a command line argument.
 
         Job options is list containing :py:class:`cluster.openlavacluster.SubmitOption` and
@@ -1677,7 +1706,7 @@ class Job(JobBase):
         :rtype: List
 
         """
-        
+
         return self._options
 
     @property
@@ -1697,7 +1726,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._output_file_name
 
     @property
@@ -1720,7 +1749,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._pend_reasons
 
     @property
@@ -1741,7 +1770,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._predicted_start_time
 
     @property
@@ -1762,7 +1791,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._priority
 
     @property
@@ -1789,7 +1818,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._process_id
 
     @property
@@ -1813,7 +1842,7 @@ class Job(JobBase):
         :rtype: list
 
         """
-        
+
         return self._processes
 
     @property
@@ -1833,7 +1862,7 @@ class Job(JobBase):
         :rtype: list of str
 
         """
-        
+
         return self._project_names
 
     @property
@@ -1854,7 +1883,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._requested_resources
 
     @property
@@ -1874,7 +1903,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._requested_slots
 
     @property
@@ -1895,7 +1924,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._reservation_time
 
     @property
@@ -1913,7 +1942,7 @@ class Job(JobBase):
         :rtype: list of :py:class:`cluster.ResourceLimit` objects
 
         """
-        
+
         return self._runtime_limits
 
     @property
@@ -1933,7 +1962,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._start_time
 
     @property
@@ -1945,7 +1974,7 @@ class Job(JobBase):
         :rtype: :py:class:`cluster.openlavacluster.JobStatus`
 
         """
-        
+
         status = self._status
         if status & lsblib.JOB_STAT_DONE:  # If its done, its done.
             status = 0x40
@@ -1968,7 +1997,7 @@ class Job(JobBase):
         :rtype: :py:class:`cluster.Host`
 
         """
-        
+
         return Host(self._submission_host)
 
     @property
@@ -1988,7 +2017,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._submit_time
 
     @property
@@ -2034,7 +2063,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._susp_reasons
 
     @property
@@ -2055,7 +2084,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._termination_time
 
     @property
@@ -2075,7 +2104,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._user_name
 
     @property
@@ -2096,13 +2125,13 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._user_priority
 
     @property
     def queue(self):
         """
-        The queue ob ject that this job is currently in.  This may have been modified by the scheduling system, or an
+        The queue object that this job is currently in.  This may have been modified by the scheduling system, or an
         administrator.
 
         Example::
@@ -2117,7 +2146,7 @@ class Job(JobBase):
         :rtype: Queue
 
         """
-        
+
         return Queue(self._queue_name)
 
     @property
@@ -2138,10 +2167,10 @@ class Job(JobBase):
         :rtype: list
 
         """
-        
+
         return [Host(hn) for hn in self._requested_hosts]
 
-    ## Openlava Only
+    # # Openlava Only
     @property
     def checkpoint_directory(self):
         """
@@ -2164,7 +2193,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._checkpoint_directory
 
     @property
@@ -2188,7 +2217,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._checkpoint_period
 
     @property
@@ -2235,7 +2264,7 @@ class Job(JobBase):
         :rtype: float
 
         """
-        
+
         return self._cpu_factor
 
     @property
@@ -2259,7 +2288,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._cwd
 
     @property
@@ -2283,7 +2312,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._execution_cwd
 
     @property
@@ -2307,7 +2336,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._execution_home_directory
 
     @property
@@ -2331,7 +2360,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._execution_user_id
 
     @property
@@ -2355,7 +2384,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._execution_user_name
 
     @property
@@ -2379,7 +2408,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._host_specification
 
     @property
@@ -2403,7 +2432,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._login_shell
 
     @property
@@ -2427,7 +2456,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._parent_group
 
     @property
@@ -2451,7 +2480,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._pre_execution_command
 
     @property
@@ -2475,7 +2504,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._resource_usage_last_update_time
 
     @property
@@ -2522,7 +2551,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._service_port
 
     @property
@@ -2547,7 +2576,7 @@ class Job(JobBase):
         :rtype: str
 
         """
-        
+
         return self._submit_home_directory
 
     @property
@@ -2569,7 +2598,7 @@ class Job(JobBase):
         :rtype: int
 
         """
-        
+
         return self._termination_signal
 
     def __init__(self, job=None, job_id=None, array_index=0):
@@ -2606,7 +2635,7 @@ class Job(JobBase):
         self._last_update_time = 0
         if job:
             self._job_id = lsblib.get_job_id(job.jobId)
-            self._array_index = lsblib.get_array_index(job.jobId)  
+            self._array_index = lsblib.get_array_index(job.jobId)
         elif job_id:
             self._job_id = job_id
             self._array_index = array_index
@@ -3172,7 +3201,7 @@ class Job(JobBase):
 
         :param job_state:
             Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
-            jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+            jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administrator,
             "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
             currently suspended.
 
@@ -3219,6 +3248,7 @@ class Job(JobBase):
         real_job_id = lsblib.create_job_id(job_id=0, array_index=array_index)
         num_jobs = lsblib.lsb_openjobinfo(job_id=real_job_id, user=user_name, queue=queue_name, host=host_name,
                                           job_name=job_name, options=job_state)
+        # noinspection PyUnusedLocal
         jl = [Job(job=lsblib.lsb_readjobinfo()) for i in range(num_jobs)]
         lsblib.lsb_closejobinfo()
         return jl
@@ -3327,6 +3357,46 @@ class Resource(BaseResource):
 
 
 class QueueStatus(NumericStatus):
+    """
+    Each queue has a status, its status defines what state the queue is in, accepting/rejecting new jobs,
+    dispatching/holding jobs, etc. Queues may have many statuses.
+
+    .. list-table:: Valid Statuses
+        :header-rows: 1
+
+        * - Value
+          - Friendly Name
+          - Name
+          - Description
+        * - 0x01
+          - Open
+          - QUEUE_STAT_OPEN
+          - The queue is open to accept newly submitted jobs.
+        * - 0x02
+          - Active
+          - QUEUE_STAT_ACTIVE
+          - The queue is actively dispatching jobs. The queue can be inactivated and reactivated by
+            the LSF administrator using lsb_queuecontrol. The queue will also be inactivated when its run or dispatch
+            window is closed. In this case it cannot be reactivated manually; it will be reactivated by the LSF system
+            when its run and dispatch windows reopen.
+        * - 0x04
+          - Run windows open
+          - QUEUE_STAT_RUN
+          - The queue run and dispatch windows are open. The initial state of a queue at LSF boot time
+            is open and either active or inactive, depending on its run and dispatch windows.
+        * - 0x08
+          - No Permission
+          - QUEUE_STAT_NOPERM
+          - Remote queue rejecting jobs.
+        * - 0x10
+          - Remote Disconnected
+          - QUEUE_STAT_DISC
+          - Remote queue status is disconnected.
+        * - 0x20
+          - Runwindow Closed
+          - QUEUE_STAT_RUNWIN_CLOSE
+          - Queue run windows are closed.
+    """
     states = {
         0x01: {
             'friendly': "Open",
@@ -3366,6 +3436,66 @@ class QueueStatus(NumericStatus):
 
 
 class QueueAttribute(NumericStatus):
+    """
+    Queues have zero or more attributes, attributes define features of the queue, for example if it can support
+    parallel jobs etc.
+
+    .. list-table:: Valid Statuses
+        :header-rows: 1
+
+        * - Value
+          - Friendly Name
+          - Name
+          - Description
+        * - 0x01
+          - Exclusive
+          - Q_ATTRIB_EXCLUSIVE
+          - This queue accepts jobs which request exclusive execution.
+        * - 0x02
+          - Default Queue
+          - Q_ATTRIB_DEFAULT
+          - This queue is a default LSF queue.
+        * - 0x04
+          - Round Robin Scheduling Policy
+          - Q_ATTRIB_FAIRSHARE
+          - This queue uses the Round Robin scheduling policy.
+        * - 0x80
+          - Backfill Enabled
+          - Q_ATTRIB_BACKFILL
+          - This queue uses a backfilling policy.
+        * - 0x100
+          - Preference Scheduling Policy
+          - Q_ATTRIB_HOST_PREFER
+          - This queue uses a host preference policy.
+        * - 0x800
+          - Non-Interactive only
+          - Q_ATTRIB_NO_INTERACTIVE
+          - This queue does not accept batch interactive jobs.
+        * - 0x1000
+          - Interactive Only
+          - Q_ATTRIB_ONLY_INTERACTIVE
+          - This queue only accepts batch interactive jobs.
+        * - 0x2000
+          - No host type resources
+          - Q_ATTRIB_NO_HOST_TYPE
+          - No host type related resource name specified in resource requirement.
+        * - 0x4000
+          - Ignores deadlines
+          - Q_ATTRIB_IGNORE_DEADLINE
+          - This queue disables deadline constrained resource scheduling.
+        * - 0x8000
+          - Checkpointing supported
+          - Q_ATTRIB_CHKPNT
+          - Jobs may run as chkpntable.
+        * - 0x10000
+          - Re-Runnable
+          - Q_ATTRIB_RERUNNABLE
+          - Jobs may run as rerunnable.
+        * - 0x80000
+          - Interactive First
+          - Q_ATTRIB_ENQUE_INTERACTIVE_AHEAD
+          - Push interactive jobs in front of other jobs in queue.
+"""
     states = {
         0x01: {
             'friendly': "Exclusive",
@@ -3430,40 +3560,361 @@ class QueueAttribute(NumericStatus):
     }
 
 
-class SingleArgMemoized(object):
+class Queue(QueueBase, SingleArgMemoized):
+    """
+    Retrieve Queue information and perform administrative actions on queues on the cluster.
 
-    _memoized = {}
+    .. py:data:: cluster_type
 
-    def __new__(cls, arg):
-        key = (cls, arg)
-        if key in SingleArgMemoized._memoized:
-            return SingleArgMemoized._memoized[key]
-        else:
-            ob = object.__new__(cls)
-            SingleArgMemoized._memoized[key] = ob
-            return ob
+        The type of cluster this host object is associated with.
 
-    @staticmethod
-    def get_id_tuple(cls, args, kwargs):
-        """
-        Some quick'n'dirty way to generate a unique key for an specific call.
-        """
-        l = [cls]
-        for arg in args:
-            l.append(arg)
+    .. py:attribute:: name
 
-        for k, v in kwargs:
-            l.append(k)
-            l.append(v)
-        return hash
+        The name of the queue as configured by the cluster administrator.
+
+    .. py:attribute:: description
+
+        The description of the queue as configured by the cluster administrator.  May be empty if no description
+        has been configured, or not supported by the scheduler.
+
+    .. py:attribute:: priority
+
+        The priority of the queue is used to determine which queue takes precedence
+        when the scheduler selects jobs to execute on the cluster.
+
+    .. py:attribute:: nice
+
+        Jobs that execute under this queue will execute with the following default
+        nice value.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: max_jobs_per_user
+
+        The maximum number of unique jobs that an individual user that is supported in this queue.
+
+    .. py:attribute:: max_slots_per_user
+
+        The maximum number of slots that an individual user can consume in this queue.
+
+    .. py:attribute:: max_jobs_per_processor
+
+        The maximum number of jobs that can be shared between a single processor in this queue.
+
+    .. py:attribute:: max_slots_per_processor
+
+        The maximum number of job slots that can be shared by a single processor in this queue.
+
+    .. py:attribute:: run_windows
+
+        Openlava run windows that are defined in the queue configuration.  Run windows determine
+        at which times jobs in the queue can execute on hosts.  The value may be empty
+        if there are no restrictions on when jobs can execute.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: runtime_limits
+
+        Array of run time limits imposed on jobs in this queue.
+
+    .. py:attribute:: host_specification
+
+        A hostname or model name that describes the specification of the host being used to compare runlimits or
+        cpulimits.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: attributes
+
+        Queues may have attributes set on them by the scheduler, that define their behavior.  For example
+        if they accept parallel jobs, or have specific constraints enabled.
+
+        Returns a list of JobAttribute
+
+    .. py:attribute:: statuses
+
+        Returns a list of applicable statuses for the queue, depending on the scheduler this may be either
+        an empty list, or contain multiple statuses. For example open/closed, dispatching/holding, etc.
+
+    .. py:attribute:: max_slots
+
+    Returns the maximum number of scheduling slots that may be consumed by this queue
+
+        .. note::
+
+            If max_slots is greater than max_processors, then there will be contention for physical cores.
+
+    .. py:attribute:: total_slots
+
+        Returns the total number of slots that can be consumed by this queue, including those from suspended jobs.
+
+    .. py:attribute:: num_running_slots
+
+        The number of slots consumed by jobs in this queue that are currently executing.
+
+    .. py:attribute:: num_pending_slots
+
+        The number of slots consumed by jobs in this queue that are currently pending.
+
+    .. py:attribute:: num_suspended_slots
+
+        The number of slots consumed by jobs in this queue that are currently suspended.
+
+    .. py:attribute:: num_user_suspended_slots
+
+        The number of slots consumed by jobs in this queue that are currently suspended by user request.
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: num_system_suspended_slots
 
 
-class Queue(SingleArgMemoized):
+        The number of slots consumed by jobs in this queue that are currently suspended by the system
+        or a system administrator.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        self.num_system_suspended_slots = queue.numSSUSP
+
+    .. py:attribute:: num_reserved_slots
+
+        The number of slots consumed by jobs in this queue that are currently reserved but not yet executing jobs.
+
+    .. py:attribute:: max_jobs
+
+        The maximum number of jobs that can be dispatched at any given time.
+
+    .. py:attribute:: pre_execution_command
+
+        The command that will be executed prior to jobs executing on this queue.  If no command
+        has been defined, then will return an empty string.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: post_execution_command
+
+        The command that will be executed after jobs have completed executing on this queue.  If no command
+        has been defined, then will return an empty string.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: pre_post_user_name
+
+        The user any pre or post execution commands will execute under.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: admins
+
+        Gets the queue administrators.  Queue administrators can perform any action on the queue.
+        This does not imply they are actual superusers on the physical systems.
+
+    .. py:attribute:: migration_threshold
+
+        The threshold where jobs rerunnable or checkpointable will be migrated to another, less heavily
+        loaded host.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: scheduling_delay
+
+        The delay, in seconds, between scheduling actions on this queue.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: scheduling_delay_timedelta
+
+        A timedelta object for the scheduling delay.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: accept_interval
+
+        The minimum number of seconds to wait between dispatching a new job to a host in this queue.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: accept_interval_timedelta
+
+        A timedelta object of accept_interval
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: dispatch_windows
+
+        Openlava dispatch windows that are defined in the queue configuration.  dispatch windows determine
+        at which times jobs in the queue can be dispatched to hosts.  The value may be empty if there are no
+        restrictions on when jobs can be dispatched.
+
+    .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: max_slots_per_job
+
+        The maximum number of job slots that can be consumed by a single job.
+
+    .. py:attribute:: requeue_exit_values
+
+        Jobs with this exit value will be requeued.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: max_jobs_per_host
+
+        The maximum number of concurrent jobs to execute on a single host in this queue.
+
+    .. py:attribute:: max_slots_per_host
+
+        The maximum number of slots that can be consumed by a single host in this queue.
+
+    .. py:attribute:: resource_requirements
+
+        The default resource requirements for this queue. If there are no resource requirements
+        then will return an empty string.
+
+    .. py:attribute:: slot_hold_time
+
+        The maximum amount of seconds to hold reserved slots for a job in this queue.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: slot_hold_time_timedelta
+
+        A timedelta object for slot_hold_time
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: stop_condition
+
+        The threshold to stop executing jobs in this queue.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: job_starter_command
+
+        The command to execute when starting a job.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: suspend_action_command
+
+        The command to use when suspending a job.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: resume_action_command
+
+        The command to use when resuming a job.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: terminate_action_command
+
+        The command to use when terminating a job.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: min_slots_per_job
+
+        The minimum number of slots that can be consumed by a single job.
+
+    .. py:attribute:: default_slots_per_job
+
+        The default number of slots consumed by a single job.
+
+    .. py:attribute:: checkpoint_data_directory
+
+        The default directory to store checkpoint data
+
+    .. py:attribute:: checkpoint_period
+
+        The default number of seconds between checkpoint operations if supported.
+
+    .. py:attribute:: checkpoint_period_timedelta
+
+        A timedelta object of checkpoint period
+
+    .. py:attribute:: resume_condition
+
+        The threshold to resume jobs.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    .. py:attribute:: stop_condition
+
+        The threshold to stop jobs.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    ..py:attribute:: allowed_users
+
+        A list of user names that are allowed to submit jobs into this queue. If all users can submit jobs, then returns
+        an empty list.
+
+    ..py:attribute:: allowed_hosts
+
+        A list of user names that are allowed to execute jobs into this queue. If all hosts can submit jobs, then 
+        returns an empty list.
+
+
+    """
     cluster_type = "openlava"
     _memoized = {}
 
     @classmethod
     def get_queue_list(cls):
+        """
+        Gets a list of all Queue objects, one for each queue on the cluster.  Depending on the scheduler
+        may return all queues on the cluster, or only queues that the user has access to.
+
+        :return: List of :py:class:`openlavacluster.Queue` objects
+        """
         initialize()
         qs = lsblib.lsb_queueinfo()
         if qs is None:
@@ -3487,8 +3938,9 @@ class Queue(SingleArgMemoized):
         self.description = queue.description
         self.priority = queue.priority
         self.nice = queue.nice
-        self._allowed_users = queue.userList
-        self._allowed_hosts = queue.hostList
+        self.allowed_users = queue.userList
+
+        self.allowed_hosts = queue.hostList
         self.max_jobs_per_user = queue.userJobLimit
         self.max_slots_per_user = queue.userJobLimit
         self.max_jobs_per_processor = queue.procJobLimit
@@ -3564,7 +4016,7 @@ class Queue(SingleArgMemoized):
         self._num_suspended_jobs = 0
         self._num_user_suspended_jobs = 0
         self._num_system_suspended_jobs = 0
-        ## iterate through jobs and count/sum each one.
+        # # iterate through jobs and count/sum each one.
         for j in self.jobs():
             self._total_jobs += 1
             if j.status.name == "JOB_STAT_RUN":
@@ -3578,47 +4030,74 @@ class Queue(SingleArgMemoized):
             elif j.status.name == "JOB_STAT_PEND":
                 self._num_pending_jobs += 1
 
-    def __str__(self):
-        return "%s" % self.name
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __unicode__(self):
-        return u"%s" % self.__str__()
-
     @property
     def total_jobs(self):
+        """
+        The total number of jobs in the queue.
+
+        :return:
+        """
         self.update_job_count()
         return self._total_jobs
 
     @property
     def num_running_jobs(self):
+        """
+        The total number of executing jobs in the queue.
+
+        :return:
+        """
+
         self.update_job_count()
         return self._num_running_jobs
 
     @property
     def num_pending_jobs(self):
+        """
+        The total number of pending jobs in the queue.
+
+        :return:
+        """
         self.update_job_count()
         return self._num_pending_jobs
 
     @property
     def num_suspended_jobs(self):
+        """
+        The total number of suspended jobs in the queue.
+
+        :return:
+        """
         self.update_job_count()
         return self._num_suspended_jobs
 
     @property
     def num_user_suspended_jobs(self):
+        """
+        The total number of jobs that were suspended by their user in the queue.
+
+        :return:
+        """
         self.update_job_count()
         return self._num_user_suspended_jobs
 
     @property
     def num_system_suspended_jobs(self):
+        """
+        The total number of jobs that have been suspended by the system.
+
+        :return:
+        """
         self.update_job_count()
         return self._num_system_suspended_jobs
 
     @property
     def is_accepting_jobs(self):
+        """
+        True if the queue is accepting new jobs.
+
+        :return:
+        """
         for state in self.statuses:
             if state.name == "QUEUE_STAT_OPEN":
                 return True
@@ -3626,106 +4105,112 @@ class Queue(SingleArgMemoized):
 
     @property
     def is_dispatching_jobs(self):
+        """
+        True if the queue is dispatching jobs.
+
+        :return:
+        """
         for state in self.statuses:
             if state.name == "QUEUE_STAT_ACTIVE":
                 return True
         return False
 
     def close(self):
+        """
+        Closes the queue, once closed no new jobs will be accepted.
+
+        :return:
+        """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_CLOSED)
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to close queue: %s" % self.name)
 
     def open(self):
+        """
+        Opens the queue, once open new jobs will be accepted.
+
+        :return:
+        """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_OPEN)
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to open queue: %s" % self.name)
 
     def inactivate(self):
+        """
+        Inactivates the queue, when inactive jobs will no longer be dispatched.
+
+        :return:
+        """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_INACTIVATE)
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to inactivate queue: %s" % self.name)
 
     def activate(self):
+        """
+        Activates the queue, when active, jobs will be dispatched to hosts for execution.
+
+        :return:
+        """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_ACTIVATE)
         if rc == 0:
             return rc
         raise_cluster_exception(lsblib.get_lsberrno(), "Unable to activate queue: %s" % self.name)
 
-    def allowed_hosts(self, ):
-        pass
+    def jobs(self, **kwargs):
+        """
+        Returns matching jobs on the host.  By default, returns all jobs that are executing on the host.
 
-    def allowed_users(self):
-        pass
+        Example::
 
-    def jobs(self):
-        return Job.get_job_list(queue_name=self.name)
+            >>> from cluster.openlavacluster import Host
+            >>> host = Host.get_host_list()[0]
+            >>> host.jobs()
+            [9790]
+
+        :param job_id: Only return jobs matching the specified job id.
+        :param job_name: Only return jobs matching the specified job name.
+        :param user: Only return jobs belonging to the specified user.
+        :param host_name: Only return jobs executing on the specified host.
+        :param options: Unused.
+        :return: List of :py:class:`cluster.openlavacluster.Job` objects
+        """
+        return Job.get_job_list(queue_name=self.name, **kwargs)
 
     @staticmethod
     def json_attributes():
         return [
-            'name',
-            'description',
-            'priority',
             'nice',
-            'allowed_users',
-            'allowed_hosts',
-            'max_jobs_per_user',
-            'max_slots_per_user',
-            'max_jobs_per_processor',
-            'max_slots_per_processor',
             'run_windows',
-            'runtime_limits',
-            'host_specification',
-            'attributes',
-            'statuses',
-            'max_slots',
-            'total_slots',
-            'num_running_slots',
-            'num_pending_slots',
-            'num_suspended_slots',
+
             'num_user_suspended_slots',
             'num_system_suspended_slots',
-            'num_reserved_slots',
-            'max_jobs',
-            'total_jobs',
-            'num_running_jobs',
-            'num_pending_jobs',
-            'num_suspended_jobs',
+
             'num_user_suspended_jobs',
             'num_system_suspended_jobs',
             'pre_execution_command',
             'post_execution_command',
             'pre_post_user_name',
-            'admins',
+
             'migration_threshold',
             'scheduling_delay',
             'accept_interval',
-            'dispatch_windows',
-            'max_slots_per_job',
+
+
             'requeue_exit_values',
-            'max_jobs_per_host',
-            'max_slots_per_host',
-            'resource_requirements',
+
             'slot_hold_time',
             'stop_condition',
             'job_starter_command',
             'suspend_action_command',
             'resume_action_command',
             'terminate_action_command',
-            'min_slots_per_job',
-            'default_slots_per_job',
-            'checkpoint_data_directory',
-            'checkpoint_period',
+
             'resume_condition',
             'stop_condition',
-            'is_accepting_jobs',
-            'is_dispatching_jobs',
-            'jobs',
-            'cluster_type',
+
         ]
 
 
@@ -3762,7 +4247,7 @@ class User(SingleArgMemoized, UserBase):
         self._num_suspended_jobs = 0
         self._num_user_suspended_jobs = 0
         self._num_system_suspended_jobs = 0
-        ## iterate through jobs and count/sum each one.
+        # # iterate through jobs and count/sum each one.
 
     def _update_job_count(self):
         s_total = set()
@@ -3811,19 +4296,19 @@ class User(SingleArgMemoized, UserBase):
 
     @property
     def num_suspended_jobs(self):
-        """Returns the nuber of jobs that are suspended"""
+        """Returns the number of jobs that are suspended"""
         self._update_job_count()
         return self._num_suspended_jobs
 
     @property
     def num_user_suspended_jobs(self):
-        """Returns the nuber of jobs that are suspended by the user"""
+        """Returns the number of jobs that are suspended by the user"""
         self._update_job_count()
         return self._num_user_suspended_jobs
 
     @property
     def num_system_suspended_jobs(self):
-        """Returns the nuber of jobs that are suspended by the system"""
+        """Returns the number of jobs that are suspended by the system"""
         self._update_job_count()
         return self._num_system_suspended_jobs
 
@@ -3877,7 +4362,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.name
             u'...'
 
@@ -3891,7 +4376,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.host_name
             u'...'
 
@@ -3905,7 +4390,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.description
             u''
 
@@ -3932,7 +4417,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> Host.get_host_list()
             [master, comp00, comp01, comp02, comp03, comp04]
 
@@ -3970,7 +4455,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.open()
             Traceback (most recent call last):
               ...
@@ -3992,7 +4477,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.close()
             Traceback (most recent call last):
               ...
@@ -4014,7 +4499,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.jobs()
             [9790]
 
@@ -4039,6 +4524,7 @@ class Host(SingleArgMemoized, HostBase):
         lsblib.lsb_closejobinfo()
         return jobs
 
+    @property
     def load_information(self):
         """
         Return load information on the host.  Load information is a collection of available metrics that describe
@@ -4052,7 +4538,8 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
+            >>> info=host.load_information
             >>> for i in range(len(info['names'])):
             ...     values = ""
             ...     for v in info['values']:
@@ -4222,7 +4709,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.admins
             [u'openlava']
 
@@ -4241,7 +4728,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.is_busy
             False
 
@@ -4269,7 +4756,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.is_down
             False
 
@@ -4290,7 +4777,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.is_closed
             False
 
@@ -4311,7 +4798,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.has_checkpoint_support
             True
 
@@ -4330,7 +4817,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.host_model
             u'IntelI5'
 
@@ -4349,7 +4836,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.host_type
             u'linux'
 
@@ -4386,7 +4873,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_jobs
             2
 
@@ -4408,7 +4895,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_processors
             1
 
@@ -4427,7 +4914,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_ram
             992
 
@@ -4449,7 +4936,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_slots
             2
 
@@ -4468,7 +4955,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_swap
             509
 
@@ -4486,7 +4973,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_tmp
             64002
 
@@ -4505,7 +4992,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_reserved_slots
             0
 
@@ -4519,12 +5006,12 @@ class Host(SingleArgMemoized, HostBase):
     @property
     def num_running_jobs(self):
         """
-        Returns the number of concurent jobs that are executing on the host
+        Returns the number of concurrent jobs that are executing on the host
 
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_running_jobs
             0
 
@@ -4543,7 +5030,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_running_slots
             0
 
@@ -4562,7 +5049,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_suspended_jobs
             0
 
@@ -4581,7 +5068,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_suspended_slots
             0
 
@@ -4599,7 +5086,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.run_windows
             u'-'
 
@@ -4623,7 +5110,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.statuses
             [HOST_STAT_OK]
 
@@ -4642,7 +5129,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.total_jobs
             0
 
@@ -4661,7 +5148,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.total_slots
             0
 
@@ -4680,7 +5167,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.cpu_factor
             100.0
 
@@ -4702,7 +5189,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.is_server
             True
 
@@ -4725,7 +5212,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_disks
             0
 
@@ -4748,7 +5235,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_user_suspended_jobs
             0
 
@@ -4771,7 +5258,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_user_suspended_slots
             0
 
@@ -4779,7 +5266,7 @@ class Host(SingleArgMemoized, HostBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
-        :return: user suspened slot count
+        :return: user suspended slot count
         :rtype: int
 
         """
@@ -4794,7 +5281,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_system_suspended_jobs
             0
 
@@ -4817,7 +5304,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.num_system_suspended_slots
             0
 
@@ -4840,7 +5327,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.has_kernel_checkpoint_copy
             False
 
@@ -4863,7 +5350,7 @@ class Host(SingleArgMemoized, HostBase):
         Example::
 
             >>> from cluster.openlavacluster import Host
-            >>> host=Host.get_host_list()[0]
+            >>> host = Host.get_host_list()[0]
             >>> host.max_slots_per_user
             2147483647
 
@@ -4893,6 +5380,7 @@ class ExecutionHost(Host):
         :rtype: int
 
     """
+
     def __init__(self, host_name, num_slots_for_job=1):
         """
         Accepts the additional optional argument num_slots_for_job (default 1) that indicates how many slots are
