@@ -98,7 +98,7 @@ class CompareWebLocal(unittest.TestCase):
 
         for local_host in Host.get_host_list():
             remote_ob = OLHost(connection, host_name=local_host.name)
-            local_ob = Host(host_name=local_host.name)
+            local_ob = Host(local_host.name)
             for attr in local_ob.json_attributes():
                 attr_val = getattr(local_ob, attr)
                 if isinstance(attr_val, list):
