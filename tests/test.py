@@ -31,6 +31,7 @@ from olwclient import Job as OLJob, OpenLavaConnection, RemoteServerError, NoSuc
 # Todo: Test User
 # Todo: Test Cluster
 
+
 class Cargs:
     username = None
     password = None
@@ -242,7 +243,7 @@ class TestRemoteExceptions(unittest.TestCase):
             request = urllib2.Request(url, None, {'Content-Type': 'application/json'})
             self.assertRaises(
                 ex,
-                connection.open(request)
+                connection.open, request
             )
 
 
