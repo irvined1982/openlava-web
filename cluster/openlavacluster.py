@@ -3568,19 +3568,31 @@ class Queue(QueueBase, SingleArgMemoized):
 
         The type of cluster this host object is associated with.
 
+        :return: Type of cluster
+        :rtype: str
+
     .. py:attribute:: name
 
         The name of the queue as configured by the cluster administrator.
+
+        :return: Name of queue
+        :rtype: str
 
     .. py:attribute:: description
 
         The description of the queue as configured by the cluster administrator.  May be empty if no description
         has been configured, or not supported by the scheduler.
 
+        :return: Description of queue
+        :rtype: str
+
     .. py:attribute:: priority
 
         The priority of the queue is used to determine which queue takes precedence
         when the scheduler selects jobs to execute on the cluster.
+
+        :return: Queue Priority
+        :rtype: Int
 
     .. py:attribute:: nice
 
@@ -3591,21 +3603,36 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return: Default nice value
+        :rtype: int
+
     .. py:attribute:: max_jobs_per_user
 
         The maximum number of unique jobs that an individual user that is supported in this queue.
+
+        :return: Max jobs per user
+        :rtype: int
 
     .. py:attribute:: max_slots_per_user
 
         The maximum number of slots that an individual user can consume in this queue.
 
+        :return: Max slots per user
+        :rtype: int
+
     .. py:attribute:: max_jobs_per_processor
 
         The maximum number of jobs that can be shared between a single processor in this queue.
 
+        :return: Max jobs per Processor
+        :rtype: int
+
     .. py:attribute:: max_slots_per_processor
 
         The maximum number of job slots that can be shared by a single processor in this queue.
+
+        :return: Max slots per processor
+        :rtype: int
 
     .. py:attribute:: run_windows
 
@@ -3617,9 +3644,15 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return: Run windows
+        :rtype: str
+
     .. py:attribute:: runtime_limits
 
         Array of run time limits imposed on jobs in this queue.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: host_specification
 
@@ -3630,6 +3663,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: attributes
 
         Queues may have attributes set on them by the scheduler, that define their behavior.  For example
@@ -3637,34 +3673,55 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Returns a list of JobAttribute
 
+        :return:
+        :rtype:
+
     .. py:attribute:: statuses
 
         Returns a list of applicable statuses for the queue, depending on the scheduler this may be either
         an empty list, or contain multiple statuses. For example open/closed, dispatching/holding, etc.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: max_slots
 
-    Returns the maximum number of scheduling slots that may be consumed by this queue
+        Returns the maximum number of scheduling slots that may be consumed by this queue
 
         .. note::
 
             If max_slots is greater than max_processors, then there will be contention for physical cores.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: total_slots
 
         Returns the total number of slots that can be consumed by this queue, including those from suspended jobs.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: num_running_slots
 
         The number of slots consumed by jobs in this queue that are currently executing.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: num_pending_slots
 
         The number of slots consumed by jobs in this queue that are currently pending.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: num_suspended_slots
 
         The number of slots consumed by jobs in this queue that are currently suspended.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: num_user_suspended_slots
 
@@ -3672,6 +3729,9 @@ class Queue(QueueBase, SingleArgMemoized):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: num_system_suspended_slots
 
@@ -3683,15 +3743,22 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
-        self.num_system_suspended_slots = queue.numSSUSP
+        :return:
+        :rtype:
 
     .. py:attribute:: num_reserved_slots
 
         The number of slots consumed by jobs in this queue that are currently reserved but not yet executing jobs.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: max_jobs
 
         The maximum number of jobs that can be dispatched at any given time.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: pre_execution_command
 
@@ -3702,6 +3769,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: post_execution_command
 
         The command that will be executed after jobs have completed executing on this queue.  If no command
@@ -3711,6 +3781,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: pre_post_user_name
 
         The user any pre or post execution commands will execute under.
@@ -3719,10 +3792,16 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: admins
 
         Gets the queue administrators.  Queue administrators can perform any action on the queue.
         This does not imply they are actual superusers on the physical systems.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: migration_threshold
 
@@ -3733,6 +3812,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: scheduling_delay
 
         The delay, in seconds, between scheduling actions on this queue.
@@ -3740,6 +3822,9 @@ class Queue(QueueBase, SingleArgMemoized):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: scheduling_delay_timedelta
 
@@ -3749,6 +3834,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: accept_interval
 
         The minimum number of seconds to wait between dispatching a new job to a host in this queue.
@@ -3757,6 +3845,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: accept_interval_timedelta
 
         A timedelta object of accept_interval
@@ -3764,6 +3855,9 @@ class Queue(QueueBase, SingleArgMemoized):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: dispatch_windows
 
@@ -3775,9 +3869,15 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: max_slots_per_job
 
         The maximum number of job slots that can be consumed by a single job.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: requeue_exit_values
 
@@ -3787,18 +3887,30 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: max_jobs_per_host
 
         The maximum number of concurrent jobs to execute on a single host in this queue.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: max_slots_per_host
 
         The maximum number of slots that can be consumed by a single host in this queue.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: resource_requirements
 
         The default resource requirements for this queue. If there are no resource requirements
         then will return an empty string.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: slot_hold_time
 
@@ -3808,6 +3920,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: slot_hold_time_timedelta
 
         A timedelta object for slot_hold_time
@@ -3815,6 +3930,9 @@ class Queue(QueueBase, SingleArgMemoized):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: stop_condition
 
@@ -3824,6 +3942,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: job_starter_command
 
         The command to execute when starting a job.
@@ -3831,6 +3952,9 @@ class Queue(QueueBase, SingleArgMemoized):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: suspend_action_command
 
@@ -3840,6 +3964,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: resume_action_command
 
         The command to use when resuming a job.
@@ -3847,6 +3974,9 @@ class Queue(QueueBase, SingleArgMemoized):
         .. note::
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: terminate_action_command
 
@@ -3856,25 +3986,43 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: min_slots_per_job
 
         The minimum number of slots that can be consumed by a single job.
+
+        :return:
+        :rtype:
 
     .. py:attribute:: default_slots_per_job
 
         The default number of slots consumed by a single job.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: checkpoint_data_directory
 
         The default directory to store checkpoint data
+
+        :return:
+        :rtype:
 
     .. py:attribute:: checkpoint_period
 
         The default number of seconds between checkpoint operations if supported.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: checkpoint_period_timedelta
 
         A timedelta object of checkpoint period
+
+        :return:
+        :rtype:
 
     .. py:attribute:: resume_condition
 
@@ -3884,6 +4032,9 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     .. py:attribute:: stop_condition
 
         The threshold to stop jobs.
@@ -3892,16 +4043,24 @@ class Queue(QueueBase, SingleArgMemoized):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
+        :return:
+        :rtype:
+
     ..py:attribute:: allowed_users
 
         A list of user names that are allowed to submit jobs into this queue. If all users can submit jobs, then returns
         an empty list.
+
+        :return:
+        :rtype:
 
     ..py:attribute:: allowed_hosts
 
         A list of user names that are allowed to execute jobs into this queue. If all hosts can submit jobs, then 
         returns an empty list.
 
+        :return:
+        :rtype:
 
     """
     cluster_type = "openlava"
@@ -4181,37 +4340,31 @@ class Queue(QueueBase, SingleArgMemoized):
 
     @staticmethod
     def json_attributes():
-        return [
+        attrs = QueueBase.json_attributes()
+        attrs.extend([
             'nice',
             'run_windows',
-
             'num_user_suspended_slots',
             'num_system_suspended_slots',
-
             'num_user_suspended_jobs',
             'num_system_suspended_jobs',
             'pre_execution_command',
             'post_execution_command',
             'pre_post_user_name',
-
             'migration_threshold',
             'scheduling_delay',
             'accept_interval',
-
-
             'requeue_exit_values',
-
             'slot_hold_time',
             'stop_condition',
             'job_starter_command',
             'suspend_action_command',
             'resume_action_command',
             'terminate_action_command',
-
             'resume_condition',
             'stop_condition',
-
-        ]
+        ])
+        return attrs
 
 
 class User(SingleArgMemoized, UserBase):

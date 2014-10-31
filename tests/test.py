@@ -21,8 +21,14 @@ import os
 import urllib
 from cluster.openlavacluster import Job, Host, Queue
 from cluster import ConsumedResource
-from olwclient import Job as OLJob, OpenLavaConnection
+from olwclient import Job as OLJob, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
+    NoSuchQueueError, NoSuchUserError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError, \
+    JobSubmitError
 
+# Todo: Test Queue
+# Todo: Test Host
+# Todo: Test User
+# Todo: Test Cluster
 
 class Cargs:
     username = None
@@ -206,6 +212,35 @@ class TestQueue(unittest.TestCase):
         for q in Queue.get_queue_list():
             queue = Queue(q.name)
             self.assertEqual(q.name, queue.name)
+
+
+class TestRemoteExceptions(unittest.TestCase):
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def test_exception(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+        base_url = os.environ.get("OLWEB_URL", None)
+        base_url.rstrip("/")
+        for ex in [
+            RemoteServerError,
+            NoSuchHostError,
+            NoSuchJobError,
+            NoSuchQueueError,
+            NoSuchUserError,
+            ResourceDoesntExistError,
+            ClusterInterfaceError,
+            PermissionDeniedError,
+            JobSubmitError
+        ]:
+            urllib.urlopen("%s/hosts/" % base_url)
+            print "Raising: %s" % ex.__name__
+            self.assertRaises(
+                ex,
+                connection.open("%s/exception_test?json=1&exception_name=%s" % (base_url, ex.__name__)))
 
 
 class TestRemoteJob(unittest.TestCase):
