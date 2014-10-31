@@ -233,7 +233,7 @@ def ajax_login(request):
 def queue_list(request):
     queues = Queue.get_queue_list()
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_response(queues)
+        return create_js_response(queues)
 
     return render(request, 'openlavaweb/queue_list.html', {"queue_list": queues})
 
@@ -244,7 +244,7 @@ def queue_view(request, queue_name):
     except ValueError:
         raise Http404("Queue not found")
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_response(queue)
+        return create_js_response(queue)
     return render(request, 'openlavaweb/queue_detail.html', {"queue": queue}, )
 
 
@@ -570,7 +570,7 @@ def execute_host_open(request, queue, host_name):
 def user_list(request):
     users = User.get_user_list()
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_response(data=users)
+        return create_js_response(data=users)
     paginator = Paginator(users, 25)
     page = request.GET.get('page')
     try:
@@ -588,14 +588,14 @@ def user_view(request, user_name):
     except ValueError:
         raise Http404("User not found")
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_response(user)
+        return create_js_response(user)
     return render(request, 'openlavaweb/user_detail.html', {"oluser": user}, )
 
 
 def system_view(request):
     cluster = Cluster()
     if request.is_ajax() or request.GET.get("json", None):
-        create_js_response(cluster)
+        return create_js_response(cluster)
 
     return render(request, 'openlavaweb/system_view.html', {'cluster': cluster})
 
@@ -629,7 +629,7 @@ def system_overview_hosts(request):
         nvstates.append(
             {'label': k, 'value': v}
         )
-    create_js_response(nvstates)
+    return create_js_response(nvstates)
 
 
 # noinspection PyUnusedLocal
@@ -647,7 +647,7 @@ def system_overview_jobs(request):
         nvstates.append(
             {'label': k, 'value': v}
         )
-    create_js_response(nvstates)
+    return create_js_response(nvstates)
 
 # noinspection PyUnusedLocal
 def system_overview_slots(request):
@@ -665,7 +665,7 @@ def system_overview_slots(request):
         nvstates.append(
             {'label': k, 'value': v}
         )
-    create_js_response(nvstates)
+    return create_js_response(nvstates)
 
 def get_job_list(request, job_id=0):
     """
