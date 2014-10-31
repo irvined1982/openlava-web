@@ -30,7 +30,8 @@ from olwclient import Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaCo
 # Todo: Test User
 # Todo: Test Cluster
 
-class Cargs:
+
+class Cargs(object):
     username = None
     password = None
     url = None
