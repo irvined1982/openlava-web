@@ -22,15 +22,13 @@ import urllib
 import urllib2
 from cluster.openlavacluster import Job, Host, Queue
 from cluster import ConsumedResource
-from olwclient import Job as OLJob, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
+from olwclient import Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
     NoSuchQueueError, NoSuchUserError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError, \
     JobSubmitError
 
-# Todo: Test Queue
-# Todo: Test Host
+
 # Todo: Test User
 # Todo: Test Cluster
-
 
 class Cargs:
     username = None
@@ -39,6 +37,121 @@ class Cargs:
 
 
 class CompareWebLocal(unittest.TestCase):
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_queue_attributes(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        for local_queue in Queue.get_queue_list():
+            remote_ob = OLQueue(connection, queue_name=local_queue.name)
+            local_ob = Queue(queue_name=local_queue.name)
+            for attr in local_ob.json_attributes():
+                attr_val = getattr(local_ob, attr)
+                if isinstance(attr_val, list):
+                    for val in attr_val:
+                        self.assertIn(val, [str(i) for i in getattr(remote_ob, attr)])
+                    attr_val = getattr(remote_ob, attr)
+                    for val in attr_val:
+                        self.assertIn(val, [str(i) for i in getattr(local_ob, attr)])
+                else:
+                    self.assertEqual(str(getattr(local_ob, attr)), str(getattr(remote_ob, attr)))
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_queue_list(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        remote_list = OLQueue.get_queue_list(connection)
+        local_list = Queue.get_queue_list()
+
+        local_names = set()
+        remote_names = set()
+        for ob in local_list:
+            local_names.add(str(ob))
+
+        for ob in remote_list:
+            remote_names.add(str(ob))
+
+        for ob in local_list:
+            self.assertIn(str(ob), remote_names)
+
+        for ob in remote_list:
+            self.assertIn(str(ob), local_names)
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_host_attributes(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        for local_host in Host.get_host_list():
+            remote_ob = OLHost(connection, host_name=Host.name)
+            local_ob = Host(host_name=local_host.name)
+            for attr in local_ob.json_attributes():
+                attr_val = getattr(local_ob, attr)
+                if isinstance(attr_val, list):
+                    for val in attr_val:
+                        self.assertIn(val, [str(i) for i in getattr(remote_ob, attr)])
+                    attr_val = getattr(remote_ob, attr)
+                    for val in attr_val:
+                        self.assertIn(val, [str(i) for i in getattr(local_ob, attr)])
+                else:
+                    self.assertEqual(str(getattr(local_ob, attr)), str(getattr(remote_ob, attr)))
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_host_list(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        remote_list = OLHost.get_host_list(connection)
+        local_list = Host.get_host_list()
+
+        local_names = set()
+        remote_names = set()
+        for ob in local_list:
+            local_names.add(str(ob))
+
+        for ob in remote_list:
+            remote_names.add(str(ob))
+
+        for ob in local_list:
+            self.assertIn(str(ob), remote_names)
+
+        for ob in remote_list:
+            self.assertIn(str(ob), local_names)
+
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_job_attributes(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        for local_job in Job.get_job_list():
+            remote_job = OLJob(connection, job_id=local_job.job_id, array_index=local_job.array_index)
+            local_job = Job(job_id=local_job.job_id, array_index=local_job.array_index)
+            for attr in local_job.json_attributes():
+                self.assertEqual(str(getattr(local_job, attr)), str(getattr(remote_job, attr)))
+
+
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
                          and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
@@ -102,8 +215,6 @@ class TestWebServer(unittest.TestCase):
             self.assertTrue(self.check_content_type(response, "text/html"))
             response = urllib.urlopen("%s/job/%d/%d?json=1" % (base_url, job.job_id, job.array_index))
             self.assertTrue(self.check_content_type(response, "application/json"))
-
-
 
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
     def test_queue_urls(self):

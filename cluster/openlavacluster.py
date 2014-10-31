@@ -4627,7 +4627,7 @@ class Queue(QueueBase, SingleArgMemoized):
         """
         Closes the queue, once closed no new jobs will be accepted.
 
-        :return:
+        :raises: PermissionDeniedError - The user does not have permission to perform this operation.
         """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_CLOSED)
         if rc == 0:
@@ -4638,7 +4638,7 @@ class Queue(QueueBase, SingleArgMemoized):
         """
         Opens the queue, once open new jobs will be accepted.
 
-        :return:
+        :raises: PermissionDeniedError - The user does not have permission to perform this operation.
         """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_OPEN)
         if rc == 0:
@@ -4649,7 +4649,7 @@ class Queue(QueueBase, SingleArgMemoized):
         """
         Inactivates the queue, when inactive jobs will no longer be dispatched.
 
-        :return:
+        :raises: PermissionDeniedError - The user does not have permission to perform this operation.
         """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_INACTIVATE)
         if rc == 0:
@@ -4660,7 +4660,7 @@ class Queue(QueueBase, SingleArgMemoized):
         """
         Activates the queue, when active, jobs will be dispatched to hosts for execution.
 
-        :return:
+        :raises: PermissionDeniedError - The user does not have permission to perform this operation.
         """
         rc = lsblib.lsb_queuecontrol(self.name, lsblib.QUEUE_ACTIVATE)
         if rc == 0:
@@ -4669,19 +4669,19 @@ class Queue(QueueBase, SingleArgMemoized):
 
     def jobs(self, **kwargs):
         """
-        Returns matching jobs on the host.  By default, returns all jobs that are executing on the host.
+        Returns matching jobs on the queue.  By default, returns all jobs that are executing on the queue.
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
-            >>> host = Host.get_host_list()[0]
-            >>> host.jobs()
+            >>> from cluster.openlavacluster import Queue
+            >>> queue = Queue.get_host_list()[0]
+            >>> queue.jobs()
             [9790]
 
         :param job_id: Only return jobs matching the specified job id.
         :param job_name: Only return jobs matching the specified job name.
         :param user: Only return jobs belonging to the specified user.
-        :param host_name: Only return jobs executing on the specified host.
+        :param _name: Only return jobs executing on the specified host.
         :param options: Unused.
         :return: List of :py:class:`cluster.openlavacluster.Job` objects
         """
