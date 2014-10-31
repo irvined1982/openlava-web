@@ -610,7 +610,7 @@ class NoSuchHostError(ClusterException):
     Raised when the requested host does not exist in the job scheduling environment, or it is not visible/accessible
     by the current user.
     """
-    http_response = "Http404"
+    http_response = "HttpResponseNotFound"
     pass
 
 
@@ -619,7 +619,7 @@ class NoSuchJobError(ClusterException):
     Raised when the requested job does not exist in the job scheduling environment.  This can happen when the
     job has been completed, and the scheduler has purged the job from the active jobs.
     """
-    http_response = "Http404"
+    http_response = "HttpResponseNotFound"
     pass
 
 
@@ -628,7 +628,7 @@ class NoSuchQueueError(ClusterException):
     Raised when the requested queue does not exist in the job scheduling environment, or it is not visible/accessible
     by the current user.
     """
-    http_response = "Http404"
+    http_response = "HttpResponseNotFound"
     pass
 
 
@@ -636,7 +636,7 @@ class NoSuchUserError(ClusterException):
     """
     Raised when the requested user does not exist in the job scheduling environment.
     """
-    http_response = "Http404"
+    http_response = "HttpResponseNotFound"
     pass
 
 
@@ -644,7 +644,7 @@ class ResourceDoesntExistError(ClusterException):
     """
     Raised when the requested resource does not exist in the job scheduling environment.
     """
-    http_response = "Http404"
+    http_response = "HttpResponseNotFound"
     pass
 
 
