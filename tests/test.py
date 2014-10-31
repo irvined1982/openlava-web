@@ -19,6 +19,7 @@ import unittest
 import time
 import os
 import urllib
+import urllib2
 from cluster.openlavacluster import Job, Host, Queue
 from cluster import ConsumedResource
 from olwclient import Job as OLJob, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
@@ -236,11 +237,13 @@ class TestRemoteExceptions(unittest.TestCase):
             PermissionDeniedError,
             JobSubmitError
         ]:
-            urllib.urlopen("%s/hosts/" % base_url)
             print "Raising: %s" % ex.__name__
+            url = "%s/exception_test?json=1&exception_name=%s" % (base_url, ex.__name__)
+            request = urllib2.Request(url, None, {'Content-Type': 'application/json'})
             self.assertRaises(
                 ex,
-                connection.open("%s/exception_test?json=1&exception_name=%s" % (base_url, ex.__name__)))
+                connection.open(request)
+            )
 
 
 class TestRemoteJob(unittest.TestCase):
