@@ -4717,7 +4717,35 @@ class Queue(QueueBase, SingleArgMemoized):
 
 
 class User(SingleArgMemoized, UserBase):
+    """
+        self.name = user.user
+        self.max_jobs_per_processor = user.procJobLimit
+        self.max_slots = user.maxJobs
+        self.total_slots = user.numJobs
+        self.num_running_slots = user.numRUN
+        self.num_pending_slots = user.numPEND
+        self.num_suspended_slots = user.numSSUSP + user.numUSUSP
+        self.num_user_suspended_slots = user.numUSUSP
+        self.num_system_suspended_slots = user.numSSUSP
+        self.num_reserved_slots = user.numRESERVE
+        self.max_jobs = user.maxJobs
+        self._total_jobs = 0
+        self._num_running_jobs = 0
+        self._num_pending_jobs = 0
+        self._num_suspended_jobs = 0
+        self._num_user_suspended_jobs = 0
+        self._num_system_suspended_jobs = 0
+    """
     cluster_type = "openlava"
+
+    def __str__(self):
+        return "%s" % self.name
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __unicode__(self):
+        return u"%s" % self.__str__()
 
     def __init__(self, user):
         initialize()
@@ -4814,10 +4842,9 @@ class User(SingleArgMemoized, UserBase):
         self._update_job_count()
         return self._num_system_suspended_jobs
 
-    def jobs(self, job_id=0, job_name="", queue="", host="", options=0):
-        """Return jobs on this host"""
-        num_jobs = lsblib.lsb_openjobinfo(job_id=job_id, job_name=job_name, user=self.name, queue=queue, host=host,
-                                          options=options)
+    def jobs(self, **kwargs):
+
+        num_jobs = lsblib.lsb_openjobinfo(user=self.name, **kwargs)
         jobs = []
         if num_jobs < 1:
             lsblib.lsb_closejobinfo()

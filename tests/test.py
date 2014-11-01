@@ -20,17 +20,18 @@ import time
 import os
 import urllib
 import urllib2
-from cluster.openlavacluster import Job, Host, Queue
+
+from cluster.openlavacluster import Job, Host, Queue, User
 from cluster import ConsumedResource
-from olwclient import Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
+from olwclient import User as OLUser, Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
     NoSuchQueueError, NoSuchUserError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError, \
     JobSubmitError
 
-
-# Todo: Test User
 # Todo: Test Cluster
+# Todo: Host inactive/active/close/open
+# Todo: Queue close/open/clear/etc
 
-
+    
 class Cargs(object):
     username = None
     password = None
@@ -78,6 +79,61 @@ class CompareWebLocal(unittest.TestCase):
 
         remote_list = OLQueue.get_queue_list(connection)
         local_list = Queue.get_queue_list()
+
+        local_names = set()
+        remote_names = set()
+        for ob in local_list:
+            local_names.add(str(ob))
+
+        for ob in remote_list:
+            remote_names.add(str(ob))
+
+        for ob in local_list:
+            self.assertIn(str(ob), remote_names)
+
+        for ob in remote_list:
+            self.assertIn(str(ob), local_names)
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_user_attributes(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        for local_user in Host.get_host_list():
+            remote_ob = OLUser(connection, user_name=local_user.name)
+            local_ob = User(local_user.name)
+            for attr in local_ob.json_attributes():
+
+                local_attr_val = getattr(local_ob, attr)
+                remote_attr_val = getattr(remote_ob, attr)
+
+                if isinstance(local_attr_val, list):
+                    self.assertEqual(len(local_attr_val), len(remote_attr_val))
+                elif isinstance(local_attr_val, dict):
+                    keys = local_attr_val.keys()
+                    rkeys = getattr(remote_ob, attr).keys()
+                    for key in keys:
+                        self.assertIn(key, rkeys)
+                    for key in rkeys:
+                        self.assertIn(key, keys)
+                else:
+                    self.assertEqual(str(local_attr_val), str(remote_attr_val))
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def compare_user_list(self):
+        Cargs.username = os.environ.get("OLWEB_USERNAME")
+        Cargs.password = os.environ.get("OLWEB_PASSWORD")
+        Cargs.url = os.environ.get("OLWEB_URL")
+        connection = OpenLavaConnection(Cargs)
+
+        remote_list = OLUser.get_user_list(connection)
+        local_list = User.get_user_list()
 
         local_names = set()
         remote_names = set()
@@ -330,6 +386,17 @@ class TestConsumedResource(unittest.TestCase):
         self.assertEqual(c.value, '100')
         self.assertEqual(c.limit, '101')
         self.assertEqual(c.unit, 'None')
+
+
+class TestUser(unittest.TestCase):
+    def test_user_list(self):
+        for user in User.get_user_list():
+            self.assertIsInstance(user, User)
+
+    def test_user_get(self):
+        for u in User.get_user_list():
+            user = User(u.host_name)
+            self.assertEqual(user.name, u.name)
 
 
 class TestHost(unittest.TestCase):
