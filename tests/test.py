@@ -53,11 +53,7 @@ class CompareWebLocal(unittest.TestCase):
             for attr in local_ob.json_attributes():
                 attr_val = getattr(local_ob, attr)
                 if isinstance(attr_val, list):
-                    for val in attr_val:
-                        self.assertIn(str(val), [str(i) for i in getattr(remote_ob, attr)])
-                    attr_val = getattr(remote_ob, attr)
-                    for val in attr_val:
-                        self.assertIn(str(val), [str(i) for i in getattr(local_ob, attr)])
+                    self.assertEqual(len(attr_val), len(getattr(remote_ob, attr)))
                 else:
                     self.assertEqual(str(getattr(local_ob, attr)), str(getattr(remote_ob, attr)))
 
@@ -102,11 +98,7 @@ class CompareWebLocal(unittest.TestCase):
             for attr in local_ob.json_attributes():
                 attr_val = getattr(local_ob, attr)
                 if isinstance(attr_val, list):
-                    for val in attr_val:
-                        self.assertIn(str(val), [str(i) for i in getattr(remote_ob, attr)])
-                    attr_val = getattr(remote_ob, attr)
-                    for val in attr_val:
-                        self.assertIn(str(val), [str(i) for i in getattr(local_ob, attr)])
+                    self.assertEqual(len(attr_val), len(getattr(remote_ob, attr)))
                 else:
                     self.assertEqual(str(getattr(local_ob, attr)), str(getattr(remote_ob, attr)))
 
