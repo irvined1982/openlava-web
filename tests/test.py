@@ -49,7 +49,7 @@ class CompareWebLocal(unittest.TestCase):
 
         for local_queue in Queue.get_queue_list():
             remote_ob = OLQueue(connection, queue_name=local_queue.name)
-            local_ob = Queue(queue_name=local_queue.name)
+            local_ob = Queue(local_queue.name)
             for attr in local_ob.json_attributes():
 
                 local_attr_val = getattr(local_ob, attr)
@@ -159,10 +159,24 @@ class CompareWebLocal(unittest.TestCase):
         connection = OpenLavaConnection(Cargs)
 
         for local_job in Job.get_job_list():
-            remote_job = OLJob(connection, job_id=local_job.job_id, array_index=local_job.array_index)
-            local_job = Job(job_id=local_job.job_id, array_index=local_job.array_index)
-            for attr in local_job.json_attributes():
-                self.assertEqual(str(getattr(local_job, attr)), str(getattr(remote_job, attr)))
+            remote_ob = OLJob(connection, job_id=local_job.job_id, array_index=local_job.array_index)
+            local_ob = Job(job_id=local_job.job_id, array_index=local_job.array_index)
+            for attr in local_ob.json_attributes():
+
+                local_attr_val = getattr(local_ob, attr)
+                remote_attr_val = getattr(remote_ob, attr)
+
+                if isinstance(local_attr_val, list):
+                    self.assertEqual(len(local_attr_val), len(remote_attr_val))
+                elif isinstance(local_attr_val, dict):
+                    keys = local_attr_val.keys()
+                    rkeys = getattr(remote_ob, attr).keys()
+                    for key in keys:
+                        self.assertIn(key, rkeys)
+                    for key in rkeys:
+                        self.assertIn(key, keys)
+                else:
+                    self.assertEqual(str(local_attr_val), str(remote_attr_val))
 
 
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
