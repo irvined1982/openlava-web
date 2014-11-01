@@ -51,11 +51,22 @@ class CompareWebLocal(unittest.TestCase):
             remote_ob = OLQueue(connection, queue_name=local_queue.name)
             local_ob = Queue(queue_name=local_queue.name)
             for attr in local_ob.json_attributes():
-                attr_val = getattr(local_ob, attr)
-                if isinstance(attr_val, list):
-                    self.assertEqual(len(attr_val), len(getattr(remote_ob, attr)))
+                
+                local_attr_val = getattr(local_ob, attr)
+                remote_attr_val = getattr(remote_ob, attr)
+                self.assertEqual(local_attr_val.__class__.__name__, remote_attr_val.__class__.__name__)
+
+                if isinstance(local_attr_val, list):
+                    self.assertEqual(len(local_attr_val), len(remote_attr_val))
+                elif isinstance(local_attr_val, dict):
+                    keys = local_attr_val.keys()
+                    rkeys = getattr(remote_ob, attr).keys()
+                    for key in keys:
+                        self.assertIn(key, rkeys)
+                    for key in rkeys:
+                        self.assertIn(key, keys)
                 else:
-                    self.assertEqual(str(getattr(local_ob, attr)), str(getattr(remote_ob, attr)))
+                    self.assertEqual(str(local_attr_val), str(remote_attr_val))
 
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
@@ -96,11 +107,22 @@ class CompareWebLocal(unittest.TestCase):
             remote_ob = OLHost(connection, host_name=local_host.name)
             local_ob = Host(local_host.name)
             for attr in local_ob.json_attributes():
-                attr_val = getattr(local_ob, attr)
-                if isinstance(attr_val, list):
-                    self.assertEqual(len(attr_val), len(getattr(remote_ob, attr)))
+
+                local_attr_val = getattr(local_ob, attr)
+                remote_attr_val = getattr(remote_ob, attr)
+                self.assertEqual(local_attr_val.__class__.__name__, remote_attr_val.__class__.__name__)
+
+                if isinstance(local_attr_val, list):
+                    self.assertEqual(len(local_attr_val), len(remote_attr_val))
+                elif isinstance(local_attr_val, dict):
+                    keys = local_attr_val.keys()
+                    rkeys = getattr(remote_ob, attr).keys()
+                    for key in keys:
+                        self.assertIn(key, rkeys)
+                    for key in rkeys:
+                        self.assertIn(key, keys)
                 else:
-                    self.assertEqual(str(getattr(local_ob, attr)), str(getattr(remote_ob, attr)))
+                    self.assertEqual(str(local_attr_val), str(remote_attr_val))
 
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
