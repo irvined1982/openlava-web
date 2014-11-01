@@ -51,10 +51,9 @@ class CompareWebLocal(unittest.TestCase):
             remote_ob = OLQueue(connection, queue_name=local_queue.name)
             local_ob = Queue(queue_name=local_queue.name)
             for attr in local_ob.json_attributes():
-                
+
                 local_attr_val = getattr(local_ob, attr)
                 remote_attr_val = getattr(remote_ob, attr)
-                self.assertEqual(local_attr_val.__class__.__name__, remote_attr_val.__class__.__name__)
 
                 if isinstance(local_attr_val, list):
                     self.assertEqual(len(local_attr_val), len(remote_attr_val))
@@ -110,7 +109,6 @@ class CompareWebLocal(unittest.TestCase):
 
                 local_attr_val = getattr(local_ob, attr)
                 remote_attr_val = getattr(remote_ob, attr)
-                self.assertEqual(local_attr_val.__class__.__name__, remote_attr_val.__class__.__name__)
 
                 if isinstance(local_attr_val, list):
                     self.assertEqual(len(local_attr_val), len(remote_attr_val))
