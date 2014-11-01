@@ -31,7 +31,7 @@ from olwclient import User as OLUser, Job as OLJob, Host as OLHost, Queue as OLQ
 # Todo: Host inactive/active/close/open
 # Todo: Queue close/open/clear/etc
 
-    
+
 class Cargs(object):
     username = None
     password = None
@@ -297,6 +297,22 @@ class TestWebServer(unittest.TestCase):
             response = urllib.urlopen("%s/job/%d/%d" % (base_url, job.job_id, job.array_index))
             self.assertTrue(self.check_content_type(response, "text/html"))
             response = urllib.urlopen("%s/job/%d/%d?json=1" % (base_url, job.job_id, job.array_index))
+            self.assertTrue(self.check_content_type(response, "application/json"))
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
+    def test_user_urls(self):
+        base_url = os.environ.get("OLWEB_URL", None)
+        if not base_url:
+            return
+        base_url.rstrip("/")
+        response = urllib.urlopen("%s/users/" % base_url)
+        self.assertTrue(self.check_content_type(response, "text/html"))
+        response = urllib.urlopen("%s/users/?json=1" % base_url)
+        self.assertTrue(self.check_content_type(response, "application/json"))
+        for u in User.get_user_list():
+            response = urllib.urlopen("%s/users/%s" % (base_url, u.name))
+            self.assertTrue(self.check_content_type(response, "text/html"))
+            response = urllib.urlopen("%s/users/%s?json=1" % (base_url, u.name))
             self.assertTrue(self.check_content_type(response, "application/json"))
 
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None), "OLWEB_URL not defined")
