@@ -12,7 +12,10 @@ Contents
 
    screenshots
    installation
+   cluster
    olwclient
+   restful
+   javascript
    commands
 
 About

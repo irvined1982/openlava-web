@@ -14,6 +14,8 @@
 import sys, os
 from django.conf import settings
 import sphinx_bootstrap_theme
+from sphinxcontrib import httpdomain
+
 
 settings.configure()
 
@@ -36,6 +38,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
+    'sphinxcontrib.httpdomain',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

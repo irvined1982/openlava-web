@@ -1,162 +1,176 @@
-Cluster API
-===========
+ReSTful Web Interface
+=====================
 
-The Cluster API defines the standard API used to interface with the local scheduling system, this is designed to be
-independent of the scheduling environment, currently a reference implementation exists for Openlava only.
-
-The Cluster API is mirrored in the client API, which is designed to be accessed via the olwclient python
-library.
-
-A third, Javascript library exists for accessing Openlava-Web from within a web browser.
+Both the javascript library, and the olwclient library use the following ReSTful interface.
 
 .. contents::
 
-Process Classes
----------------
+Standard Response Format
+------------------------
 
-Process classes represent individual processes that are executing on a given host.
+The standard JSON response is a JSON object containing three attributes:
 
-.. autoclass:: cluster.Process
-    :members:
+Status
+^^^^^^
 
-Resource Limit Classes
-----------------------
+A string, either OK, or FAIL.  OK indicates that the request was successfully executed without error.
+Fail indicates that the request was not successful, this can be either due to an unexpected error, or
+because the request was not valid or appropriate.
 
-Resource limits classes define resource limits that are imposed on a given job.
+Message
+^^^^^^^
 
-.. autoclass:: cluster.ResourceLimit
-    :members:
+An optional string containing a message describing the response, this can be left Null, empty, or set
+to a string.
 
-Consumed Resources
-------------------
+Data
+^^^^
 
-Consumed resources represent resources that have been consumed by a given job.
+An optional object that is returned to the client.
 
-.. autoclass:: cluster.ConsumedResource
-    :members:
+::
 
-Cluster Resources
------------------
+    {
+        "status": "OK|FAIL",
+        "message": "Optional Message",
+        "data": object
+    }
 
-.. autoclass:: cluster.openlavacluster.Resource
-    :members:
-    :inherited-members:
-
-Job Classes
------------
-
-Job classes are used to get information about, and manipulate jobs on the scheduler.  Each class, whether local,
-remote client, or javascript implements the same interface, albeit with slightly different arguments where required.
-
-The local Job class uses openlava.lsblib to communicate with the Openlava Job Scheduler.  The current host must be
-part of an openlava cluster, although it does not need to be a job server.  cluster.openlavacluster.Job implements the
-cluster.JobBase interface.
-
-.. autoclass:: cluster.openlavacluster.Job
-    :members:
-
-Job Status
-^^^^^^^^^^
-
-Job Status classes are used to define the current status of a job.
-
-.. autoclass:: cluster.openlavacluster.JobStatus
-    :members:
-    :inherited-members:
-
-Job Options
-^^^^^^^^^^^
-
-Job Option classes define options that were specified for a job.
-
-.. autoclass:: cluster.openlavacluster.SubmitOption
-    :members:
-    :inherited-members:
-
-.. autoclass:: cluster.openlavacluster.Submit2Option
-    :members:
-    :inherited-members:
-
-Host Classes
-------------
-
-Host classes are used to get information about and manipulate hosts on the cluster.  Primarily this is done through the
-Host() class, however when associated with a Job() they may be through ExecutionHost classes which also contain
-information on the number of slots that are allocated to the job.
-
-.. autoclass:: cluster.openlavacluster.Host
-    :members:
-
-.. autoclass:: cluster.openlavacluster.ExecutionHost
-    :members:
-    :inherited-members:
-
-Host Statuses
-^^^^^^^^^^^^^
-
-Host Statuses define the status of an individual host.
-
-.. autoclass:: cluster.openlavacluster.HostStatus
-    :members:
-    :inherited-members:
-
-Queue Classes
--------------
-
-Queue classes represent individual queues that are configured as part of the cluster.
-
-.. autoclass:: cluster.openlavacluster.Queue
-    :members:
-
-Queue Statuses
-^^^^^^^^^^^^^^
-
-.. autoclass:: cluster.openlavacluster.QueueStatus
-
-Queue Attributes
-^^^^^^^^^^^^^^^^
-
-.. autoclass:: cluster.openlavacluster.QueueAttribute
-
-user Classes
-------------
-
-User classes represent individual users that are part of the cluster configuration.
-
-.. autoclass:: cluster.openlavacluster.User
-    :members:
-
-Exceptions
+Logging In
 ----------
 
-The following exceptions are defined when using the Local interface.
+.. http:post:: accounts/ajax_login
 
-.. autoclass:: cluster.ClusterException
-    :members:
+    Logs in an ajax client by allowing the client to upload the username/password combination.
 
-.. autoclass:: cluster.NoSuchHostError
-    :members:
+    .. todo: Check if this is a REALLY BAD IDEA?!?!?
 
-.. autoclass:: cluster.NoSuchJobError
-    :members:
+    The username password combo should be JSON serialized and sent as the POST data.
 
-.. autoclass:: cluster.NoSuchQueueError
-    :members:
+    Example POST data::
 
-.. autoclass:: cluster.NoSuchUserError
-    :members:
+        {
+            "password": "topsecret",
+            "username": "bob"
+        }
 
-.. autoclass:: cluster.ResourceDoesntExistError
-    :members:
 
-.. autoclass:: cluster.ClusterInterfaceError
-    :members:
+    On success, returns a JSON serialized response with no data, and the message set to "User logged in"
 
-.. autoclass:: cluster.PermissionDeniedError
-    :members:
+    Example Success Response::
 
-.. autoclass:: cluster.JobSubmitError
-    :members:
+        {
+            "data": null,
+            "message": "User logged in",
+            "status": "OK"
+        }
 
-.. autoclass:: cluster.openlavacluster.ClusterException
-    :members:
+    On failure to authenticate, returns HTTP Error 403 not authenticated, the reason for the failure is specified
+    in the message.
+
+    Example Failure Response::
+
+        {
+            "data": null,
+            "message": "Invalid username or password",
+            "status": "FAIL"
+        }
+
+    :statuscode 200: no error
+    :statuscode 403: Unable to authenticate user
+
+CSRF Token
+----------
+
+.. http:get:: get_token
+
+    The CSRF token is required to be sent to the server whenever the client uses a HTTP POST request.
+    See: `Django CSRF Guide <https://docs.djangoproject.com/en/dev/ref/contrib/csrf/>`_
+
+    Returns a JSON serialized dictionary containing a single item, called cookie, the value of which
+    is set to the CSRF token.
+
+    Example response::
+
+        {
+            "data": {
+                "cookie": "Ca7mCejV7LKu1LN13bGtSaKZqCtHYGTp"
+            },
+            "message": "",
+            "status": "OK"
+        }
+
+Host Operations
+---------------
+
+Host List
+^^^^^^^^^
+
+.. http:get:: hosts/
+
+Opening a Host
+^^^^^^^^^^^^^^
+
+.. http:get:: hosts/(?P<host_name>.+?)/open
+
+Closing a Host
+^^^^^^^^^^^^^^
+
+.. http:get:: hosts/(?P<host_name>.+?)/close
+
+Getting information on a Host
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. http:get:: hosts/(.+?)
+
+Queue Operations
+----------------
+
+Queue List
+^^^^^^^^^^
+
+.. http:get:: queues/
+
+.. http:get:: queues/(.+?)
+
+.. http:get:: queues/(?P<queue_name>.+?)/close
+
+.. http:get:: queues/(?P<queue_name>.+?)/open
+
+.. http:get:: queues/(?P<queue_name>.+?)/inactivate
+
+.. http:get:: queues/(?P<queue_name>.+?)/activate
+
+.. http:get:: users/
+
+.. http:get:: users/(.+?)
+
+.. http:get:: jobs/(?P<job_id>\d+)/$', 'openlavaweb.views.get_job_list', name="olw_job_list"),
+
+.. http:get:: jobs/$', 'openlavaweb.views.get_job_list', name="olw_job_list"),
+
+.. http:post:: job/submit
+
+.. http:post:: job/submit/(?P<form_class>.+)
+
+.. http:get:: job/(\d+)/(\d+)
+
+.. http:get:: job/(\d+)/(\d+)/output
+
+.. http:get:: job/(\d+)/(\d+)/error
+
+.. http:get:: job/(\d+)/(\d+)/kill
+
+.. http:get:: job/(\d+)/(\d+)/suspend
+
+.. http:get:: job/(\d+)/(\d+)/resume
+
+.. http:get:: job/(\d+)/(\d+)/requeue
+
+.. http:get:: overview/hosts
+
+.. http:get:: overview/jobs
+
+.. http:get:: overview/slots
+
+
