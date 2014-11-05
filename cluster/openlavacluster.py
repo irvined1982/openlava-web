@@ -3570,10 +3570,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.cluster_type
-        'openlava'
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.cluster_type
+            'openlava'
 
         :return: Type of cluster
         :rtype: str
@@ -3584,10 +3584,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.name
-        u'normal'
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.name
+            u'normal'
 
         :return: Name of queue
         :rtype: str
@@ -3599,10 +3599,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.description
-        u'For normal low priority jobs, running only if hosts are lightly loaded.'
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.description
+            u'For normal low priority jobs, running only if hosts are lightly loaded.'
 
         :return: Description of queue
         :rtype: str
@@ -3614,10 +3614,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.priority
-        30
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.priority
+            30
 
         :return: Queue Priority
         :rtype: Int
@@ -3633,10 +3633,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.nice
-        20
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.nice
+            20
 
         :return: Default nice value
         :rtype: int
@@ -3647,10 +3647,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_jobs_per_user
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_jobs_per_user
+            2147483647
 
         :return: Max jobs per user
         :rtype: int
@@ -3661,10 +3661,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_slots_per_user
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_slots_per_user
+            2147483647
 
         :return: Max slots per user
         :rtype: int
@@ -3675,10 +3675,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_jobs_per_processor
-        2147483648.0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_jobs_per_processor
+            2147483648.0
 
         :return: Max jobs per Processor
         :rtype: float
@@ -3689,10 +3689,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_slots_per_processor
-        2147483648.0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_slots_per_processor
+            2147483648.0
 
         :return: Max slots per processor
         :rtype: int
@@ -3709,10 +3709,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.run_windows
-        u' '
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.run_windows
+            u' '
 
         :return: Run windows
         :rtype: str
@@ -3723,12 +3723,12 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.runtime_limits
-        [CPU Time:-1 (-1), File Size:-1 (-1), Data Segment Size:-1 (-1), Stack Size:-1 (-1), Core Size:-1 \
-        (-1), RSS Size:-1 (-1), Num Files:-1 (-1), Max Open Files:-1 (-1), Swap Limit:-1 (-1), Run Limit:-1 \
-        (-1), Process Limit:-1 (-1)]
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.runtime_limits
+            [CPU Time:-1 (-1), File Size:-1 (-1), Data Segment Size:-1 (-1), Stack Size:-1 (-1), Core Size:-1 \
+            (-1), RSS Size:-1 (-1), Num Files:-1 (-1), Max Open Files:-1 (-1), Swap Limit:-1 (-1), Run Limit:-1 \
+            (-1), Process Limit:-1 (-1)]
 
         :return: runtime limits
         :rtype: list
@@ -3744,10 +3744,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.host_specification
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.host_specification
+            u''
 
         :return: Host specification
         :rtype: str
@@ -3761,10 +3761,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.attributes
-        [Q_ATTRIB_DEFAULT]
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.attributes
+            [Q_ATTRIB_DEFAULT]
 
         :return: list of :py:class::`cluster.openlavacluster.JobAttribute` objects
         :rtype: list
@@ -3776,10 +3776,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.statuses
-        [QUEUE_STAT_OPEN, QUEUE_STAT_ACTIVE, QUEUE_STAT_RUN]
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.statuses
+            [QUEUE_STAT_OPEN, QUEUE_STAT_ACTIVE, QUEUE_STAT_RUN]
 
         :return: list of :py:class::`cluster.openlavacluster.JobStatus` objects
         :rtype: list
@@ -3794,10 +3794,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_slots
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_slots
+            2147483647
 
         :return: max slots
         :rtype: int
@@ -3808,10 +3808,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.total_slots
-        3
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.total_slots
+            3
 
         :return: total slots requested
         :rtype: int
@@ -3822,10 +3822,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.num_running_slots
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.num_running_slots
+            0
 
         :return: number of running slots
         :rtype: int
@@ -3836,10 +3836,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.num_pending_slots
-        3
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.num_pending_slots
+            3
 
         :return: number of pending slots
         :rtype: int
@@ -3850,10 +3850,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.num_suspended_slots
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.num_suspended_slots
+            0
 
         :return: num
         :rtype:
@@ -3867,10 +3867,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.num_user_suspended_slots
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.num_user_suspended_slots
+            0
 
         :return: number of slots suspended by user
         :rtype: int
@@ -3886,10 +3886,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.num_system_suspended_slots
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.num_system_suspended_slots
+            0
 
         :return: number of slots suspended by the system
         :rtype: int
@@ -3900,10 +3900,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.num_reserved_slots
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.num_reserved_slots
+            0
 
         :return: number of reserved slots
         :rtype: int
@@ -3914,10 +3914,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_jobs
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_jobs
+            2147483647
 
         :return: Max number of jobs
         :rtype: int
@@ -3933,10 +3933,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.pre_execution_command
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.pre_execution_command
+            u''
 
         :return: pre exec command
         :rtype: str
@@ -3952,10 +3952,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.post_execution_command
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.post_execution_command
+            u''
 
         :return: Post exec command
         :rtype: str
@@ -3970,10 +3970,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.pre_post_user_name
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.pre_post_user_name
+            u''
 
         :return: pre/post user
         :rtype: str
@@ -3985,10 +3985,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.admins
-        [u'openlava']
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.admins
+            [u'openlava']
 
         :return: Queue Administrators
         :rtype: list
@@ -4004,10 +4004,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.migration_threshold
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.migration_threshold
+            2147483647
 
         :return: migration threshold
         :rtype: int
@@ -4022,10 +4022,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.scheduling_delay
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.scheduling_delay
+            0
 
         :return: scheduling delay
         :rtype: int
@@ -4052,10 +4052,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.accept_interval
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.accept_interval
+            0
 
         :return: accept interval
         :rtype: int
@@ -4083,10 +4083,11 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.dispatch_windows
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.dispatch_windows
+            u''
+
         :return: dispatch windows
         :rtype: str
 
@@ -4096,10 +4097,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_slots_per_job
-        -1
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_slots_per_job
+            -1
 
         :return: max slots per job
         :rtype: int
@@ -4114,10 +4115,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.requeue_exit_values
-        []
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.requeue_exit_values
+            []
 
         :return: list of values that a job may exit with when it should be requeud.
         :rtype: list
@@ -4128,10 +4129,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_jobs_per_host
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_jobs_per_host
+            2147483647
 
         :return: max jobs per host
         :rtype: int
@@ -4142,10 +4143,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.max_slots_per_host
-        2147483647
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.max_slots_per_host
+            2147483647
 
         :return: max slots allowed per host
         :rtype: int
@@ -4157,10 +4158,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.resource_requirements
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.resource_requirements
+            u''
 
         :return: resource requirements
         :rtype: str
@@ -4175,10 +4176,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.slot_hold_time
-        0
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.slot_hold_time
+            0
 
         :return: slot hold time
         :rtype: int
@@ -4204,10 +4205,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.stop_condition
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.stop_condition
+            u''
 
         :return: Job stop condition
         :rtype: str
@@ -4222,10 +4223,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.job_starter_command
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.job_starter_command
+            u''
 
         :return: Job starter command
         :rtype: str
@@ -4240,10 +4241,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.suspend_action_command
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.suspend_action_command
+            u''
 
         :return: suspend action
         :rtype: str
@@ -4258,10 +4259,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.resume_action_command
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.resume_action_command
+            u''
 
         :return: resume action
         :rtype: str
@@ -4276,10 +4277,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.terminate_action_command
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.terminate_action_command
+            u''
 
         :return: Termination action
         :rtype: str
@@ -4290,10 +4291,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.min_slots_per_job
-        -1
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.min_slots_per_job
+            -1
 
         :return: min slots per job
         :rtype: int
@@ -4304,10 +4305,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.default_slots_per_job
-        -1
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.default_slots_per_job
+            -1
 
         :return: default job size
         :rtype: int
@@ -4316,10 +4317,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         The default directory to store checkpoint data.  Will be an empty string if no default is defined.
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.checkpoint_data_directory
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.checkpoint_data_directory
+            u''
 
         :return: checkpoint data directory
         :rtype: str
@@ -4331,10 +4332,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.checkpoint_period
-        -1
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.checkpoint_period
+            -1
 
         :return: Number of seconds between checkpoint operations
         :rtype: int
@@ -4356,10 +4357,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.resume_condition
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.resume_condition
+            u''
 
         :return: resume condition
         :rtype: str
@@ -4374,10 +4375,11 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.stop_condition
-        u''
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.stop_condition
+            u''
+
         :return: stop condition definition
         :rtype: str
 
@@ -4388,10 +4390,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.allowed_users
-        []
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.allowed_users
+            []
 
         :return: list of user names
         :rtype: list
@@ -4403,10 +4405,10 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-        >>> from cluster.openlavacluster import Queue
-        >>> queue=Queue.get_queue_list()[0]
-        >>> queue.allowed_hosts
-        []
+            >>> from cluster.openlavacluster import Queue
+            >>> queue=Queue.get_queue_list()[0]
+            >>> queue.allowed_hosts
+            []
 
         :return: list of host names
         :rtype: list
@@ -4422,6 +4424,7 @@ class Queue(QueueBase, SingleArgMemoized):
         may return all queues on the cluster, or only queues that the user has access to.
 
         :return: List of :py:class:`openlavacluster.Queue` objects
+
         """
         initialize()
         qs = lsblib.lsb_queueinfo()
