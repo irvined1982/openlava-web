@@ -308,10 +308,13 @@ information on the number of slots that are allocated to the job.
 
         A callback to execute on failure, args: str errType, str: message.
 
-    :param object data:
-
-        Data object to use to fill data structures.  If data is provided, then all other args are ignored
-        and the object is returned.
+olwclient.Host.prototype.jobs = function(callback, errback, filters)
+olwclient.Host.getHost = function(hostName, callback, errback){
+olwclient.Host.getHostList = function(callback, errback){
+olwclient.Host.prototype.close = function(callback, errback){
+olwclient.closeHost = function(hostName, callback, errback){
+olwclient.Host.prototype.open = function(callback, errback){
+olwclient.openHost = function(hostName, callback, errback){
 
 
 Queue Classes

@@ -1,59 +1,80 @@
-	  <table class="table table-striped table-condensed">
-		  <thead>
-			  <tr>
-				  <th>Queue Name</th>
-				  <th>Status</th>
-				  <th>Attributes</th>
-				  <th>Total Num Jobs (Slots)</th>
-				  <th>Num Pending Jobs (Slots)</th>
-				  <th>Num Running Jobs (Slots)</th>
-				  <th>Num Suspended Jobs (Slots)</th>
-			  </tr>
-		</thead>
-		<tbody id="queue_list_body">
-  			{% for queue in queue_list %}
-			<tr id="queue_row_{{ queue.name }}">
-				<td><a href="{% url 'olw_queue_view' queue.name %}">{{ queue.name }}</a></td>
-				<td id="queue_{{ queue.name }}_statuses">{% for stat in queue.statuses %}{{ stat.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
-				<td id="queue_{{ queue.name }}_attributes">{% for attr in queue.attributes %}{{ attr.friendly }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td>
-				<td id="queue_{{ queue.name }}_total">{{ queue.total_jobs }} ({{ queue.total_slots }})</td>
-				<td id="queue_{{ queue.name }}_pending">{{ queue.num_pending_jobs }} ({{queue.num_pending_slots}})</td>
-				<td id="queue_{{ queue.name }}_running">{{ queue.num_running_jobs }} ({{ queue.num_running_slots }})</td>
-				<td id="queue_{{ queue.name }}_suspended">{{ queue.num_suspended_jobs }} ({{ queue.num_suspended_jobs }})</td>
-			</tr>
-			{% empty %}
-			<tr><td colspan="6">No Queues.</td></tr>
-			{% endfor %}
-		</tbody>
-	</table>
+<table class="table table-striped table-condensed">
+    <thead>
+    <tr>
+        <th>Queue Name</th>
+        <th>Status</th>
+        <th>Attributes</th>
+        <th>Total Num Jobs (Slots)</th>
+        <th>Num Pending Jobs (Slots)</th>
+        <th>Num Running Jobs (Slots)</th>
+        <th>Num Suspended Jobs (Slots)</th>
+    </tr>
+    </thead>
+    <tbody id="queue_list_body">
+    {% for queue in queue_list %}
+        <tr id="queue_{{ queue.name }}_row"
+            {% if queue.is_accepting_jobs and queue.is_dispatching_jobs %}class="active"
+            {% else %}class="warning"{% endif %}>
+            <td><a href="{% url 'olw_queue_view' queue.name %}">{{ queue.name }}</a></td>
+            <td id="queue_{{ queue.name }}_statuses">
+                {% for stat in queue.statuses %}{{ stat.friendly }}{% if not forloop.last %}<br/>{% endif %}{% endfor %}
+            </td>
+            <td id="queue_{{ queue.name }}_attributes">
+                {% for attr in queue.attributes %}{{ attr.friendly }}{% if not forloop.last %}<br/>
+                {% endif %}{% endfor %}</td>
+            <td id="queue_{{ queue.name }}_total">{{ queue.total_jobs }} ({{ queue.total_slots }})</td>
+            <td id="queue_{{ queue.name }}_pending">{{ queue.num_pending_jobs }} ({{ queue.num_pending_slots }})</td>
+            <td id="queue_{{ queue.name }}_running">{{ queue.num_running_jobs }} ({{ queue.num_running_slots }})</td>
+            <td id="queue_{{ queue.name }}_suspended">{{ queue.num_suspended_jobs }} ({{ queue.num_suspended_jobs }})
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="6">No Queues.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
 <script>
     function update_queue_list(){
-        $.getJSON( "{% url "olw_queue_list" %}", function(data) {
-            data.forEach(function(queue){
-                var stats=[];
-                queue.statuses.forEach( function(s){
-                    stats.push( s.friendly );
+        olwclient.Queue.getQueueList(function(queues){
+            jQuery.each(queues, function(index, queue) {
+                var stats = [];
+                queue.statuses.forEach(function (s) {
+                    stats.push(s.friendly);
                 });
-                var st=stats.join("<br />");
+                var st = stats.join("<br />");
 
-                var attribs=[];
-                queue.attributes.forEach( function(a){
-                    attribs.push( a.friendly );
+                var attribs = [];
+                queue.attributes.forEach(function (a) {
+                    attribs.push(a.friendly);
                 });
-                var at=attribs.join("<br />");
+                var at = attribs.join("<br />");
 
-                $("#queue_" + queue.name + "_statuses").html(st);
-                $("#queue_" + queue.name + "_attributes").html(at);
+                var sel = "#queue_" + queue.name + "_";
+                $(sel + "row").removeClass("active");
+                $(sel + "row").removeClass("info");
+                $(sel + "row").removeClass("warning");
+                $(sel + "row").removeClass("danger");
+                if (queue.is_dispatching_jobs && queue.is_accepting_jobs) {
+                    $(sel + "row").addClass("active");
+                } else {
+                    $(sel + "row").addClass("warning");
+                }
 
-                $("#queue_" + queue.name + "_total").text(queue.total_jobs + ' (' + queue.total_slots + ')' );
-                $("#queue_" + queue.name + "_pending").text(queue.num_pending_jobs + ' (' + queue.num_pending_slots + ')' );
-                $("#queue_" + queue.name + "_running").text(queue.num_running_jobs + ' (' + queue.num_running_slots + ')');
-                $("#queue_" + queue.name + "_suspended").text(queue.num_suspended_jobs + ' (' + queue.num_suspended_slots + ')');
+                $(sel + "statuses").html(st);
+                $(sel + "attributes").html(at);
+                $(sel + "total").text(queue.total_jobs + ' (' + queue.total_slots + ')');
+                $(sel + "pending").text(queue.num_pending_jobs + ' (' + queue.num_pending_slots + ')');
+                $(sel + "running").text(queue.num_running_jobs + ' (' + queue.num_running_slots + ')');
+                $(sel + "suspended").text(queue.num_suspended_jobs + ' (' + queue.num_suspended_slots + ')');
             });
-        }).always(function(){
+            setTimeout(update_queue_list, 30000);
+        }, function(errType, message){
+            console.log("Unable to update queue list");
             setTimeout(update_queue_list, 30000);
         });
     }
-    update_queue_list();
+    setTimeout(update_queue_list, 30000);
 </script>
