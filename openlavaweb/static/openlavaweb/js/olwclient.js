@@ -229,7 +229,7 @@ olwclient.Job = function(data){
 
 olwclient.Job.prototype.submit_time_datetime = function(){
     var submit_time_datetime = new Date(0);
-    submit_time_datetime.setUTCSeconds(1000 * this.submit_time);
+    submit_time_datetime.setUTCSeconds(this.submit_time);
     return submit_time_datetime;
 };
 
@@ -238,7 +238,7 @@ olwclient.Job.prototype.end_time_datetime = function(){
         return null;
     }
     var end_time_datetime = new Date(0);
-    end_time_datetime.setUTCSeconds(1000 * this.end_time);
+    end_time_datetime.setUTCSeconds(this.end_time);
     return end_time_datetime;
 };
 
@@ -247,7 +247,7 @@ olwclient.Job.prototype.start_time_datetime = function(){
         return null;
     }
     var start_time_datetime = new Date(0);
-    start_time_datetime.setUTCSeconds(1000 * this.start_time);
+    start_time_datetime.setUTCSeconds(this.start_time);
     return start_time_datetime;
 };
 
@@ -256,7 +256,7 @@ olwclient.Job.prototype.predicted_start_time_datetime = function(){
         return null;
     }
     var predicted_start_time_datetime = new Date(0);
-    predicted_start_time_datetime.setUTCSeconds(1000 * this.predicted_start_time);
+    predicted_start_time_datetime.setUTCSeconds(this.predicted_start_time);
     return predicted_start_time_datetime;
 };
 
@@ -265,7 +265,7 @@ olwclient.Job.prototype.reservation_time_datetime = function(){
         return null;
     }
     var reservation_time_datetime = new Date(0);
-    reservation_time_datetime.setUTCSeconds(1000 * this.reservation_time);
+    reservation_time_datetime.setUTCSeconds(this.reservation_time);
     return reservation_time_datetime;
 };
 

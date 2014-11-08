@@ -12,40 +12,47 @@
     <script>
         function updateJob(job_id, array_index) {
             olwclient.Job.getJob(job_id, array_index, function (job) {
-                setTimeout(updateJob, 30000, job_id, array_index);
+
+
                 var sel = "#jl{% if prefix %}_prefix{% endif %}_"+ job.job_id + "_" + job.array_index + "_";
+                if (!$(sel + "row").html()){
+                    console.log("Job doesnt exist on page any more, no need to update...");
+                    return;
+                }
+                setTimeout(updateJob, 30000, job_id, array_index);
                 if ($(sel + "status").text() != job['status']['friendly']) {
-                    if (job.start_time_datetime()) {
-                        $(sel + "start_time").text(olwclient.Job.dateToString(job.start_time_datetime()));
-                    } else {
-                        $(sel + "start_time").text("Not Yet Started");
-                    }
-                    if (job.end_time_datetime()) {
-                        $(sel + "end_time").text(olwclient.Job.dateToString(job.end_time_datetime()));
-                    } else {
-                        $(sel + "end_time").text("Not Yet Finished");
-                    }
                     $(sel + "status").text(job['status']['friendly']);
-                    // Flash the row or something funky....
                     $(sel + "row").removeClass("active");
                     $(sel + "row").removeClass("info");
                     $(sel + "row").removeClass("success");
                     $(sel + "row").removeClass("danger");
                     $(sel + "row").removeClass("warning");
-                    if (job.is_running) {
-                        $(sel + "row").addClass("active");
-                    } else if (job.is_pending) {
-                        $(sel + "row").addClass("info");
-                    } else if (job.is_finished) {
-                        $(sel + "row").addClass("success");
-                    } else if (job.is_failed) {
-                        $(sel + "row").addClass("danger");
-                    } else if (job.was_killed) {
-                        $(sel + "row").addClass("warning");
-                    } else if (job.is_suspended) {
-                        $(sel + "row").addClass("warning");
-                    }
                 }
+                if (job.is_running) {
+                    $(sel + "row").addClass("active");
+                } else if (job.is_pending) {
+                    $(sel + "row").addClass("info");
+                } else if (job.is_finished) {
+                    $(sel + "row").addClass("success");
+                } else if (job.is_failed) {
+                    $(sel + "row").addClass("danger");
+                } else if (job.was_killed) {
+                    $(sel + "row").addClass("warning");
+                } else if (job.is_suspended) {
+                    $(sel + "row").addClass("warning");
+                }
+
+                if (job.start_time_datetime()) {
+                    $(sel + "start_time").text(olwclient.Job.dateToString(job.start_time_datetime()));
+                } else {
+                    $(sel + "start_time").text("Not Yet Started");
+                }
+                if (job.end_time_datetime()) {
+                    $(sel + "end_time").text(olwclient.Job.dateToString(job.end_time_datetime()));
+                } else {
+                    $(sel + "end_time").text("Not Yet Finished");
+                }
+                $(sel + "submit_time").text(olwclient.Job.dateToString(job.submit_time_datetime()));
             }, function () {
                 console.log("Unable to load job: " + job_id + " array index: " + array_index);
             });
@@ -71,7 +78,7 @@
         <td><a href="{% url 'olw_job_view_array' job.job_id job.array_index %}">{{ job.job_id }}{% if job.array_index > 0 %}[{{ job.array_index }}]{% endif %}</a></td>
         <td><a href="{% url 'olw_user_view' job.user_name %}">{{ job.user_name }}</a></td>
         <td id="jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_status">{{ job.status }}</td>
-        <td>{{ job.submit_time_datetime_local }}</td>
+        <td id="jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_submit_time">{{ job.submit_time_datetime_local }}</td>
         <td id='jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_start_time'>{% if job.start_time %}{{ job.start_time_datetime_local }}{% else %}Not yet started{% endif %}</td>
         <td id='jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_end_time'>{% if job.end_time %}{{ job.end_time_datetime_local }}{% else %}Not yet finished{% endif %}</td>
     </tr>

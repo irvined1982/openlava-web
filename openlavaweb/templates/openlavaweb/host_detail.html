@@ -5,10 +5,8 @@
 <div id="openMessageBody"></div>
 <div id="statusMessageBody"></div>
 <script>
-        var url='{% url "olw_host_view" host.name %}';
-        var closeUrl='{% url "olw_host_close" host.name %}';
-	var openUrl='{% url "olw_host_open" host.name %}';
-	function setStatus(message,cls) {
+    var url='{% url "olw_host_view" host.name %}';
+    function setStatus(message,cls) {
 		var html='<div id="statusMessage" class="fade in alert alert-'+cls+'">'+message+'</div>';
 		if ($("#statusMessageBody").html() != html ) {
 			$("#statusMessageBody").html(html);	
@@ -79,124 +77,92 @@
 		$("#indexes").empty();
 		$("#indexes").html(indexes);
 		var html="";
+        var newJobs = [];
 		jQuery.each(host.jobs, function(index, job){
-			if (index >= 20) {
-				return false;
-			}
-			html+="<tr><td><a href='" + job.url + "'>" + job.job_id;
-			if (job.array_index > 0){
-				html += "[" + job.array_index + "]";
-			}
-			html += "</a></td>";
-			html += "<td><a href='" + job.user_url + "'>" + job.user_name + "</a></td>";
-			html += "<td>" + job.status.friendly + "</td>";
-			html += "<td>" + new Date(1000*job.submit_time) + "</td>";
-			html += "<td>";
-			if (job.start_time > 0){
-				html += new Date(1000 * job.start_time);
-			} else{
-				html +="Not yet started";
-			}
-			html += "</td>";
-			html +="<td>";
-			if (job.end_time > 0){
-				html += new Date(1000*job.end_time);
-			} else{
-				html +="Not yet finished";
-			}
-			html += "</td>";
-			html += "</tr>";
+            var js = 'jl_' + job.job_id + '_' + job.array_index + '_';
+            if ($(js + "_row").html()){
+                html += "<tr>" + $(sel + "_row").html() + "</tr>";
+            }else {
+                html += '<tr id="' + js + 'row" class="active">';
+                html += '<td><a href="' + job.url + '">' + job.job_id;
+                if (job.array_index > 0) {
+                    html += "[" + job.array_index + "]";
+                }
+                html += '</a></td>';
+                html += '<td><a href="' + job.user_url + '">' + job.user_name + "</a></td>";
+                html += '<td id="' + js + 'status">' + job.status['friendly'] + "</td>";
+                html += '<td id="' + js + 'submit_time">Loading...</td>';
+                html += '<td id="' + js + 'start_time">Loading...</td>';
+                html += '<td id="' + js + 'end_time">Loading...</td';
+                html += "</tr>";
+                newJobs.push([job.job_id, job.array_index]);
+            }
 		});
+
 		if (html=="") {
 			html="<tr><td colspan='6'>No Jobs</td></tr>";
 		}
+
 		$("#jobs").html(html);
-		
+		jQuery.each(newJobs, function(index, j){
+            updateJob(j[0], j[1]);
+        });
 	}
 	
 	
 	function update(){
-		var jqxhr = $.getJSON( url, function(data) {
-			if (data.hasOwnProperty('type') && data.type=="Host") {
-				updateHostInfo(data)	
-			}else if (data.hasOwnProperty('type') && data.type=="Exception") {
-				$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load host information: ' + data.message + '</div>');
-				$("#failMessage").alert();
-				$("#statusMessageBody").empty();
-			}			
-		}).fail(function(){
-			$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load host information</div>');
-                        $("#failMessage").alert();
-			setTimeout(function(){
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+		olwclient.Host.getHost('{{ host.name }}', function(host){
+            updateHostInfo(host);
+            setTimeout(update, 30000);
+        }, function(exception, message){
+            $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load host information: ' + message + '</div>');
+            $("#failMessage").alert();
+            $("#statusMessageBody").empty();
+            setTimeout(function(){
 				$("#failMessage").alert('close');
-			},15000); 
-		}).always(function() {
-			setTimeout(update, 30000);
-		});
-	}
-	update();
-	
+			},15000);
+            setTimeout(update, 30000);
+        });
+    }
+
+    $(function(){
+            olwclient.serverUrl("{% url 'olw_system_view' %}");
+            setTimeout(update, 30000);
+    });
 	
 	function closeHost(){
-                $("#closeModal").modal('hide');
-                var jqxhr = $.getJSON( closeUrl, function(data) {
-			var message='';
-			var style='';
-			var close=false;
-			if (data.hasOwnProperty('status') && data.status == "OK") {
-				message="Host close request sent successfully.";
-				style='success';
-				close=true;
-			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
-				style='danger';
-				message=data.message;
-			}else{
-				style='warning';
-				message="Strange response from server.";
-			}
-                        $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
-                        $("#closeMessage").alert();
-			if (close) {
-				setTimeout(function(){
-					$("#closeMessage").alert('close');
-			        },30000); 
-			}
-                })
-                .fail(function() {
-                        $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-warning">Unable to close host.</div>');
-                        $("#closeMessage").alert();
-                })
-        }		
-	function openHost(){
-                $("#openModal").modal('hide');
-                var jqxhr = $.getJSON( openUrl, function(data) {
-			var message='';
-			var style='';
-			var close=false;
-			if (data.hasOwnProperty('status') && data.status == "OK") {
-				message="Host open request sent successfully.";
-				style='success';
-				close=true;
-			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
-				style='danger';
-				message=data.message;
-			}else{
-				style='warning';
-				message="Strange response from server.";
-			}
-                        $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
-                        $("#openMessage").alert();
-			if (close) {
-				setTimeout(function(){
-					$("#openMessage").alert('close');
-			        },30000); 
-			}
-                })
-                .fail(function() {
-                        $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-warning">Unable to open host.</div>');
-                        $("#openMessage").alert();
-                })
-        }
+        $("#closeModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.openHost("{{ host.name }}", function(){
+            $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-success">Host close request sent successfully.</div>');
+            setTimeout(function(){
+                $("#closeMessage").alert('close');
+            },30000);
+        }, function(exception, message){
+            $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-danger">Host close request failed.' + message +' </div>');
+            setTimeout(function(){
+                $("#closeMessage").alert('close');
+            },30000);
+        });
+    }
+
+    function openHost(){
+        $("#openModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.openHost("{{ host.name }}", function(){
+            $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-success">Host open request sent successfully.</div>');
+            setTimeout(function(){
+                $("#openMessage").alert('close');
+            },30000);
+        }, function(exception, message){
+            $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-danger">Host open request failed.' + message +' </div>');
+            setTimeout(function(){
+                $("#openMessage").alert('close');
+            },30000);
+        });
+    }
+
 </script>
 
 <div><!-- queue management -->

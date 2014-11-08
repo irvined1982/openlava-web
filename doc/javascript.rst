@@ -323,3 +323,7 @@ User Classes
 ------------
 
 User classes represent individual users that are configured in the cluster.
+
+
+job user_url
+job.url
