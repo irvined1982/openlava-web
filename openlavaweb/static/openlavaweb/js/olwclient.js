@@ -99,15 +99,22 @@ olwclient.Host.getHostList = function(callback, errback){
 };
 
 olwclient.Host.prototype.close = function(callback, errback){
-    var url = "/hosts/" + this.name + "/close";
+    olwclient.closeHost(this.name, callback, errback);
+};
+
+olwclient.closeHost = function(hostName, callback, errback){
+    var url = "/hosts/" + hostName + "/close";
     olwclient.executeCommand(url, callback, errback)
 };
 
 olwclient.Host.prototype.open = function(callback, errback){
-    var url = "/hosts/" + this.name + "/open";
-    olwclient.executeCommand(url, callback, errback)
+    olwclient.openHost(this.name, callback, errback);
 };
 
+olwclient.openHost = function(hostName, callback, errback){
+    var url = "/hosts/" + hostName + "/open";
+    olwclient.executeCommand(url, callback, errback)
+};
 
 olwclient.User = function(data){
     for (var propName in data){
