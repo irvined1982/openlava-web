@@ -20,9 +20,22 @@
 
 var olwclient = olwclient || {};
 
-olwclient.serverUrl = null;
+olwclient._serverUrl = null;
+
+olwclient.serverUrl = function(url) {
+    if (url !== undefined) {
+        if (url.slice(-1) == "/") {
+            url = url.substring(0, url.length - 1);
+        }
+        olwclient._serverUrl = url;
+    }
+    return olwclient._serverUrl;
+};
 
 olwclient.handleJSONResponse = function(data, callback, errback){
+    if (!data){
+        return errback("Invalid response from server");
+    }
     if (!data.hasOwnProperty('status')){
         return errback("MalformedResponse", "The response from the server did not contain the expected attributes");
     }
@@ -45,11 +58,11 @@ olwclient.handleJSONResponse = function(data, callback, errback){
 };
 
 olwclient.login = function(username, password, callback, errback){
-    if (!olwclient.serverUrl){
+    if (!olwclient._serverUrl){
         jQuery.error( "No serverUrl defined." );
     }
 
-    var login_url = olwclient.serverUrl + "/accounts/ajax_login";
+    var login_url = olwclient._serverUrl + "/accounts/ajax_login";
     var data = {
         "password": password,
         "username": username
@@ -83,6 +96,16 @@ olwclient.Host.getHost = function(hostName, callback, errback){
 
 olwclient.Host.getHostList = function(callback, errback){
     return olwclient.getObjectList("/hosts/", olwclient.Host, callback, errback);
+};
+
+olwclient.Host.prototype.close = function(callback, errback){
+    var url = "/hosts/" + this.name + "/close";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+olwclient.Host.prototype.open = function(callback, errback){
+    var url = "/hosts/" + this.name + "/open";
+    olwclient.executeCommand(url, callback, errback)
 };
 
 
@@ -136,11 +159,41 @@ olwclient.Queue.prototype.jobs = function(callback, errback, filters){
     olwclient.Job.getJobList(callback, errback, filters);
 };
 
+olwclient.Queue.prototype.close = function(callback, errback){
+    var url = "/queues/" + this.name + "/close";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+olwclient.Queue.prototype.open = function(callback, errback){
+    var url = "/queues/" + this.name + "/open";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+olwclient.Queue.prototype.activate = function(callback, errback){
+    var url = "/queues/" + this.name + "/activate";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+olwclient.Queue.prototype.open = function(callback, errback){
+    var url = "/queues/" + this.name + "/inactivate";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+
 
 olwclient.Job = function(data){
-    var jobObject = this;
 
-    olwclient.Host.getHost(data['submission_host'], function(host){
+    for (var propName in data){
+        if (propName == "submission_host" || propName == "execution_hosts"){
+            continue;
+        }else if (data.hasOwnProperty(propName))this[propName] = data[propName];
+    }
+    return this;
+
+
+/*
+    var jobObject = this;
+    olwclient.Host.getHost(data['submission_host']['name'], function(host){
         jobObject.submission_host = host;
     }, function(error, message){
        console.log(error + ": " + message);
@@ -161,14 +214,56 @@ olwclient.Job = function(data){
         }
     }, function(error, message){
         console.log(error + ": " + message);
-    });
+    });*/
 
-    for (var propName in data){
-        if (propName == "submission_host" || propName == "execution_hosts"){
-            continue;
-        }else if (data.hasOwnProperty(propName))this[propName] = data[propName];
+
+}
+
+
+olwclient.Job.prototype.submit_time_datetime = function(){
+    var submit_time_datetime = new Date(0);
+    submit_time_datetime.setUTCSeconds(1000 * this.submit_time);
+    return submit_time_datetime;
+};
+
+olwclient.Job.prototype.end_time_datetime = function(){
+    if (this.end_time < 1){
+        return null;
     }
-    return this;
+    var end_time_datetime = new Date(0);
+    end_time_datetime.setUTCSeconds(1000 * this.end_time);
+    return end_time_datetime;
+};
+
+olwclient.Job.prototype.start_time_datetime = function(){
+    if (this.start_time < 1){
+        return null;
+    }
+    var start_time_datetime = new Date(0);
+    start_time_datetime.setUTCSeconds(1000 * this.start_time);
+    return start_time_datetime;
+};
+
+olwclient.Job.prototype.predicted_start_time_datetime = function(){
+    if (this.predicted_start_time_datetime < 1){
+        return null;
+    }
+    var predicted_start_time_datetime = new Date(0);
+    predicted_start_time_datetime.setUTCSeconds(1000 * this.predicted_start_time);
+    return predicted_start_time_datetime;
+};
+
+olwclient.Job.prototype.reservation_time_datetime = function(){
+    if (this.reservation_time_datetime < 1){
+        return null;
+    }
+    var reservation_time_datetime = new Date(0);
+    reservation_time_datetime.setUTCSeconds(1000 * this.reservation_time);
+    return reservation_time_datetime;
+};
+
+olwclient.Job.dateToString = function(date){
+    return date.toDateString() + " " + date.toLocaleTimeString();
 };
 
 olwclient.Job.getJob = function(job_id, array_index, callback, errback){
@@ -183,18 +278,59 @@ olwclient.Job.getJobList = function(callback, errback, filters){
     return olwclient.getObjectList(url, olwclient.Job, callback, errback);
 };
 
+olwclient.Job.prototype.kill = function(callback, errback){
+    olwclient.killJob(this.job_id, this.array_index, callback, errback);
+};
 
-olwclient.Queue.prototype.jobs = function(callback, errback, filters){
-    if (!filters)filters={};
-    filters['queue_name'] = self.name;
-    olwclient.Job.getJobList(callback, errback, filters);
+olwclient.killJob = function(job_id, array_index, callback, errback){
+    olwclient.executeCommand("/jobs/" + job_id + "/" + array_index + "/kill", callback, errback)
+};
+
+olwclient.Job.prototype.requeue = function(hold, callback, errback){
+    olwclient.requeueJob(this.job_id, this.array_index, hold, callback, errback);
+};
+
+olwclient.requeueJob = function(job_id, array_index, hold, callback, errback){
+    var url = "/jobs/" + job_id + "/" + array_index + "/requeue";
+    if (hold)url += "?hold=True";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+olwclient.Job.prototype.suspend = function(callback, errback){
+    olwclient.suspendJob(this.job_id, this.array_index, callback, errback);
+};
+
+olwclient.suspendJob = function(job_id, array_index, callback, errback){
+    var url = "/jobs/" + job_id + "/" + array_index + "/suspend";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+olwclient.Job.prototype.resume = function(callback, errback){
+    olwclient.resumeJob(this.job_id, this.array_index, callback, errback);
+};
+
+olwclient.resumeJob = function(job_id, array_index, callback, errback){
+    var url = "/jobs/" + job_id + "/" + array_index + "/resume";
+    olwclient.executeCommand(url, callback, errback)
+};
+
+
+
+olwclient.executeCommand = function(subUrl, callback, errback){
+    $.getJSON(url, null, function(data){
+        olwclient.handleJSONResponse(data, function(parsed_data){
+            callback(parsed_data);
+        }, errback);
+    }).fail(function( jqxhr ) {
+        olwclient.handleJSONResponse(jqxhr.responseJSON, callback, errback);
+    });
 };
 
 olwclient.getObject = function(subUrl, type, callback, errback){
-    if (!olwclient.serverUrl)jQuery.error("No serverUrl defined.");
-    var url = olwclient.serverUrl + subUrl;
+    if (!olwclient._serverUrl)jQuery.error("No serverUrl defined.");
+    var url = olwclient._serverUrl + subUrl;
 
-    $.getJSON(url, data, function(data){
+    $.getJSON(url, null, function(data){
         olwclient.handleJSONResponse(data, function(parsed_data){
             callback(new type(parsed_data));
         }, errback);
@@ -204,11 +340,11 @@ olwclient.getObject = function(subUrl, type, callback, errback){
 };
 
 olwclient.getObjectList = function(subUrl, type, callback, errback){
-    if (!olwclient.serverUrl)jQuery.error("No serverUrl defined.");
+    if (!olwclient._serverUrl)jQuery.error("No serverUrl defined.");
 
-    var url = olwclient.serverUrl + subUrl;
+    var url = olwclient._serverUrl + subUrl;
 
-    $.getJSON(url, data, function(data){
+    $.getJSON(url, null, function(data){
         olwclient.handleJSONResponse(data, function(parsed_data){
             var objects = [];
             var i;
@@ -219,5 +355,4 @@ olwclient.getObjectList = function(subUrl, type, callback, errback){
         olwclient.handleJSONResponse(jqxhr.responseJSON, callback, errback);
     });
 };
-
 

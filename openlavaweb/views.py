@@ -2140,3 +2140,7 @@ def exception_test(request):
         else:
             return render(request, 'openlavaweb/exception.html', {'exception': e})
     return render(request, 'openlavaweb/exception_test.html', {'classes': [e.__name__ for e in ClusterException.__subclasses__()]})
+
+
+def js_tests(request):
+    return render(request, 'openlavaweb/js_tests.html', {'classes': [e.__name__ for e in ClusterException.__subclasses__()]})

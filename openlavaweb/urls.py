@@ -60,6 +60,8 @@ urlpatterns = patterns('',
                            {'template_name': 'openlavaweb/logout.html'}, name="olw_logout"),
                        url(r'^accounts/ajax_login$', 'openlavaweb.views.ajax_login', name="olw_ajax_login"),
                        url(r'^exception_test$', 'openlavaweb.views.exception_test', name="olw_exception_test"),
+                       url(r'^js_tests', 'openlavaweb.views.js_tests', name="olw_js_tests"),
+                       # JS tests
 )
 
 

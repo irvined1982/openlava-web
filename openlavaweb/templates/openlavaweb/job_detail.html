@@ -9,29 +9,21 @@
 <div id="statusMessageBody"></div>
 
 <script>
-        var url='{% url "olw_job_view_array" job.job_id job.array_index %}';
-        var killUrl='{% url "olw_job_kill" job.job_id job.array_index %}';
-        var suspendUrl='{% url "olw_job_suspend" job.job_id job.array_index %}';
-        var resumeUrl='{% url "olw_job_resume" job.job_id job.array_index %}';
-        var requeueHoldUrl='{% url "olw_job_requeue" job.job_id job.array_index %}?hold=1';
-        var requeuePendUrl='{% url "olw_job_requeue" job.job_id job.array_index %}';
+    var url='{% url "olw_job_view_array" job.job_id job.array_index %}';
+    var killUrl='{% url "olw_job_kill" job.job_id job.array_index %}';
+    var suspendUrl='{% url "olw_job_suspend" job.job_id job.array_index %}';
+    var resumeUrl='{% url "olw_job_resume" job.job_id job.array_index %}';
+    var requeueHoldUrl='{% url "olw_job_requeue" job.job_id job.array_index %}?hold=1';
+    var requeuePendUrl='{% url "olw_job_requeue" job.job_id job.array_index %}';
 
 	function setStatus(message,cls) {
 		var html='<div id="statusMessage" class="fade in alert alert-'+cls+'">'+message+'</div>';
-		if ($("#statusMessageBody").html() != html ) {
-			$("#statusMessageBody").html(html);	
+		var m = $("#statusMessageBody");
+        if (m.html() != html ) {
+            m.html(html);
 		}
 	}
-	{% if job.is_pending %}	
-		setStatus("<strong>Pending</strong>: The job is currently pending.  The scheduler has not executed the job yet because of the following reasons:  {{ job.pending_reasons}}", "info");
-	{% endif %}
-	{% if job.is_running %}
-		setStatus("<strong>Running</strong>: The job is currently running.","success");
-	{% endif %}
-	{% if job.is_suspended %}
-		setStatus("<strong>Suspended</strong>: The job is currently suspended.  The job is suspended because of the following reasons:  {{ job.suspension_reasons}}","warning");
-	{% endif %}
-	
+
 	function updateJobInfo(job) {
 		if (job.is_pending){
 			setStatus("<strong>Pending</strong>: The job is currently pending.  The scheduler has not executed the job yet because of the following reasons:  {{ job.pending_reasons}}", "info");
@@ -46,36 +38,36 @@
 		}else{
 			setStatus("<strong>Unknown</strong>: Unable to determine state of job","warning");
 		}
-		$("#status").text(job.status.friendly + ": " + job.status.description);
-		$("#pid").text(job.process_id);
-		$("#cpuTimeConsumed").text(job.cpu_time_timedelta);
+		$("#status").text(job.status['friendly'] + ": " + job.status['description']);
+
+        $("#queue").html("<a href='"+ job.queue.url +"'>" + job.queue.name + "</a>");
+        $("#cpuTimeConsumed").text(job.cpu_time_timedelta);
+        // Todo: create CPU Time Timedelta
+
 		var html="";
 		jQuery.each(job.execution_hosts, function(index, host) {
-			html+="<a href='" + host.url + "'>" + host.name + "</a> ";
+			html+="<a href='" + host.url + "'>" + host.name + "(" + host.num_processors + ")</a> ";
 		});
 		if (html == "") {
 			html="Not executing";
 		}
 		$("#executionHosts").html(html);
+
 		if (job.reservation_time > 0) {
-			$("reservationTime").text(new Date(job.reservation_time*1000));
+			$("reservationTime").text(olwclient.Job.dateToString(job.reservation_time_datetime()));
 		}
 		if (job.start_time > 0) {
-			$("startTime").text(new Date(job.start_time*1000));
+			$("startTime").text(olwclient.Job.dateToString(job.start_time_datetime()));
 		}
 		if (job.predicted_start_time > 0) {
-			$("predictedStartTime").text(new Date(job.predicted_start_time*1000));
+			$("predictedStartTime").text(olwclient.Job.dateToString(job.predicted_start_time_datetime()));
 		}
 		if (job.end_time > 0) {
-			$("endTime").text(new Date(job.end_time*1000));
+			$("endTime").text(olwclient.Job.dateToString(job.end_time_datetime()));
 		}
-		$("#queue").html("<a href='"+ job.queue.url +"'>" + job.queue.name + "</a>");
-		$("#executionHomeDir").text(job.execution_home_dir);
-		$("#executionCwd").text(job.execution_cwd);
-		$("#executionUserName").text(job.execution_user_name + " (" + job.execution_user_id + ")");
-		$("#resourceUsageLastUpdateTime").text(new Date(job.resource_usage_last_update_time));
-		$("#servicePort").text(job.service_port);
-		html="";
+
+
+        html="";
 		jQuery.each(job.consumed_resources, function(index, res) {
 			html+="<tr><th>" + res.name + "</th><td>" + res.value;
 			if (res.unit){
@@ -104,7 +96,7 @@
 			}
 			html+="</td><td>";
 			html+=proc.process_id;
-			html+="</td>"
+			html+="</td>";
 			if (job.cluster_type=="openlava") {
 				html+="<td>" + proc.parent_process_id + "</td>";
 				html+="<td>" + proc.process_group_id + "</td>";
@@ -113,132 +105,172 @@
 			html+="</tr>";
 		});
 		$("#processes").empty();
-		$("#processes").html(html);	
+		$("#processes").html(html);
+
+        if (job.type == "openlava") {
+            $("#executionHomeDir").text(job.execution_home_dir);
+            $("#executionCwd").text(job.execution_cwd);
+            $("#executionUserName").text(job.execution_user_name + " (" + job.execution_user_id + ")");
+            $("#resourceUsageLastUpdateTime").text(new Date(job.resource_usage_last_update_time));
+            $("#servicePort").text(job.service_port);
+            $("#pid").text(job.process_id);
+        }
 	}
 		
 	function update(){
-		var jqxhr = $.getJSON( url, function(data) {
-			if (data.hasOwnProperty('type') && data.type=="Job") {
-				updateJobInfo(data)	
-			}else if (data.hasOwnProperty('type') && data.type=="Exception") {
-				$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load job information: ' + data.message + '</div>');
-				$("#failMessage").alert();
-				$("#statusMessageBody").empty();
-			}			
-		}).fail(function(){
-			$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load job information</div>');
-                        $("#failMessage").alert();
-			setTimeout(function(){
-				$("#failMessage").alert('close');
-			},15000); 
-		}).always(function() {
-			setTimeout(update, 30000);
-		});
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.Job.getJob('{{job.job_id}}', '{{ job.array_index }}', function(job) {
+            updateJobInfo(job);
+            setTimeout(update, 30000);
+        }, function(exception, message){
+            $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load job information: ' + message + '</div>');
+            $("#failMessage").alert();
+            $("#statusMessageBody").empty();
+            setTimeout(function(){
+                $("#failMessage").alert('close');
+            },15000);
+        });
 	}
 	update();
 	
-        function killJob(){
-                $("#killModal").modal('hide');
-                var jqxhr = $.getJSON( killUrl, function(data) {
-                        $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-success">Job kill request sent successfully.</div>');
-                        $("#killMessage").alert();
-                })
-                .fail(function() {
-                        $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-warning">Unable to kill job.</div>');
-                        $("#killMessage").alert();
-                })
-                .always(function(){
-                        setTimeout(function(){
-                                $("#killMessage").alert('close');
-                        },10000);                        
+    function killJob() {
+        $("#killModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.killJob('{{ job.job_id}}', '{{ job.array_index}}', function(){
+                    $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-success">Job kill request sent successfully.</div>');
+                    $("#killMessage").alert();
+                    setTimeout(function () {
+                        $("#killMessage").alert('close');
+                    }, 10000);
+                },
+                function () {
+                    $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-warning">Unable to kill job.</div>');
+                    $("#killMessage").alert();
+                    setTimeout(function () {
+                        $("#killMessage").alert('close');
+                    }, 10000);
                 });
-        }
-        function suspendJob(){
-                $("#suspendModal").modal('hide');
-                var jqxhr = $.getJSON( suspendUrl, function(data) {
-                        $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-success">Job suspend request sent successfully.</div>');
-                        $("#suspendMessage").alert();
-                })
-                .fail(function() {
-                        $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-warning">Unable to suspend job.</div>');
-                        $("#suspendMessage").alert();
-                })
-                .always(function(){
-                        setTimeout(function(){
-                                $("#suspendMessage").alert('close');
-                        },10000);                        
+    }
+
+    function suspendJob() {
+        $("#suspendModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.suspendJob('{{ job.job_id}}', '{{ job.array_index}}', function () {
+                    $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-success">Job suspend request sent successfully.</div>');
+                    $("#suspendMessage").alert();
+                    setTimeout(function () {
+                        $("#suspendMessage").alert('close');
+                    }, 10000);
+                },
+                function () {
+                    $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-warning">Unable to suspend job.</div>');
+                    $("#suspendMessage").alert();
+                    setTimeout(function () {
+                        $("#suspendMessage").alert('close');
+                    }, 10000);
                 });
-        }
-        function resumeJob(){
-                $("#resumeModal").modal('hide');
-                var jqxhr = $.getJSON( resumeUrl, function(data) {
-                        $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-success">Job resume request sent successfully.</div>');
-                        $("#resumeMessage").alert();
-                })
-                .fail(function() {
-                        $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-warning">Unable to resume job.</div>');
-                        $("#resumeMessage").alert();
-                })
-                .always(function(){
-                        setTimeout(function(){
-                                $("#resumeMessage").alert('close');
-                        },10000);                        
+    }
+
+    function resumeJob(){
+        $("#resumeModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.resumeJob('{{ job.job_id}}', '{{ job.array_index}}', function () {
+                    $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-success">Job resume request sent successfully.</div>');
+                    $("#resumeMessage").alert();
+                    setTimeout(function(){
+                        $("#resumeMessage").alert('close');
+                    },10000);
+                },
+                function () {
+                    $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-warning">Unable to resume job.</div>');
+                    $("#resumeMessage").alert();
+                    setTimeout(function(){
+                        $("#resumeMessage").alert('close');
+                    },10000);
                 });
-        }
-        function requeueHoldJob(){
-                $("#requeueHoldModal").modal('hide');
-                var jqxhr = $.getJSON( requeueHoldUrl, function(data) {
-                        $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
-                        $("#requeueHoldMessage").alert();
-                })
-                .fail(function() {
-                        $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
-                        $("#requeueHoldMessage").alert();
-                })
-                .always(function(){
-                        setTimeout(function(){
-                                $("#requeueHoldMessage").alert('close');
-                        },10000);                        
+    }
+
+    function requeueHoldJob() {
+        $("#requeueHoldModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.requeueJob('{{ job.job_id}}', '{{ job.array_index}}', true, function () {
+                    $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
+                    $("#requeueHoldMessage").alert();
+                    setTimeout(function () {
+                        $("#requeueHoldMessage").alert('close');
+                    }, 10000);
+
+                },
+                function () {
+                    $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
+                    $("#requeueHoldMessage").alert();
+                    setTimeout(function () {
+                        $("#requeueHoldMessage").alert('close');
+                    }, 10000);
                 });
-        }
-        function requeuePendJob(){
-                $("#requeuePendModal").modal('hide');
-                var jqxhr = $.getJSON( requeuePendUrl, function(data) {
-                        $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
-                        $("#requeuePendMessage").alert();
-                })
-                .fail(function() {
-                        $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
-                        $("#requeuePendMessage").alert();
-                })
-                .always(function(){
-                        setTimeout(function(){
-                                $("#requeuePendMessage").alert('close');
-                        },10000);                        
+    }
+
+
+    function requeuePendJob() {
+        $("#requeuePendModal").modal('hide');
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+        olwclient.requeueJob('{{ job.job_id}}', '{{ job.array_index}}', false, function () {
+                    $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-success">Job requeue request sent successfully.</div>');
+                    $("#requeuePendMessage").alert();
+                    setTimeout(function () {
+                        $("#requeuePendMessage").alert('close');
+                    }, 10000);
+                },
+                function () {
+                    $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
+                    $("#requeuePendMessage").alert();
+                    setTimeout(function () {
+                        $("#requeuePendMessage").alert('close');
+                    }, 10000);
                 });
-        }
+    }
+
 
 </script>
+
+{% if job.is_pending %}
+    <script>setStatus("<strong>Pending</strong>: The job is currently pending.  The scheduler has not executed the job yet because of the following reasons:  {{ job.pending_reasons}}", "info");</script>
+{% elif job.is_running %}
+    <script>setStatus("<strong>Running</strong>: The job is currently running.","success");</script>
+{% elif job.is_suspended %}
+    <script>setStatus("<strong>Suspended</strong>: The job is currently suspended.  The job is suspended because of the following reasons:  {{ job.suspension_reasons}}","warning");</script>
+{% elif job.is_failed %}
+    <script>setStatus("<strong>Failed</strong>: The job failed.  The job exited with a non-zero exit status.","danger");</script>
+{% elif job.was_killed %}
+    <script>setStatus("<strong>Killed</strong>: The job was killed.  The job was killed, either by the owner, or a cluster administrator.","warning");</script>
+{% elif job.is_completed %}
+    <script>setStatus("<strong>Completed</strong>: The job has finished.  The job has finished.","success");</script>
+{% endif %}
 
 <!-- Job Manangement -->
 <div>
 	<div class="btn-group">
 		<button type="button" class="btn dropdown-toggle btn-lg btn-primary {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="dropdown" >Requeue<span class="caret"></span></button>
 		<ul class="dropdown-menu" role="menu">
-			<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
-			<li><a href="#" {% if user.username in job.admins %}{% else %}class="disabled"{% endif %} data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
+            {% if user.username in job.admins %}
+                <li><a href="#" data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
+            {% else %}
+                <li><a href="#" class="disabled" data-toggle="modal" data-target="#requeuePendModal">Restart (PEND)</a></li>
+                <li><a href="#" class="disabled" data-toggle="modal" data-target="#requeueHoldModal">Hold (PSUSP)</a></li>
+            {% endif %}
 		</ul>
 	</div>
 	<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#killModal">Kill </button>
 	<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#suspendModal">Suspend</button>
 	<button class="btn btn-primary btn-lg {% if user.username in job.admins %}active{%else%}disabled{% endif %}" data-toggle="modal" data-target="#resumeModal">Resume</button>
 	
-	<div class="modal fade" id="killModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal fade" id="killModal" tabindex="-1" role="dialog" aria-labelledby="myKillModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Kill Job?</h4>
+					<h4 class="modal-title" id="myKillModalLabel">Kill Job?</h4>
 				</div>
 				<div class="modal-body">
 					If the job is running, it shall be terminated with a SIGTERM signal. The job will be removed from the queue, and will not be automatically restarted.
@@ -250,29 +282,29 @@
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->                                                                                                                
 	</div>
-	<div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="mSuspendyModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Suspend Job?</h4>
+					<h4 class="modal-title" id="mSuspendyModalLabel">Suspend Job?</h4>
 				</div>
 				<div class="modal-body">
 					If the job is running, it shall be sent a SIGSTOP signal. The job will enter the USUSP or PSUSP state.
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-					<button onClick="suspendJob(); return false;"type="button" class="btn btn-primary">Suspend</button>
+					<button onClick="suspendJob(); return false;" type="button" class="btn btn-primary">Suspend</button>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->                                                                                                                
 	</div>
-	<div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal fade" id="resumeModal" tabindex="-1" role="dialog" aria-labelledby="myResumeModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Resume Job?</h4>
+					<h4 class="modal-title" id="myResumeModalLabel">Resume Job?</h4>
 				</div>
 				<div class="modal-body">
 					If the job is running, it shall be sent a SIGCONT signal. The job will move to either a RUN or PEND state.
@@ -285,12 +317,12 @@
 		</div><!-- /.modal-dialog -->                                                                                                                
 	</div>
 
-<div class="modal fade" id="requeuePendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="requeuePendModal" tabindex="-1" role="dialog" aria-labelledby="myrequeueModalLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
                         <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title" id="myModalLabel">Requeue Job?</h4>
+                                <h4 class="modal-title" id="myrequeueModalLabel">Requeue Job?</h4>
                         </div>
                         <div class="modal-body">
                                 If the job is running, it shall be sent a SIGTERM signal. The job shall be requeued and will pend until resources are available to execute it.
@@ -303,12 +335,12 @@
         </div><!-- /.modal-dialog -->                                                                                                                
 </div>
 
-<div class="modal fade" id="requeueHoldModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="requeueHoldModal" tabindex="-1" role="dialog" aria-labelledby="myRequeueHoldModalLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
                         <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title" id="myModalLabel">Resume Job?</h4>
+                                <h4 class="modal-title" id="myRequeueHoldModalLabel">Resume Job?</h4>
                         </div>
                         <div class="modal-body">
                                 If the job is running, it shall be sent a SIGTERM signal. The job will be requeued, however it will be suspended, and will not execute until it has been unsuspended by the user.
@@ -350,7 +382,7 @@
 	<dt>Predicted Start Time</dt><dd id="predictedStartTime">{% if job.predicted_start_time > 0 %}{{ job.predicted_start_time_datetime_local }}{% else %}Not Available{% endif %}</dd>
 	<dt>End Time</dt><dd id="endTime">{% if job.end_time > 0 %}{{ job.end_time_datetime_local }}{% else %}Not yet finished{% endif %}</dd>
 	<dt>Options</dt><dd>{% for option in job.options %}{{ option.friendly }}<br>{% endfor %}</dd>
-	<dt>Queue Name</dt><dd id="queue"><a href="{% url "olw_queue_view" job.queue.name %}">{{ job.queue.name }}</a></dd>
+	<dt>Queue Name</dt><dd id="queue"><a href='{% url "olw_queue_view" job.queue.name %}'>{{ job.queue.name }}</a></dd>
 	<dt>Requested Hosts</dt><dd>{% for host in job.requested_hosts %}{{ host.name }} {% empty %}No hosts requested{% endfor %}</dd>
 	<dt>Requested Resources</dt><dd>{{ job.requested_resources|default:"Not Specified" }}</dd>
 	<dt>Max Num Processors</dt><dd>{{ job.max_requested_slots }}</dd>
@@ -436,17 +468,21 @@
 	</thead>
 	<tbody id="processes">
 		{% for proc in job.processes %}
-		<tr>
-			<td>{{ proc.hostname|default:"Unknown" }}</td>
-			<td>{{ proc.process_id }}</td>
-			{% if job.cluster_type == "openlava" %}
-			<td>{{ proc.parent_process_id }} </td>
-			<td>{{ proc.process_group_id }}</td>
-			<td>{{ proc.cray_job_id }}</td>
-			{% endif %}
-		</tr>
+            <tr>
+                <td>{{ proc.hostname|default:"Unknown" }}</td>
+                <td>{{ proc.process_id }}</td>
+                {% if job.cluster_type == "openlava" %}
+                <td>{{ proc.parent_process_id }} </td>
+                <td>{{ proc.process_group_id }}</td>
+                <td>{{ proc.cray_job_id }}</td>
+                {% endif %}
+            </tr>
 		{% empty %}
-		<tr><td colspan={% if job.cluster_type == "openlava" %}5{% else %}2{% endif %}>No Processes</td></tr>
+            {% if job.cluster_type == "openlava" %}
+                <tr><td colspan=5>No Processes</td></tr>
+            {% else %}
+                <tr><td colspan=2>No Processes</td></tr>
+            {% endif %}
 		{% endfor %}
 	</tbody>
 </table>

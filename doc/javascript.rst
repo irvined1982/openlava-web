@@ -81,6 +81,212 @@ Olwclient uses the RESTful interface to the olweb server to communicate with the
 responsible for connecting to the job scheduler and retrieving job information.  This is then serialized using JSON
 and sent back to the client.
 
+.. js:function:: olwclient.Job.prototype.submit_time_datetime()
+
+    .. note::
+
+        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        object in locale time, and not UTC.
+
+.. js:function:: olwclient.Job.prototype.end_time_datetime()
+
+    .. note::
+
+        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        object in locale time, and not UTC.
+
+.. js:function:: olwclient.Job.prototype.start_time_datetime()
+
+    .. note::
+
+        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        object in locale time, and not UTC.
+
+.. js:function:: olwclient.Job.prototype.predicted_start_time_datetime()
+
+    .. note::
+
+        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        object in locale time, and not UTC.
+
+.. js:function:: olwclient.Job.prototype.reservation_time_datetime()
+
+    .. note::
+
+        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        object in locale time, and not UTC.
+
+.. js:function:: olwclient.Job.getJob(job_id, array_index, callback, errback)
+
+    Get a single job.
+
+    :param job_id: Numeric Job ID.
+
+    :param array_index: Array index of the job.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+.. js:function:: olwclient.Job.getJobList(callback, errback, filters)
+
+    Returns a list of jobs that match the specified criteria.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+    :param int filters.job_id:
+
+        The numeric Job ID, if this is specified, then queue_name, host_name, user_name, and job_state are
+        ignored.
+
+    :param int filters.array_index:
+
+        The array index of the job.  If array_index is -1, then all array tasks from the corresponding job ID are
+        returned.  If array_index is not zero, then a job_id must also be specified.
+
+    :param String filters.queue_name:
+
+        The name of the queue.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are submitted into the named queue.
+
+    :param String filters.host_name:
+
+        The name of the host.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are executing on the specified host.
+
+    :param String filters.user_name:
+
+        The name of the user.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are owned by the specified user.
+
+    :param String filters.job_state:
+
+        Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
+        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+        "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
+        currently suspended.
+
+    :param String filters.job_name:
+        Only return jobs that are named job_name.
+
+.. js:function:: olwclient.Job.prototype.kill()
+
+        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+.. js:function:: olwclient.killJob(job_id, array_index, callback, errback)
+
+        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+    :param job_id: Numeric Job ID.
+
+    :param array_index: Array index of the job.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+.. js:function:: olwclient.Job.prototype.requeue(hold)
+
+        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
+
+        :param bool hold:
+
+            When true, jobs will be held in the suspended pending state.
+
+            .. note::
+
+                Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+.. js:function:: olwclient.requeueJob(job_id, array_index, hold, callback, errback)
+
+        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
+
+    :param job_id: Numeric Job ID.
+
+    :param array_index: Array index of the job.
+
+    :param bool hold:
+
+        When true, jobs will be held in the suspended pending state.
+
+        .. note::
+
+            Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+
+
+.. js:function:: olwclient.Job.prototype.suspend()
+
+    Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+.. js:function:: olwclient.suspendJob(job_id, array_index, callback, errback)
+
+    Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+    :param job_id: Numeric Job ID.
+
+    :param array_index: Array index of the job.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+.. js:function:: olwclient.Job.prototype.resume()
+
+    Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+.. js:function:: olwclient.resumeJob(job_id, array_index, callback, errback)
+
+    Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+    :param job_id: Numeric Job ID.
+
+    :param array_index: Array index of the job.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+.. js:function:: olwclient.executeCommand(subUrl, callback, errback)
+
+    :param String subUrl: sub url to open.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param function errback:
+        A function with two arguments: exception_name - name of error, and message - message
+        sent by remote server.  Called when the operation failed.
+
+.. js:attribute:: olwclient.Job.prototype.execution_hosts
+
+.. js:attribute:: olwclient.Job.prototype.submission_host
+
+
 Host Classes
 ------------
 

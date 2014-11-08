@@ -1,7 +1,7 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
 	<h1>Jobs</h1>
-	{% include "openlavaweb/widgets/job_list.html" %}
+	{% include "openlavaweb/widgets/job_list.html" with prefix="job_list_detail" %}
 
 	<ul class="pager">
 		{% if job_list.has_previous %}
