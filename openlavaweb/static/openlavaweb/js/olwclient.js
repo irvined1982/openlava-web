@@ -380,3 +380,30 @@ olwclient.getObjectList = function(subUrl, type, callback, errback){
     });
 };
 
+olwclient.getHostOverview = function(callback, errback){
+    var url =  olwclient._serverUrl + "/overview/hosts";
+    $.getJSON(url, null, function(data){
+        olwclient.handleJSONResponse(data, callback, errback);
+    }).fail(function( jqxhr ) {
+        olwclient.handleJSONResponse(jqxhr.responseJSON, callback, errback);
+    });
+};
+
+olwclient.getJobOverview = function(callback, errback){
+    var url =  olwclient._serverUrl + "/overview/jobs";
+    $.getJSON(url, null, function(data){
+        olwclient.handleJSONResponse(data, callback, errback);
+    }).fail(function( jqxhr ) {
+        olwclient.handleJSONResponse(jqxhr.responseJSON, callback, errback);
+    });
+};
+
+olwclient.getSlotsOverview = function(callback, errback){
+    var url =  olwclient._serverUrl + "/overview/slots";
+    $.getJSON(url, null, function(data){
+        olwclient.handleJSONResponse(data, callback, errback);
+    }).fail(function( jqxhr ) {
+        olwclient.handleJSONResponse(jqxhr.responseJSON, callback, errback);
+    });
+};
+

@@ -21,11 +21,11 @@
 
 <script>
 function update_alerts(){
-    $.getJSON("{% url "olw_system_overview_hosts" %}", function(data){
+    olwclient.getHostOverview(function(overview){
         var total = 0;
         var down = 0;
         var closed = 0;
-        data.forEach(function(entry){
+        overview.forEach(function(entry){
             if (entry.label =="Down"){
                 down += entry.value;
             }
@@ -50,32 +50,37 @@ function update_alerts(){
             // Remove the label
             $("#hostsClosedMessageBody").empty();
         }
-    }).always(function(){
+        setTimeout(update_alerts, 30000);
+    }, function(errType, message){
+        console.log("Unable to load host overview information: " + message);
         setTimeout(update_alerts, 30000);
     });
 }
 
-function update_chart(chart, selector, url){
-    var jqxhr = $.getJSON( url, function(data) {
-            d3.select(selector)
-	        .datum(data)
-	        .transition().duration(500)
-	        .call(chart);
-	    }).fail(function(){
-            $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load cluster load information</div>');
-            $("#failMessage").alert();
-			setTimeout(function(){
-			    $("#failMessage").alert('close');
-			},15000);
-	    }).always(function() {
-	        setTimeout(function(){
-	            update_chart(chart, selector, url);
-	        }, 30000);
-	    });
+function update_chart(chart, selector, callable){
+    callable(
+            function(data){
+                d3.select(selector)
+                .datum(data)
+                .transition().duration(500)
+                .call(chart);
+                setTimeout(function(){
+	                update_chart(chart, selector, callable);
+	            }, 30000);
+            }, function(errType, message){
+                $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load cluster load information: ' + message + '</div>');
+                $("#failMessage").alert();
+                setTimeout(function(){
+                    $("#failMessage").alert('close');
+                },15000);
+                setTimeout(function(){
+	                update_chart(chart, selector, callable);
+	            }, 30000);
+            });
 	}
 
 
-function add_standard_pie(url, selector){
+function add_standard_pie(callable, selector){
 	nv.addGraph(function() {
    	    var chart;
        	chart = nv.models.pieChart()
@@ -89,16 +94,17 @@ function add_standard_pie(url, selector){
        	.y(function(d) { return d.value })
        	;
 	    nv.utils.windowResize(chart.update);
-	    update_chart(chart, selector, url);
+	    update_chart(chart, selector, callable);
     });
 }
 
-add_standard_pie("{% url "olw_system_overview_slots" %}","#slotUtilChart svg");
-add_standard_pie("{% url "olw_system_overview_jobs" %}","#jobUtilChart svg");
-add_standard_pie("{% url "olw_system_overview_hosts" %}",'#hostChart svg');
-update_alerts();
-
-
+$(function(){
+    olwclient.serverUrl("{% url 'olw_system_view' %}");
+    add_standard_pie(olwclient.getSlotsOverview, "#slotUtilChart svg");
+    add_standard_pie(olwclient.getJobOverview, "#jobUtilChart svg");
+    add_standard_pie(olwclient.getHostOverview, '#hostChart svg');
+    update_alerts();
+})
 </script>
 
 

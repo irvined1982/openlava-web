@@ -27,11 +27,11 @@ Configuration
 Authentication
 --------------
 
-.. js:func:: olwclient.login(username, password, callback, errback)
+.. js:function:: olwclient.login(username, password, callback, errback)
 
     Authenticate using the provided credentials and obtain the session cookie and csrf token.
 
-    :param string olwclient.username:
+    :param string username:
 
         The username to use when authenticating to the openlava web server.
 
@@ -39,7 +39,7 @@ Authentication
 
         The password to use when authenticating to the openlava web server.
 
-     :param callback callback:
+    :param callback callback:
 
         A callback to execute on success, no arguments.
 
@@ -90,7 +90,7 @@ Queue Classes
 
 Queue classes represent individual queues that are configured as part of the cluster.
 
-.. js:attribute:: olwclient.Queue.getQueue = function(queueName, callback, errback)
+.. js:attribute:: olwclient.Queue.getQueue(queueName, callback, errback)
 
     Get a Queue object.
 
@@ -105,7 +105,7 @@ Queue classes represent individual queues that are configured as part of the clu
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.Queue.getQueueList = function(callback, errback)
+.. js:attribute:: olwclient.Queue.getQueueList(callback, errback)
 
     Get all queues configured on the cluster.
 
@@ -118,7 +118,7 @@ Queue classes represent individual queues that are configured as part of the clu
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.Queue.prototype.jobs = function(callback, errback, filters)
+.. js:attribute:: olwclient.Queue.prototype.jobs(callback, errback, filters)
 
     Returns a list of jobs that match the specified criteria.
 
@@ -160,7 +160,7 @@ Queue classes represent individual queues that are configured as part of the clu
 
         Only return jobs that are named job_name.
 
-.. js:attribute:: olwclient.Queue.prototype.close = function(callback, errback)
+.. js:attribute:: olwclient.Queue.prototype.close(callback, errback)
 
     Close the queue, the queue will no longer accept new jobs.'
 
@@ -171,7 +171,7 @@ Queue classes represent individual queues that are configured as part of the clu
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.Queue.prototype.open = function(callback, errback)
+.. js:attribute:: olwclient.Queue.prototype.open(callback, errback)
 
     Open the queue, the queue will accept new jobs.
 
@@ -182,7 +182,7 @@ Queue classes represent individual queues that are configured as part of the clu
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.Queue.prototype.activate = function(callback, errback)
+.. js:attribute:: olwclient.Queue.prototype.activate(callback, errback)
 
     Activate the queue, jobs will be dispatched.
 
@@ -193,7 +193,7 @@ Queue classes represent individual queues that are configured as part of the clu
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.Queue.prototype.inactivate = function(callback, errback)
+.. js:attribute:: olwclient.Queue.prototype.inactivate(callback, errback)
 
     Inactivate the queue, no more jobs will be dispatched.
 
@@ -217,7 +217,7 @@ User classes represent individual users that are configured in the cluster.
 
     The URL to the full URL for the job
 
-.. js:attribute:: olwclient.User.prototype.jobs = function(callback, errback, filters)
+.. js:attribute:: olwclient.User.prototype.jobs(callback, errback, filters)
 
     Returns a list of jobs that the user owns on the cluster.
 
@@ -259,7 +259,7 @@ User classes represent individual users that are configured in the cluster.
 
         Only return jobs that are named job_name.
 
-.. js:attribute:: olwclient.User.getUser = function(userName, callback, errback)
+.. js:attribute:: olwclient.User.getUser(userName, callback, errback)
 
     :param string userName: The name of the user to retrieve.
 
@@ -270,7 +270,7 @@ User classes represent individual users that are configured in the cluster.
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.User.getUserList = function(callback, errback)
+.. js:attribute:: olwclient.User.getUserList(callback, errback)
 
     Get a list of all users on the cluster.
 
@@ -293,35 +293,35 @@ and sent back to the client.
 
     .. note::
 
-        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        Warning! Unlike ::py:attr:`olwclient.Job.reservation_time_datetime` returns a Date
         object in locale time, and not UTC.
 
 .. js:function:: olwclient.Job.prototype.end_time_datetime()
 
     .. note::
 
-        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        Warning! Unlike ::py:attr:`olwclient.Job.reservation_time_datetime` returns a Date
         object in locale time, and not UTC.
 
 .. js:function:: olwclient.Job.prototype.start_time_datetime()
 
     .. note::
 
-        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        Warning! Unlike ::py:attr:`olwclient.Job.reservation_time_datetime` returns a Date
         object in locale time, and not UTC.
 
 .. js:function:: olwclient.Job.prototype.predicted_start_time_datetime()
 
     .. note::
 
-        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        Warning! Unlike ::py:attr:`olwclient.Job.reservation_time_datetime` returns a Date
         object in locale time, and not UTC.
 
 .. js:function:: olwclient.Job.prototype.reservation_time_datetime()
 
     .. note::
 
-        Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
+        Warning! Unlike ::py:attr:`olwclient.Job.reservation_time_datetime` returns a Date
         object in locale time, and not UTC.
 
 .. js:attribute:: olwclient.Job.prototype.execution_hosts
@@ -445,7 +445,7 @@ information on the number of slots that are allocated to the job.
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:function:: olwclient.Host.prototype.jobs = function(callback, errback, filters)
+.. js:function:: olwclient.Host.prototype.jobs(callback, errback, filters)
 
     Get all jobs that are running on the host.
 
@@ -487,7 +487,7 @@ information on the number of slots that are allocated to the job.
     :param String filters.job_name:
         Only return jobs that are named job_name.
 
-.. js:function:: olwclient.Host.getHostList = function(callback, errback)
+.. js:function:: olwclient.Host.getHostList(callback, errback)
 
     Get a list of all hosts that are part of the cluster.
 
@@ -499,7 +499,7 @@ information on the number of slots that are allocated to the job.
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:function:: olwclient.Host.prototype.close = function(callback, errback)
+.. js:function:: olwclient.Host.prototype.close(callback, errback)
 
     Close the host, no new jobs will be dispatched.
 
@@ -512,7 +512,7 @@ information on the number of slots that are allocated to the job.
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
 
-.. js:function:: olwclient.Host.prototype.open = function(callback, errback)
+.. js:function:: olwclient.Host.prototype.open(callback, errback)
 
     Open the host to accept new jobs.
 
@@ -604,7 +604,7 @@ Jobs
 Hosts
 ^^^^^
 
-.. js:function:: olwclient.openHost = function(hostName, callback, errback)
+.. js:function:: olwclient.openHost(hostName, callback, errback)
 
     Open a specified host without retrieving the host object.
 
@@ -620,7 +620,7 @@ Hosts
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:function:: olwclient.closeHost = function(hostName, callback, errback)
+.. js:function:: olwclient.closeHost(hostName, callback, errback)
 
     Close a specified host without retrieving the host object.
 
@@ -639,7 +639,7 @@ Hosts
 Queue
 ^^^^^
 
-.. js:attribute:: olwclient.closeQueue = function(queueName, callback, errback)
+.. js:attribute:: olwclient.closeQueue(queueName, callback, errback)
 
     Close the specified queue.
 
@@ -655,7 +655,7 @@ Queue
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.openQueue = function(queueName, callback, errback)
+.. js:attribute:: olwclient.openQueue(queueName, callback, errback)
 
     Open the specified queue.
 
@@ -671,7 +671,7 @@ Queue
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.activateQueue = function(queueName, callback, errback)
+.. js:attribute:: olwclient.activateQueue(queueName, callback, errback)
 
     Activate the specified queue.
 
@@ -687,7 +687,7 @@ Queue
 
         A callback to an ..js:function::`.errBack`  to execute on failure.
 
-.. js:attribute:: olwclient.inactivateQueue = function(queueName, callback, errback)
+.. js:attribute:: olwclient.inactivateQueue(queueName, callback, errback)
 
     Inactivate the queue.
 
@@ -710,11 +710,50 @@ This function is called when an operation on the remote server failed.  In most 
 it will be based on an error returned by the remote server, however if the server is unavailable
 or the AJAX call fails, then the error will also be set accordingly.
 
-.. js:function:: errBack(errType, message)
+.. js:function:: olwclient.errBack(errType, message)
 
     When error handling is needed, a callback should be specified that accepts the following arguments.
 
     :param string errType: The type of error raised, it is the name of a ClusterException class.
 
     :param string message: A description of the error raised.
+
+Overview Functions
+------------------
+
+.. js:function:: olwclient.getHostOverview(callback, errback)
+
+    Gets an overview of host states.
+
+    :param callback callback:
+
+        A callback to execute on success, host overview as single object argument.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:function:: olwclient.getJobOverview(callback, errback)
+
+    Gets an overview of job states
+
+    :param callback callback:
+
+        A callback to execute on success, job overview as single object.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:function:: olwclient.getSlotsOverview(callback, errback)
+
+    Gets an overview of slot states
+
+    :param callback callback:
+
+        A callback to execute on success, slot overview as single object argument.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
