@@ -131,19 +131,45 @@ Queue List
 
 .. http:get:: queues/
 
+Getting information on a Queue
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. http:get:: queues/(.+?)
+
+Closing a Queue
+^^^^^^^^^^^^^^^
 
 .. http:get:: queues/(?P<queue_name>.+?)/close
 
+Opening a Queue
+^^^^^^^^^^^^^^^
+
 .. http:get:: queues/(?P<queue_name>.+?)/open
+
+Inactivating a Queue
+^^^^^^^^^^^^^^^^^^^^
 
 .. http:get:: queues/(?P<queue_name>.+?)/inactivate
 
+Activating a Queue
+^^^^^^^^^^^^^^^^^^
 .. http:get:: queues/(?P<queue_name>.+?)/activate
+
+User Operations
+---------------
+
+User List
+^^^^^^^^^
 
 .. http:get:: users/
 
+Getting information on a User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. http:get:: users/(.+?)
+
+Jobs
+----
 
 .. http:get:: jobs/(?P<job_id>\d+)/$', 'openlavaweb.views.get_job_list', name="olw_job_list"),
 
@@ -167,10 +193,85 @@ Queue List
 
 .. http:get:: job/(\d+)/(\d+)/requeue
 
+Overviews
+---------
+
+Host State
+^^^^^^^^^^
+
 .. http:get:: overview/hosts
+
+Example response::
+
+    {
+        "data": [
+            {
+                "label": "Down",
+                "value": 4
+            },
+            {
+                "label": "In Use",
+                "value": 0
+            },
+            {
+                "label": "Full",
+                "value": 2
+            },
+            {
+                "label": "Closed",
+                "value": 0
+            },
+            {
+                "label": "Empty",
+                "value": 0
+            }
+        ],
+        "message": "",
+        "status": "OK"
+    }
+
+Job State
+^^^^^^^^^
 
 .. http:get:: overview/jobs
 
+
+Example response::
+
+    {
+        "data": [
+            {
+                "label": "Running",
+                "value": 3
+            },
+            {
+                "label": "Pending",
+                "value": 256
+            }
+        ],
+        "message": "",
+        "status": "OK"
+    }
+
+Slot State
+^^^^^^^^^^
+
 .. http:get:: overview/slots
 
+Example response::
+
+    {
+        "data": [
+            {
+                "label": "Running",
+                "value": 2
+            },
+            {
+                "label": "Pending",
+                "value": 255
+            }
+        ],
+        "message": "",
+        "status": "OK"
+    }
 

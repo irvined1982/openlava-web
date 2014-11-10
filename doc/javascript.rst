@@ -10,9 +10,19 @@ almost identical to programming the other.
 
 .. contents::
 
-.. js:data:: olwclient.serverUrl
+Configuration
+-------------
+
+.. js:function:: olwclient.serverUrl(newUrl)
 
     URL to the Openlava Web Server
+
+    :param string newUrl:
+
+        Set the serverUrl to this url if specified, if unspecified the serverUrl is left unchanged.
+
+    :returns: URL of server
+    :rtype: string
 
 Authentication
 --------------
@@ -29,13 +39,14 @@ Authentication
 
         The password to use when authenticating to the openlava web server.
 
-    :param callback callback:
+     :param callback callback:
 
-        A callback to execute on success, no args.
+        A callback to execute on success, no arguments.
 
     :param callback errback:
 
-        A callback to execute on failure, args: str errType, str: message.
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
 
 Status Classes
 --------------
@@ -73,6 +84,203 @@ Consumed Resources
 ^^^^^^^^^^^^^^^^^^
 
 Consumed resources represent resources that have been consumed by a given job.
+
+Queue Classes
+-------------
+
+Queue classes represent individual queues that are configured as part of the cluster.
+
+.. js:attribute:: olwclient.Queue.getQueue = function(queueName, callback, errback)
+
+    Get a Queue object.
+
+    :param string queueName:
+
+        The name of the queue to get
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.Queue.getQueueList = function(callback, errback)
+
+    Get all queues configured on the cluster.
+
+    :param function callback:
+
+        A function that will be called when the task is successfully completed. Single argument
+        containing an array of queue objects.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.Queue.prototype.jobs = function(callback, errback, filters)
+
+    Returns a list of jobs that match the specified criteria.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+    :param int filters.job_id:
+
+        The numeric Job ID, if this is specified, then queue_name, host_name, user_name, and job_state are
+        ignored.
+
+    :param int filters.array_index:
+
+        The array index of the job.  If array_index is -1, then all array tasks from the corresponding job ID are
+        returned.  If array_index is not zero, then a job_id must also be specified.
+
+    :param String filters.host_name:
+
+        The name of the host.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are executing on the specified host.
+
+    :param String filters.user_name:
+
+        The name of the user.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are owned by the specified user.
+
+    :param String filters.job_state:
+
+        Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
+        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+        "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
+        currently suspended.
+
+    :param String filters.job_name:
+
+        Only return jobs that are named job_name.
+
+.. js:attribute:: olwclient.Queue.prototype.close = function(callback, errback)
+
+    Close the queue, the queue will no longer accept new jobs.'
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.Queue.prototype.open = function(callback, errback)
+
+    Open the queue, the queue will accept new jobs.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.Queue.prototype.activate = function(callback, errback)
+
+    Activate the queue, jobs will be dispatched.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.Queue.prototype.inactivate = function(callback, errback)
+
+    Inactivate the queue, no more jobs will be dispatched.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+User Classes
+------------
+
+User classes represent individual users that are configured in the cluster.
+
+.. js:attribute:: olwclient.User.Prototype.user_url
+
+    The URL to the full user object
+
+.. js:attribute:: olwclient.User.Prototype.job.url
+
+    The URL to the full URL for the job
+
+.. js:attribute:: olwclient.User.prototype.jobs = function(callback, errback, filters)
+
+    Returns a list of jobs that the user owns on the cluster.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+    :param int filters.job_id:
+
+        The numeric Job ID, if this is specified, then queue_name, host_name, user_name, and job_state are
+        ignored.
+
+    :param int filters.array_index:
+
+        The array index of the job.  If array_index is -1, then all array tasks from the corresponding job ID are
+        returned.  If array_index is not zero, then a job_id must also be specified.
+
+    :param String filters.queue_name:
+
+        The name of the queue.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are submitted into the named queue.
+
+    :param String filters.host_name:
+
+        The name of the host.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are executing on the specified host.
+
+    :param String filters.job_state:
+
+        Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
+        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+        "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
+        currently suspended.
+
+    :param String filters.job_name:
+
+        Only return jobs that are named job_name.
+
+.. js:attribute:: olwclient.User.getUser = function(userName, callback, errback)
+
+    :param string userName: The name of the user to retrieve.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.User.getUserList = function(callback, errback)
+
+    Get a list of all users on the cluster.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
 
 Job Classes
 -----------
@@ -116,6 +324,45 @@ and sent back to the client.
         Warning! Unlike ::py:attribute:`olwclient.Job.reservation_time_datetime` returns a Date
         object in locale time, and not UTC.
 
+.. js:attribute:: olwclient.Job.prototype.execution_hosts
+
+.. js:attribute:: olwclient.Job.prototype.submission_host
+
+.. js:function:: olwclient.Job.prototype.kill()
+
+        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+.. js:function:: olwclient.Job.prototype.requeue(hold)
+
+        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
+
+        :param bool hold:
+
+            When true, jobs will be held in the suspended pending state.
+
+            .. note::
+
+                Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+
+.. js:function:: olwclient.Job.prototype.suspend()
+
+    Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+.. js:function:: olwclient.Job.prototype.resume()
+
+    Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+
+.. js:function:: olwclient.executeCommand(subUrl, callback, errback)
+
+    :param String subUrl: sub url to open.
+
+    :param function callback:
+        A function that will be called when the task is successfully completed. No arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
 .. js:function:: olwclient.Job.getJob(job_id, array_index, callback, errback)
 
     Get a single job.
@@ -127,9 +374,9 @@ and sent back to the client.
     :param function callback:
         A function that will be called when the task is successfully completed. No arguments.
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
 .. js:function:: olwclient.Job.getJobList(callback, errback, filters)
 
@@ -138,9 +385,9 @@ and sent back to the client.
     :param function callback:
         A function that will be called when the task is successfully completed. No arguments.
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
     :param int filters.job_id:
 
@@ -177,9 +424,114 @@ and sent back to the client.
     :param String filters.job_name:
         Only return jobs that are named job_name.
 
-.. js:function:: olwclient.Job.prototype.kill()
+Host Classes
+------------
 
-        Kills the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+Host classes are used to get information about and manipulate hosts on the cluster.  Primarily this is done through the
+Host() class, however when associated with a Job() they may be through ExecutionHost classes which also contain
+information on the number of slots that are allocated to the job.
+
+.. js:class:: olwclient.Host.getHost(hostname, callback, errback, data)
+
+    :param string hostname:
+
+        Hostname of host
+
+    :param callback callback:
+
+        A callback to execute on success, single host arg.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:function:: olwclient.Host.prototype.jobs = function(callback, errback, filters)
+
+    Get all jobs that are running on the host.
+
+    :param callback callback:
+
+        A callback to execute on success, single jobs arg.  See ::js:func:`olwclient.Job.getJobList`.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+    :param int filters.job_id:
+
+        The numeric Job ID, if this is specified, then queue_name, host_name, user_name, and job_state are
+        ignored.
+
+    :param int filters.array_index:
+
+        The array index of the job.  If array_index is -1, then all array tasks from the corresponding job ID are
+        returned.  If array_index is not zero, then a job_id must also be specified.
+
+    :param String filters.queue_name:
+
+        The name of the queue.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are submitted into the named queue.
+
+    :param String filters.user_name:
+
+        The name of the user.  If specified, implies that job_id and array_index are set to default.  Only returns
+        jobs that are owned by the specified user.
+
+    :param String filters.job_state:
+
+        Only return jobs in this state, state can be "ACT" - all active jobs, "ALL" - All jobs, including finished
+        jobs, "EXIT" - Jobs that have exited due to an error or have been killed by the user or an administator,
+        "PEND" - Jobs that are in a pending state, "RUN" - Jobs that are currently running, "SUSP" Jobs that are
+        currently suspended.
+
+    :param String filters.job_name:
+        Only return jobs that are named job_name.
+
+.. js:function:: olwclient.Host.getHostList = function(callback, errback)
+
+    Get a list of all hosts that are part of the cluster.
+
+    :param callback callback:
+
+        A callback to execute on success, single hosts arg.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:function:: olwclient.Host.prototype.close = function(callback, errback)
+
+    Close the host, no new jobs will be dispatched.
+
+    :param callback callback:
+
+        A callback to execute on success, no arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+
+.. js:function:: olwclient.Host.prototype.open = function(callback, errback)
+
+    Open the host to accept new jobs.
+
+    :param callback callback:
+
+        A callback to execute on success, no arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+Convenience Functions
+---------------------
+
+The following functions are available to reduce the need to load the object form the server when
+it is only required to perform an action. (Such as job kill, etc.)
+
+Jobs
+^^^^
 
 .. js:function:: olwclient.killJob(job_id, array_index, callback, errback)
 
@@ -192,21 +544,9 @@ and sent back to the client.
     :param function callback:
         A function that will be called when the task is successfully completed. No arguments.
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
+    :param callback errback:
 
-.. js:function:: olwclient.Job.prototype.requeue(hold)
-
-        Requeues the job.  The user must be a job owner,  queue or cluster administrator for this operation to succeed.
-
-        :param bool hold:
-
-            When true, jobs will be held in the suspended pending state.
-
-            .. note::
-
-                Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
 .. js:function:: olwclient.requeueJob(job_id, array_index, hold, callback, errback)
 
@@ -227,15 +567,9 @@ and sent back to the client.
     :param function callback:
         A function that will be called when the task is successfully completed. No arguments.
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
+    :param callback errback:
 
-
-
-.. js:function:: olwclient.Job.prototype.suspend()
-
-    Suspends the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
 .. js:function:: olwclient.suspendJob(job_id, array_index, callback, errback)
 
@@ -248,13 +582,9 @@ and sent back to the client.
     :param function callback:
         A function that will be called when the task is successfully completed. No arguments.
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
+    :param callback errback:
 
-.. js:function:: olwclient.Job.prototype.resume()
-
-    Resumes the job.  The user must be a job owner, queue or cluster administrator for this operation to succeed.
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
 .. js:function:: olwclient.resumeJob(job_id, array_index, callback, errback)
 
@@ -267,34 +597,16 @@ and sent back to the client.
     :param function callback:
         A function that will be called when the task is successfully completed. No arguments.
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
+    :param callback errback:
 
-.. js:function:: olwclient.executeCommand(subUrl, callback, errback)
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
-    :param String subUrl: sub url to open.
+Hosts
+^^^^^
 
-    :param function callback:
-        A function that will be called when the task is successfully completed. No arguments.
+.. js:function:: olwclient.openHost = function(hostName, callback, errback)
 
-    :param function errback:
-        A function with two arguments: exception_name - name of error, and message - message
-        sent by remote server.  Called when the operation failed.
-
-.. js:attribute:: olwclient.Job.prototype.execution_hosts
-
-.. js:attribute:: olwclient.Job.prototype.submission_host
-
-
-Host Classes
-------------
-
-Host classes are used to get information about and manipulate hosts on the cluster.  Primarily this is done through the
-Host() class, however when associated with a Job() they may be through ExecutionHost classes which also contain
-information on the number of slots that are allocated to the job.
-
-.. js:class:: olwclient.Host.getHost(hostname, callback, errback, data)
+    Open a specified host without retrieving the host object.
 
     :param string hostname:
 
@@ -302,33 +614,107 @@ information on the number of slots that are allocated to the job.
 
     :param callback callback:
 
-        A callback to execute on success, single host arg.
+        A callback to execute on success, no arguments.
 
     :param callback errback:
 
-        A callback to execute on failure, args: str errType, str: message.
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
-olwclient.Host.prototype.jobs = function(callback, errback, filters)
-olwclient.Host.getHost = function(hostName, callback, errback){
-olwclient.Host.getHostList = function(callback, errback){
-olwclient.Host.prototype.close = function(callback, errback){
-olwclient.closeHost = function(hostName, callback, errback){
-olwclient.Host.prototype.open = function(callback, errback){
-olwclient.openHost = function(hostName, callback, errback){
+.. js:function:: olwclient.closeHost = function(hostName, callback, errback)
 
+    Close a specified host without retrieving the host object.
 
-Queue Classes
--------------
+    :param string hostname:
 
-Queue classes represent individual queues that are configured as part of the cluster.
+        Hostname of host
 
+    :param callback callback:
 
+        A callback to execute on success, no arguments.
 
-User Classes
-------------
+    :param callback errback:
 
-User classes represent individual users that are configured in the cluster.
+        A callback to an ..js:function::`.errBack`  to execute on failure.
 
+Queue
+^^^^^
 
-job user_url
-job.url
+.. js:attribute:: olwclient.closeQueue = function(queueName, callback, errback)
+
+    Close the specified queue.
+
+    :param string queueName:
+
+        The name of the queue.
+
+    :param callback callback:
+
+        A callback to execute on success, no arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.openQueue = function(queueName, callback, errback)
+
+    Open the specified queue.
+
+    :param string queueName:
+
+        The name of the queue.
+
+    :param callback callback:
+
+        A callback to execute on success, no arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.activateQueue = function(queueName, callback, errback)
+
+    Activate the specified queue.
+
+    :param string queueName:
+
+    The name of the queue.
+
+    :param callback callback:
+
+        A callback to execute on success, no arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+.. js:attribute:: olwclient.inactivateQueue = function(queueName, callback, errback)
+
+    Inactivate the queue.
+
+    :param string queueName:
+
+        The name of the queue.
+
+    :param callback callback:
+
+        A callback to execute on success, no arguments.
+
+    :param callback errback:
+
+        A callback to an ..js:function::`.errBack`  to execute on failure.
+
+Error Callback
+--------------
+
+This function is called when an operation on the remote server failed.  In most circumstances
+it will be based on an error returned by the remote server, however if the server is unavailable
+or the AJAX call fails, then the error will also be set accordingly.
+
+.. js:function:: errBack(errType, message)
+
+    When error handling is needed, a callback should be specified that accepts the following arguments.
+
+    :param string errType: The type of error raised, it is the name of a ClusterException class.
+
+    :param string message: A description of the error raised.
+

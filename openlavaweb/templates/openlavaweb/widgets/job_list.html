@@ -33,7 +33,7 @@
                     $(sel + "row").addClass("active");
                 } else if (job.is_pending) {
                     $(sel + "row").addClass("info");
-                } else if (job.is_finished) {
+                } else if (job.is_completed) {
                     $(sel + "row").addClass("success");
                 } else if (job.is_failed) {
                     $(sel + "row").addClass("danger");
@@ -72,7 +72,7 @@
     <tr id="jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_row"
             {% if job.is_running %}class="active"
             {% elif job.is_pending %}class="info"
-            {% elif job.is_failed %}"class=danger"
+            {% elif job.is_failed %}"class="danger"
             {% elif job.was_killed %}class="warning"
             {% elif job.is_suspended %}class="warning"
             {% endif %}>

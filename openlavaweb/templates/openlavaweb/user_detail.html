@@ -2,8 +2,6 @@
 {% block content %}
 <div id="failMessageBody"></div>
 <script>
-        var url='{% url "olw_user_view" oluser.name %}';
-	
 	function updateUserInfo(user) {
 		$("#totalJobSlots").text( user.total_jobs + " (" + user.total_slots + ")");
 		$("#pendingJobSlots").text(user.num_pending_jobs + " (" + user.num_pending_slots + ")");
@@ -14,57 +12,58 @@
 			$("#systemSuspendedJobSlots").text(user.num_system_suspended_jobs + " (" + user.num_system_suspended_slots + ")");
 		}
 				
-		var html="";
-		jQuery.each(user.jobs, function(index, job){
-			if (index >= 20) {
-				return false;
-			}
-			html+="<tr><td><a href='" + job.url + "'>" + job.job_id;
-			if (job.array_index > 0){
-				html += "[" + job.array_index + "]";
-			}
-			html += "</a></td>";
-			html += "<td><a href='" + job.user_url + "'>" + job.user_name + "</a></td>";
-			html += "<td>" + job.status.friendly + "</td>";
-			html += "<td>" + new Date(1000*job.submit_time) + "</td>";
-			html += "<td>";
-			if (job.start_time > 0){
-				html += new Date(1000 * job.start_time);
-			} else{
-				html +="Not yet started";
-			}
-			html += "</td>";
-			html +="<td>";
-			if (job.end_time > 0){
-				html += new Date(1000*job.end_time);
-			} else{
-				html +="Not yet finished";
-			}
-			html += "</td>";
-			html += "</tr>";
-		});
-		$("#jobs").html(html);
+		var newJobs = [];
+            var html = "";
+            jQuery.each(user.jobs, function(index, job){
+                if (index > 20){
+                    return;
+                }
+                var js = 'jl_' + job.job_id + '_' + job.array_index + '_';
+                if ($(js + "_row").html()){
+                    html += "<tr>" + $(sel + "_row").html() + "</tr>";
+                }else {
+                    html += '<tr id="' + js + 'row" class="active">';
+                    html += '<td><a href="' + job.url + '">' + job.job_id;
+                    if (job.array_index > 0) {
+                        html += "[" + job.array_index + "]";
+                    }
+                    html += '</a></td>';
+                    html += '<td><a href="' + job.user_url + '">' + job.user_name + "</a></td>";
+                    html += '<td id="' + js + 'status">' + job.status['friendly'] + "</td>";
+                    html += '<td id="' + js + 'submit_time">Loading...</td>';
+                    html += '<td id="' + js + 'start_time">Loading...</td>';
+                    html += '<td id="' + js + 'end_time">Loading...</td';
+                    html += "</tr>";
+                    newJobs.push([job.job_id, job.array_index]);
+                }
+            });
+
+            if (html=="") {
+                html="<tr><td colspan='6'>No Jobs</td></tr>";
+            }
+
+            $("#jobs").html(html);
+            jQuery.each(newJobs, function(index, j){
+                updateJob(j[0], j[1]);
+            });
 	}
 	function update(){
-		var jqxhr = $.getJSON( url, function(data) {
-			if (data.hasOwnProperty('type') && data.type=="User") {
-				updateUserInfo(data)	
-			}else if (data.hasOwnProperty('type') && data.type=="Exception") {
-				$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load user information: ' + data.message + '</div>');
-				$("#failMessage").alert();
-				$("#statusMessageBody").empty();
-			}			
-		}).fail(function(){
-			$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load user information</div>');
-                        $("#failMessage").alert();
-			setTimeout(function(){
+        olwclient.User.getUser('{{ user.name }}', function(user){
+            updateUserInfo(user);
+            setTimeout(update, 30000);
+        }, function(errType, message){
+            $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load user information: ' + message + '</div>');
+            $("#failMessage").alert();
+            $("#statusMessageBody").empty();
+            setTimeout(function(){
 				$("#failMessage").alert('close');
-			},15000); 
-		}).always(function() {
-			setTimeout(update, 30000);
-		});
+			},15000);
+            setTimeout(update, 30000);
+        });
 	}
-	update();
+    $(function(){
+        setTimeout(update, 30000);
+    });
 </script>
 
 <h1>User: {{ oluser.name }}</h1>

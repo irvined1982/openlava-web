@@ -294,7 +294,7 @@ olwclient.Job.getJob = function(job_id, array_index, callback, errback){
 };
 
 olwclient.Job.getJobList = function(callback, errback, filters){
-    // Todo: Sort jobs
+
     var url = "/jobs/";
     if (filters){
         url += "?" + $.param(filters);
