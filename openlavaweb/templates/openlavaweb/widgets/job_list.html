@@ -14,8 +14,9 @@
             olwclient.Job.getJob(job_id, array_index, function (job) {
 
 
-                var sel = "#jl{% if prefix %}_prefix{% endif %}_"+ job.job_id + "_" + job.array_index + "_";
+                var sel = "#jl{% if prefix %}_{{ prefix }}{% endif %}_"+ job.job_id + "_" + job.array_index + "_";
                 if (!$(sel + "row").html()){
+                    console.log(sel+"row");
                     console.log("Job doesnt exist on page any more, no need to update...");
                     return;
                 }
@@ -53,8 +54,8 @@
                     $(sel + "end_time").text("Not Yet Finished");
                 }
                 $(sel + "submit_time").text(olwclient.Job.dateToString(job.submit_time_datetime()));
-            }, function () {
-                console.log("Unable to load job: " + job_id + " array index: " + array_index);
+            }, function (errType, message) {
+                console.log("Unable to load job: " + job_id + " array index: " + array_index+": "+message);
             });
         }
     </script>

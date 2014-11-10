@@ -7,12 +7,7 @@
 <div id="activateMessageBody"></div>
 <div id="statusMessageBody"></div>
 <script>
-        var url='{% url "olw_queue_view" queue.name %}';
-        var closeUrl='{% url "olw_queue_close" queue.name %}';
-	var openUrl='{% url "olw_queue_open" queue.name %}';
-	var inactivateUrl='{% url "olw_queue_inactivate" queue.name %}';
-	var activateUrl='{% url "olw_queue_activate" queue.name %}';
-	
+
 	function setStatus(message,cls) {
 		var html='<div id="statusMessage" class="fade in alert alert-'+cls+'">'+message+'</div>';
 		if ($("#statusMessageBody").html() != html ) {
@@ -20,210 +15,168 @@
 		}
 	}
 	
-	{% if queue.is_accepting_jobs and queue.is_despatching_jobs %}
+	{% if queue.is_accepting_jobs and queue.is_dispatching_jobs %}
 		setStatus("Queue is accepting and dispatching jobs", "success");
 	{% elif queue.is_accepting_jobs %}
 		setStatus("Queue is accepting jobs, however the queue is inactive and is not dispatching jobs at this time.", "warning");
-	{% elif queue.is_despatching_jobs %}
-		setStatus("Queue is despatching jobs, however the queue is closed and is not accepting new jobs at this time.", "warning");
+	{% elif queue.is_dispatching_jobs %}
+		setStatus("Queue is dispatching jobs, however the queue is closed and is not accepting new jobs at this time.", "warning");
 	{% else %}
-		setStatus("Queue is closed and inactive, no new jobs are being accepted or despatched at this time.", "danger");
+		setStatus("Queue is closed and inactive, no new jobs are being accepted or dispatched at this time.", "danger");
 	{% endif %}
-	
+	function jobSorter(a,b){
+        if (a.job_id != b.job_id){
+            return a.job_id < b.job_id;
+        }
+        return a.array_index < b.array_index
+    }
 	function update() {
-		var jqxhr = $.getJSON( url, function(queue) {
-			if (queue.is_accepting_jobs && queue.is_despatching_jobs){
-				setStatus("Queue is accepting and dispatching jobs", "success");
-			}else if (queue.is_accepting_jobs){
-				setStatus("Queue is accepting jobs, however the queue is inactive and is not dispatching jobs at this time.", "warning");
-			}else if (queue.is_despatching_jobs) {
-				setStatus("Queue is despatching jobs, however the queue is closed and is not accepting new jobs at this time.", "warning");
-			}else{
-				setStatus("Queue is closed and inactive, no new jobs are being accepted or despatched at this time.", "danger");	
-			}
-			var statuses=[];
-			jQuery.each(queue.statuses, function(index, item) {
-				statuses.push(item.friendly);
-			});
-			$("#statusList").html(statuses.join("<br>"));
-			var attributes=[];
-			jQuery.each(queue.attributes, function(index, item){
-				attributes.push(item.friendly);
-			});
-			$("#attributeList").html(attributes.join("<br>"));
-			$("#totalJobSlots").text( queue.total_jobs + " (" + queue.total_slots + ")");
-			$("#pendingJobSlots").text(queue.num_pending_jobs + " (" + queue.num_pending_slots + ")");
-			$("#runningJobSlots").text(queue.num_running_jobs + " (" + queue.num_running_slots + ")");
-			$("#suspendedJobSlots").text(queue.num_suspended_jobs + " (" + queue.num_suspended_jobs + ")");
-			if (queue.cluster_type == "openlava"){
-				$("#userSuspendedJobSlots").text(queue.num_user_suspended_jobs + " (" + queue.num_user_suspended_slots + ")");
-				$("#systemSuspendedJobSlots").text(queue.num_system_suspended_jobs + " (" + queue.num_system_suspended_slots + ")");
-			}
-			$("#reservedSlots").text(queue.num_reserved_slots);
-			var html="";
-			jQuery.each(queue.jobs, function(index, job){
-				if (index >= 20) {
-					return false;
-				}
-				html+="<tr><td><a href='" + job.url + "'>" + job.job_id;
-				if (job.array_index > 0){
-					html += "[" + job.array_index + "]";
-				}
-				html += "</a></td>";
-				html += "<td><a href='" + job.user_url + "'>" + job.user_name + "</a></td>";
-				html += "<td>" + job.status.friendly + "</td>";
-				html += "<td>" + new Date(1000*job.submit_time) + "</td>";
-				html += "<td>";
-				if (job.start_time > 0){
-					html += new Date(1000 * job.start_time);
-				} else{
-					html +="Not yet started";
-				}
-				html += "</td>";
-				html +="<td>";
-				if (job.end_time > 0){
-					html += new Date(1000*job.end_time);
-				} else{
-					html +="Not yet finished";
-				}
-				html += "</td>";
-				html += "</tr>";
-			});
-			$("#jobs").html(html);
-			
-		}).fail(function(){
-			$("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load queue information</div>');
-                        $("#failMessage").alert();
-			setTimeout(function(){
-				$("#failMessage").alert('close');
-			},15000); 
-		}).always(function() {
-			setTimeout(update, 30000);
-		});
-	}
-	update();
-	function closeQueue(){
-                $("#closeModal").modal('hide');
-                var jqxhr = $.getJSON( closeUrl, function(data) {
-			var message='';
-			var style='';
-			var close=false;
-			if (data.hasOwnProperty('status') && data.status == "OK") {
-				message="Queue close request sent successfully.";
-				style='success';
-				close=true;
-			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
-				style='danger';
-				message=data.message;
-			}else{
-				style='warning';
-				message="Strange response from server.";
-			}
-                        $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
-                        $("#closeMessage").alert();
-			if (close) {
-				setTimeout(function(){
-					$("#closeMessage").alert('close');
-			        },30000); 
-			}
-                })
-                .fail(function() {
-                        $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-warning">Unable to close queue.</div>');
-                        $("#closeMessage").alert();
-                })
-        }		
-	function openQueue(){
-                $("#openModal").modal('hide');
-                var jqxhr = $.getJSON( openUrl, function(data) {
-                       	var message='';
-			var style='';
-			var close=false;
-			if (data.hasOwnProperty('status') && data.status == "OK") {
-				message="Queue open request sent successfully.";
-				style='success';
-				close=true;
-			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
-				style='danger';
-				message=data.message;
-			}else{
-				style='warning';
-				message="Strange response from server.";
-			}
-                        $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
-                        $("#openMessage").alert();
-			if (close) {
-				setTimeout(function(){
-					$("#openMessage").alert('close');
-			        },30000); 
-			}
-                })
-                .fail(function() {
-                        $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-warning">Unable to open queue.</div>');
-                        $("#openMessage").alert();
-                })
+        olwclient.Queue.getQueue('{{ queue.name }}', function (queue) {
+            if (queue.is_accepting_jobs && queue.is_dispatching_jobs) {
+                setStatus("Queue is accepting and dispatching jobs", "success");
+            } else if (queue.is_accepting_jobs) {
+                setStatus("Queue is accepting jobs, however the queue is inactive and is not dispatching jobs at this time.", "warning");
+            } else if (queue.is_dispatching_jobs) {
+                setStatus("Queue is dispatching jobs, however the queue is closed and is not accepting new jobs at this time.", "warning");
+            } else {
+                setStatus("Queue is closed and inactive, no new jobs are being accepted or dispatched at this time.", "danger");
+            }
 
-        }
-	function inactivateQueue(){
-                $("#inactivateModal").modal('hide');
-                var jqxhr = $.getJSON( inactivateUrl, function(data) {
-                       	var message='';
-			var style='';
-			var close=false;
-			if (data.hasOwnProperty('status') && data.status == "OK") {
-				message="Queue inactivate request sent successfully.";
-				style='success';
-				close=true;
-			}else if (data.hasOwnProperty('status') &&  data.status == "Fail") {
-				style='danger';
-				message=data.message;
-			}else{
-				style='warning';
-				message="Strange response from server.";
-			}
-                        $("#inactivateMessageBody").html('<div id="inactivateMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
-                        $("#inactivateMessage").alert();
-			if (close) {
-				setTimeout(function(){
-					$("#inactivateMessage").alert('close');
-			        },30000); 
-			}
-			
-                })
-                .fail(function() {
-                        $("#inactivateMessageBody").html('<div id="inactivateMessage" class="fade in alert alert-warning">Unable to inactivate queue.</div>');
-                        $("#inactivateMessage").alert();
-                })
-        }
-	function activateQueue(){
-                $("#activateModal").modal('hide');
-                var jqxhr = $.getJSON( openUrl, function(data) {
-                    	var message='';
-			var style='';
-			var close=false;
-			if (data.hasOwnProperty('status') && data.status == "OK") {
-				message="Queue activate request sent successfully.";
-				style='success';
-				close=true;
-			}else if (data.hasOwnProperty('status') && data.status == "Fail") {
-				style='danger';
-				message=data.message;
-			}else{
-				style='warning';
-				message="Strange response from server.";
-			}
-                        $("#activateMessageBody").html('<div id="activateMessage" class="fade in alert alert-' + style + '">' + message + '</div>');
-                        $("#activateMessage").alert();
-			if (close) {
-				setTimeout(function(){
-					$("#activateMessage").alert('close');
-			        },30000); 
-			}
-                })
-                .fail(function() {
-                        $("#activateMessageBody").html('<div id="activateMessage" class="fade in alert alert-warning">Unable to activate queue.</div>');
-                        $("#activateMessage").alert();
-                })
-        }
+            var statuses = [];
+            jQuery.each(queue.statuses, function (index, item) {
+                statuses.push(item.friendly);
+            });
+            $("#statusList").html(statuses.join("<br>"));
+            var attributes = [];
+            jQuery.each(queue.attributes, function (index, item) {
+                attributes.push(item.friendly);
+            });
+            $("#attributeList").html(attributes.join("<br>"));
+            $("#totalJobSlots").text(queue.total_jobs + " (" + queue.total_slots + ")");
+            $("#pendingJobSlots").text(queue.num_pending_jobs + " (" + queue.num_pending_slots + ")");
+            $("#runningJobSlots").text(queue.num_running_jobs + " (" + queue.num_running_slots + ")");
+            $("#suspendedJobSlots").text(queue.num_suspended_jobs + " (" + queue.num_suspended_jobs + ")");
+            if (queue.cluster_type == "openlava") {
+                $("#userSuspendedJobSlots").text(queue.num_user_suspended_jobs + " (" + queue.num_user_suspended_slots + ")");
+                $("#systemSuspendedJobSlots").text(queue.num_system_suspended_jobs + " (" + queue.num_system_suspended_slots + ")");
+            }
+            $("#reservedSlots").text(queue.num_reserved_slots);
+            var newJobs = [];
+            var html = "";
+            jQuery.each(queue.jobs, function(index, job){
+                if (index > 20){
+                    return;
+                }
+                var js = 'jl_' + job.job_id + '_' + job.array_index + '_';
+                if ($(js + "_row").html()){
+                    html += "<tr>" + $(sel + "_row").html() + "</tr>";
+                }else {
+                    html += '<tr id="' + js + 'row" class="active">';
+                    html += '<td><a href="' + job.url + '">' + job.job_id;
+                    if (job.array_index > 0) {
+                        html += "[" + job.array_index + "]";
+                    }
+                    html += '</a></td>';
+                    html += '<td><a href="' + job.user_url + '">' + job.user_name + "</a></td>";
+                    html += '<td id="' + js + 'status">' + job.status['friendly'] + "</td>";
+                    html += '<td id="' + js + 'submit_time">Loading...</td>';
+                    html += '<td id="' + js + 'start_time">Loading...</td>';
+                    html += '<td id="' + js + 'end_time">Loading...</td';
+                    html += "</tr>";
+                    newJobs.push([job.job_id, job.array_index]);
+                }
+            });
+
+            if (html=="") {
+                html="<tr><td colspan='6'>No Jobs</td></tr>";
+            }
+
+            $("#jobs").html(html);
+            jQuery.each(newJobs, function(index, j){
+                updateJob(j[0], j[1]);
+            });
+            console.log("Setting timeout");
+            setTimeout(update, 30000);
+        }, function (errType, message) {
+            $("#failMessageBody").html('<div id="failMessage" class="fade in alert alert-danger">Error! Unable to load queue information:' + message + '</div>');
+            $("#failMessage").alert();
+            setTimeout(function () {
+                $("#failMessage").alert('close');
+            }, 15000);
+            setTimeout(update, 30000);
+        });
+    }
+
+    setTimeout(update, 30000);
+
+	function closeQueue() {
+        $("#closeModal").modal('hide');
+        olwclient.closeQueue('{{ queue.name }}', function () {
+            $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-success">Queue close request sent successfully.</div>');
+            $("#closeMessage").alert();
+            setTimeout(function () {
+                $("#closeMessage").alert('close');
+            }, 30000);
+
+        }, function (errType, message) {
+            $("#closeMessageBody").html('<div id="closeMessage" class="fade in alert alert-danger">' + message + '</div>');
+            $("#closeMessage").alert();
+            setTimeout(function () {
+                $("#closeMessage").alert('close');
+            }, 30000);
+        });
+    }
+    function openQueue() {
+        $("#openModal").modal('hide');
+        olwclient.openQueue('{{ queue.name }}', function () {
+            $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-success">Queue open request sent successfully.</div>');
+            $("#openMessage").alert();
+            setTimeout(function () {
+                $("#openMessage").alert('close');
+            }, 30000);
+
+        }, function (errType, message) {
+            $("#openMessageBody").html('<div id="openMessage" class="fade in alert alert-danger">' + message + '</div>');
+            $("#openMessage").alert();
+            setTimeout(function () {
+                $("#openMessage").alert('close');
+            }, 30000);
+        });
+    }
+    function inactivateQueue() {
+        $("#inactivateModal").modal('hide');
+        olwclient.inactivateQueue('{{ queue.name }}', function () {
+            $("#inactivateMessageBody").html('<div id="inactivateMessage" class="fade in alert alert-success">Queue inactivate request sent successfully.</div>');
+            $("#inactivateMessage").alert();
+            setTimeout(function () {
+                $("#inactivateMessage").alert('close');
+            }, 30000);
+
+        }, function (errType, message) {
+            $("#inactivateMessageBody").html('<div id="inactivateMessage" class="fade in alert alert-danger">' + message + '</div>');
+            $("#inactivateMessage").alert();
+            setTimeout(function () {
+                $("#inactivateMessage").alert('close');
+            }, 30000);
+        });
+    }
+    function activateQueue() {
+        $("#activateModal").modal('hide');
+        olwclient.activateQueue('{{ queue.name }}', function () {
+            $("#activateMessageBody").html('<div id="activateMessage" class="fade in alert alert-success">Queue activate request sent successfully.</div>');
+            $("#activateMessage").alert();
+            setTimeout(function () {
+                $("#activateMessage").alert('close');
+            }, 30000);
+
+        }, function (errType, message) {
+            $("#activateMessageBody").html('<div id="activateMessage" class="fade in alert alert-danger">' + message + '</div>');
+            $("#activateMessage").alert();
+            setTimeout(function () {
+                $("#activateMessage").alert('close');
+            }, 30000);
+        });
+    }
 </script>
 
 <div><!-- queue management -->
@@ -321,9 +274,9 @@
 		<dt>Checkpoint Period</dt><dd>{% if queue.checkpoint_period != -1 %}{{ queue.checkpoint_period_timedelta }}{% else %}None configured{% endif %}</dd>
 		<dt>Default Processor Limit</dt><dd>{% if queue.default_slots_per_job != -1 %}{{ queue.default_slots_per_job }}{% else %}None configured{% endif %}</dd>
 		<dt>Host Specification</dt><dd>{{ queue.host_specification|default:"None configured" }}</dd>
-		<dt>Job Dispatch Window</dt><dd>{{ queue.dispatch_window|default:"None configured" }}</dt>
+		<dt>Job Dispatch Window</dt><dd>{{ queue.dispatch_window|default:"None configured" }}</dd>
 		<dt>Job Limit per User</dt><dd>{% if queue.max_jobs_per_user == 2147483647 %}Unlimited{%else %}{{ queue.max_jobs_per_user }}{% endif %}</dd>
-		<dt>Job Limit per Processor</dt><dd>{% if queue.max_jobs_per_processor = 2147483648.0 %}Unlimited{% else %}{{ queue.max_jobs_per_processor }}{% endif %}</dd>
+		<dt>Job Limit per Processor</dt><dd>{% if queue.max_jobs_per_processor == 2147483648.0 %}Unlimited{% else %}{{ queue.max_jobs_per_processor }}{% endif %}</dd>
 		<dt>Job Run Window</dt><dd>{{ queue.run_window|default:"None configured" }}</dd>
 		<dt>Job Starter Command</dt><dd>{{ queue.job_starter_command|default:"None configured" }}</dd>
 		<dt>Max Jobs Per Host</dt><dd>{% if queue.max_jobs_per_host == 2147483647 %}Unlimited{% else %}{{ queue.max_jobs_per_host }}{% endif %}</dd>

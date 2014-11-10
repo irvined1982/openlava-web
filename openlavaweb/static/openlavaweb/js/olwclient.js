@@ -167,25 +167,41 @@ olwclient.Queue.prototype.jobs = function(callback, errback, filters){
 };
 
 olwclient.Queue.prototype.close = function(callback, errback){
-    var url = "/queues/" + this.name + "/close";
+    return olwclient.closeQueue(this.name, callback, errback);
+};
+
+olwclient.closeQueue = function(queueName, callback, errback){
+    var url = "/queues/" + queueName + "/close";
     olwclient.executeCommand(url, callback, errback)
 };
 
 olwclient.Queue.prototype.open = function(callback, errback){
-    var url = "/queues/" + this.name + "/open";
+    return olwclient.openQueue(this.name, callback, errback);
+};
+
+olwclient.openQueue = function(queueName, callback, errback){
+    var url = "/queues/" + queueName + "/open";
     olwclient.executeCommand(url, callback, errback)
 };
+
 
 olwclient.Queue.prototype.activate = function(callback, errback){
-    var url = "/queues/" + this.name + "/activate";
-    olwclient.executeCommand(url, callback, errback)
+    return olwclient.activateQueue(this.name, callback, errback);
 };
 
-olwclient.Queue.prototype.open = function(callback, errback){
-    var url = "/queues/" + this.name + "/inactivate";
-    olwclient.executeCommand(url, callback, errback)
+olwclient.activateQueue = function(queueName, callback, errback){
+    var url = "/queues/" + queueName + "/activate";
+    olwclient.executeCommand(url, callback, errback);
 };
 
+olwclient.Queue.prototype.inactivate = function(callback, errback){
+    return olwclient.inactivateQueue(this.name, callback, errback);
+};
+
+olwclient.inactivateQueue = function(queueName, callback, errback){
+    var url = "/queues/" + queueName + "/inactivate";
+    olwclient.executeCommand(url, callback, errback)
+};
 
 
 olwclient.Job = function(data){
@@ -278,6 +294,7 @@ olwclient.Job.getJob = function(job_id, array_index, callback, errback){
 };
 
 olwclient.Job.getJobList = function(callback, errback, filters){
+    // Todo: Sort jobs
     var url = "/jobs/";
     if (filters){
         url += "?" + $.param(filters);

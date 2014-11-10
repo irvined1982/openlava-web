@@ -72,9 +72,12 @@
             });
             setTimeout(update_queue_list, 30000);
         }, function(errType, message){
-            console.log("Unable to update queue list");
+            console.log("Unable to update queue list: " + message);
             setTimeout(update_queue_list, 30000);
         });
     }
+    $(function() {
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
+    });
     setTimeout(update_queue_list, 30000);
 </script>
