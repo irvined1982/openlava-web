@@ -20,12 +20,15 @@ import time
 import os
 import urllib
 import urllib2
+import subprocess
 
-from cluster.openlavacluster import Job, Host, Queue, User
-from cluster import ConsumedResource
 from olwclient import User as OLUser, Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
     NoSuchQueueError, NoSuchUserError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError, \
     JobSubmitError
+
+from openlavaweb.cluster.openlavacluster import Job, Host, Queue, User
+from openlavaweb.cluster import ConsumedResource
+
 
 # Todo: Test Cluster
 # Todo: Host inactive/active/close/open
@@ -36,6 +39,66 @@ class Cargs(object):
     username = None
     password = None
     url = None
+
+
+class TestCLIScripts(unittest.TestCase):
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def check_bhosts(self):
+        cmd = [
+            'badmin.py',
+            '--username',
+            os.environ.get("OLWEB_USERNAME", None),
+            '--password',
+            os.environ.get("OLWEB_PASSWORD", None),
+            os.environ.get("OLWEB_URL", None),
+        ]
+        hosts = Host.get_host_list()
+        for mod in [[], ['-w']]:
+
+            output = subprocess.check_output(cmd + mod)
+
+            self.assertEqual(len(output.splitlines())-1, len(hosts))
+
+            for host in hosts:
+                output = subprocess.check_output(cmd + mod + [host.name])
+                self.assertEqual(len(output.splitlines()), 2)
+                self.assertEqual(output.splitlines()[1].split()[0], host.name)
+
+        output = subprocess.check_output(cmd + ["-l"])
+        self.assertGreater(len(output), 0)
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+    def check_bjobs(self):
+        cmd = [
+            'bjobs.py',
+            '--username',
+            os.environ.get("OLWEB_USERNAME", None),
+            '--password',
+            os.environ.get("OLWEB_PASSWORD", None),
+            os.environ.get("OLWEB_URL", None),
+        ]
+        jobs = Host.get_host_list()
+        for mod in [[], ['-w']]:
+
+            output = subprocess.check_output(cmd + mod)
+
+            self.assertEqual(len(output.splitlines())-1, len(jobs))
+
+            for job in jobs:
+                job_str = str(job.job_id)
+                if job.array_index > 0:
+                    job_str += "[%s]" % job.array_index
+
+                output = subprocess.check_output(cmd + mod + [job_str])
+                self.assertEqual(len(output.splitlines()), 2)
+                self.assertEqual(output.splitlines()[1].split()[0], str(job.job_id))
+
+        output = subprocess.check_output(cmd + ["-l"])
+        self.assertGreater(len(output), 0)
 
 
 class CompareWebLocal(unittest.TestCase):

@@ -15,10 +15,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with python-cluster.  If not, see <http://www.gnu.org/licenses/>.
-from cluster import *
-from openlava import lslib, lsblib
 import datetime
 import time
+
+from openlavaweb.cluster import *
+from openlava import lslib, lsblib
+
 
 initialized_openlava = False
 _memoized = {}
@@ -1126,7 +1128,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> Job.cluster_type
             'openlava'
 
@@ -1139,7 +1141,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> j=Job(job_id=9707)
             >>> j.job_id
             9707
@@ -1155,7 +1157,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> j=Job(job_id=9707)
             >>> j.job_id
             9707
@@ -1188,7 +1190,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.admins
@@ -1207,7 +1209,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.begin_time
@@ -1226,7 +1228,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.command
@@ -1250,7 +1252,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> import time
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0] # doctest: +ELLIPSIS
             Job <...> is submitted to default queue <normal>.
@@ -1278,7 +1280,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.cpu_time
@@ -1299,7 +1301,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9591> is submitted to default queue <normal>.
             >>> job.dependency_condition
@@ -1330,7 +1332,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.email_user
@@ -1350,7 +1352,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> import time
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
@@ -1381,7 +1383,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.error_file_name
@@ -1401,7 +1403,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1438,7 +1440,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.input_file_name
@@ -1460,7 +1462,7 @@ class Job(JobBase):
 
     Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1491,7 +1493,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1524,7 +1526,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1556,7 +1558,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1588,7 +1590,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1620,7 +1622,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1653,7 +1655,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.max_requested_slots
@@ -1675,7 +1677,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9601> is submitted to default queue <normal>.
             >>> job.name
@@ -1716,7 +1718,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.output_file_name
@@ -1737,7 +1739,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_pending
@@ -1760,7 +1762,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.predicted_start_time
@@ -1781,7 +1783,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.priority
@@ -1802,7 +1804,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_pending
@@ -1830,7 +1832,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -1852,7 +1854,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.project_names
@@ -1873,7 +1875,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.requested_resources
@@ -1893,7 +1895,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.requested_slots
@@ -1914,7 +1916,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.reservation_time
@@ -1934,7 +1936,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
 
@@ -1952,7 +1954,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.start_time
@@ -1987,7 +1989,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0] # doctest: +ELLIPSIS
             Job <...> is submitted to default queue <...>.
             >>> job.submission_host
@@ -2007,7 +2009,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.submit_time
@@ -2027,7 +2029,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> print job.submit_time_datetime
@@ -2046,7 +2048,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.is_running
@@ -2074,7 +2076,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.termination_time
@@ -2094,7 +2096,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.user_name
@@ -2115,7 +2117,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.user_priority
@@ -2136,7 +2138,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.queue
@@ -2157,7 +2159,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.requested_hosts
@@ -2183,7 +2185,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.checkpoint_directory
@@ -2207,7 +2209,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.checkpoint_period
@@ -2231,7 +2233,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> print job.checkpoint_period_timedelta
@@ -2254,7 +2256,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.cpu_factor
@@ -2278,7 +2280,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.cwd
@@ -2302,7 +2304,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.execution_cwd
@@ -2326,7 +2328,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.execution_cwd
@@ -2350,7 +2352,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.execution_user_id
@@ -2374,7 +2376,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.execution_user_name
@@ -2398,7 +2400,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.host_specification
@@ -2422,7 +2424,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.login_shell
@@ -2446,7 +2448,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.parent_group
@@ -2470,7 +2472,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.pre_execution_command
@@ -2494,7 +2496,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.resource_usage_last_update_time
@@ -2518,7 +2520,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> print job.resource_usage_last_update_time_datetime
@@ -2541,7 +2543,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.service_port
@@ -2565,7 +2567,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.submit_home_directory
@@ -2588,7 +2590,7 @@ class Job(JobBase):
 
             Openlava Only! This property is specific to Openlava and is not generic to all cluster interfaces.
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <9581> is submitted to default queue <normal>.
             >>> job.termination_signal
@@ -2606,7 +2608,7 @@ class Job(JobBase):
         Creates a new instance of the job class.
 
         >>> # Print all jobs and their status.
-        >>> from cluster.openlavacluster import Job
+        >>> from openlavacluster import Job
         >>> for job in Job.get_job_list(job_state="ALL"):
         ...     print "Job: %d[%d] is: %s" % ( job.job_id, job.array_index, job.status)
         ...
@@ -2770,7 +2772,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> # Submit a normal job.
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <6306> is submitted to default queue <normal>.
@@ -2792,7 +2794,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> # Submit a normal job.
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <6306> is submitted to default queue <normal>.
@@ -2816,7 +2818,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> import time
             >>> # Submit a normal job.
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
@@ -2856,7 +2858,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> # Submit a normal job.
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <6306> is submitted to default queue <normal>.
@@ -2881,7 +2883,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> import time
             >>> # Submit a normal job.
             >>> job = Job.submit(command="sleep 500", requested_slots=1)[0]
@@ -2904,7 +2906,7 @@ class Job(JobBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> # Submit a normal job.
             ... job = Job.submit(command="sleep 500", requested_slots=1)[0]
             Job <6306> is submitted to default queue <normal>.
@@ -3156,7 +3158,7 @@ class Job(JobBase):
         Example::
 
             >>> # Print all jobs and their status.
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> for job in Job.get_job_list(job_state="ALL"):
             ...     print "Job: %d[%d] is: %s" % ( job.job_id, job.array_index, job.status)
             ...
@@ -3166,7 +3168,7 @@ class Job(JobBase):
             Job: 6296[2] is: Pending
             Job: 6296[3] is: Pending
             # Get array elements for jobs
-            >>> from cluster.openlavacluster import Job
+            >>> from openlavacluster import Job
             >>> job_ids=set()
             >>> for job in Job.get_job_list(job_state="ALL"):
             ...     job_ids.add(job.job_id)
@@ -3570,7 +3572,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.cluster_type
             'openlava'
@@ -3584,7 +3586,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.name
             u'normal'
@@ -3599,7 +3601,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.description
             u'For normal low priority jobs, running only if hosts are lightly loaded.'
@@ -3614,7 +3616,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.priority
             30
@@ -3633,7 +3635,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.nice
             20
@@ -3647,7 +3649,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_jobs_per_user
             2147483647
@@ -3661,7 +3663,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_slots_per_user
             2147483647
@@ -3675,7 +3677,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_jobs_per_processor
             2147483648.0
@@ -3689,7 +3691,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_slots_per_processor
             2147483648.0
@@ -3709,7 +3711,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.run_windows
             u' '
@@ -3723,7 +3725,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.runtime_limits
             [CPU Time:-1 (-1), File Size:-1 (-1), Data Segment Size:-1 (-1), Stack Size:-1 (-1), Core Size:-1 \
@@ -3744,7 +3746,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.host_specification
             u''
@@ -3761,7 +3763,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.attributes
             [Q_ATTRIB_DEFAULT]
@@ -3776,7 +3778,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.statuses
             [QUEUE_STAT_OPEN, QUEUE_STAT_ACTIVE, QUEUE_STAT_RUN]
@@ -3794,7 +3796,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_slots
             2147483647
@@ -3808,7 +3810,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.total_slots
             3
@@ -3822,7 +3824,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.num_running_slots
             0
@@ -3836,7 +3838,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.num_pending_slots
             3
@@ -3850,7 +3852,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.num_suspended_slots
             0
@@ -3867,7 +3869,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.num_user_suspended_slots
             0
@@ -3886,7 +3888,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.num_system_suspended_slots
             0
@@ -3900,7 +3902,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.num_reserved_slots
             0
@@ -3914,7 +3916,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_jobs
             2147483647
@@ -3933,7 +3935,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.pre_execution_command
             u''
@@ -3952,7 +3954,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.post_execution_command
             u''
@@ -3970,7 +3972,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.pre_post_user_name
             u''
@@ -3985,7 +3987,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.admins
             [u'openlava']
@@ -4004,7 +4006,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.migration_threshold
             2147483647
@@ -4022,7 +4024,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.scheduling_delay
             0
@@ -4052,7 +4054,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.accept_interval
             0
@@ -4083,7 +4085,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.dispatch_windows
             u''
@@ -4097,7 +4099,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_slots_per_job
             -1
@@ -4115,7 +4117,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.requeue_exit_values
             []
@@ -4129,7 +4131,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_jobs_per_host
             2147483647
@@ -4143,7 +4145,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.max_slots_per_host
             2147483647
@@ -4158,7 +4160,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.resource_requirements
             u''
@@ -4176,7 +4178,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.slot_hold_time
             0
@@ -4205,7 +4207,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.stop_condition
             u''
@@ -4223,7 +4225,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.job_starter_command
             u''
@@ -4241,7 +4243,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.suspend_action_command
             u''
@@ -4259,7 +4261,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.resume_action_command
             u''
@@ -4277,7 +4279,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.terminate_action_command
             u''
@@ -4291,7 +4293,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.min_slots_per_job
             -1
@@ -4305,7 +4307,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.default_slots_per_job
             -1
@@ -4317,7 +4319,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         The default directory to store checkpoint data.  Will be an empty string if no default is defined.
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.checkpoint_data_directory
             u''
@@ -4332,7 +4334,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.checkpoint_period
             -1
@@ -4357,7 +4359,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.resume_condition
             u''
@@ -4375,7 +4377,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.stop_condition
             u''
@@ -4390,7 +4392,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.allowed_users
             []
@@ -4405,7 +4407,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue=Queue.get_queue_list()[0]
             >>> queue.allowed_hosts
             []
@@ -4677,7 +4679,7 @@ class Queue(QueueBase, SingleArgMemoized):
 
         Example::
 
-            >>> from cluster.openlavacluster import Queue
+            >>> from openlavacluster import Queue
             >>> queue = Queue.get_host_list()[0]
             >>> queue.jobs()
             [9790]
@@ -4894,7 +4896,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.name
             u'...'
@@ -4908,7 +4910,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.host_name
             u'...'
@@ -4922,7 +4924,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.description
             u''
@@ -4949,7 +4951,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> Host.get_host_list()
             [master, comp00, comp01, comp02, comp03, comp04]
@@ -4987,7 +4989,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.open()
             Traceback (most recent call last):
@@ -5009,7 +5011,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.close()
             Traceback (most recent call last):
@@ -5031,7 +5033,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.jobs()
             [9790]
@@ -5070,7 +5072,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> info=host.load_information
             >>> for i in range(len(info['names'])):
@@ -5241,7 +5243,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.admins
             [u'openlava']
@@ -5260,7 +5262,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.is_busy
             False
@@ -5288,7 +5290,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.is_down
             False
@@ -5309,7 +5311,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.is_closed
             False
@@ -5330,7 +5332,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.has_checkpoint_support
             True
@@ -5349,7 +5351,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.host_model
             u'IntelI5'
@@ -5368,7 +5370,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.host_type
             u'linux'
@@ -5387,7 +5389,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host.resources
             [foo]
 
@@ -5405,7 +5407,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_jobs
             2
@@ -5427,7 +5429,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_processors
             1
@@ -5446,7 +5448,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_ram
             992
@@ -5468,7 +5470,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_slots
             2
@@ -5487,7 +5489,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_swap
             509
@@ -5505,7 +5507,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_tmp
             64002
@@ -5524,7 +5526,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_reserved_slots
             0
@@ -5543,7 +5545,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_running_jobs
             0
@@ -5562,7 +5564,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_running_slots
             0
@@ -5581,7 +5583,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_suspended_jobs
             0
@@ -5600,7 +5602,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_suspended_slots
             0
@@ -5618,7 +5620,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.run_windows
             u'-'
@@ -5642,7 +5644,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.statuses
             [HOST_STAT_OK]
@@ -5661,7 +5663,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.total_jobs
             0
@@ -5680,7 +5682,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.total_slots
             0
@@ -5699,7 +5701,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.cpu_factor
             100.0
@@ -5721,7 +5723,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.is_server
             True
@@ -5744,7 +5746,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_disks
             0
@@ -5767,7 +5769,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_user_suspended_jobs
             0
@@ -5790,7 +5792,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_user_suspended_slots
             0
@@ -5813,7 +5815,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_system_suspended_jobs
             0
@@ -5836,7 +5838,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.num_system_suspended_slots
             0
@@ -5859,7 +5861,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.has_kernel_checkpoint_copy
             False
@@ -5882,7 +5884,7 @@ class Host(SingleArgMemoized, HostBase):
 
         Example::
 
-            >>> from cluster.openlavacluster import Host
+            >>> from openlavacluster import Host
             >>> host = Host.get_host_list()[0]
             >>> host.max_slots_per_user
             2147483647

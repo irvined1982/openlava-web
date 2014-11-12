@@ -37,8 +37,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 from django.conf import settings
 
-from cluster import ClusterException, NoSuchJobError
-from cluster.openlavacluster import Cluster, Host, Job, Queue, User, ExecutionHost, NoSuchHostError
+from openlavaweb.cluster import ClusterException
+from openlavaweb.cluster.openlavacluster import Cluster, Host, Job, Queue, User, ExecutionHost, NoSuchHostError
 # noinspection PyUnresolvedReferences
 from openlava import lsblib
 

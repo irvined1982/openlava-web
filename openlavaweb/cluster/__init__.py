@@ -889,7 +889,7 @@ class ConsumedResource:
 
     Example::
 
-        >>> from cluster import ConsumedResource
+        >>> from openlavaweb.cluster import ConsumedResource
         >>> c=ConsumedResource(name="MyTestResource", value=100, limit=200, unit="bogoVals")
         >>> c
         MyTestResource: 100bogoVals (200)
