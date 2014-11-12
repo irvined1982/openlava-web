@@ -78,6 +78,7 @@
     }
     $(function() {
         olwclient.serverUrl("{% url 'olw_system_view' %}");
+        setTimeout(update_queue_list, 30000);
     });
-    setTimeout(update_queue_list, 30000);
+
 </script>

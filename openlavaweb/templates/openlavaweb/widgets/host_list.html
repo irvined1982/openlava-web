@@ -58,6 +58,7 @@
         });
     }
     $(function() {
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
         setTimeout(update_host_list, 30000);
     });
 </script>

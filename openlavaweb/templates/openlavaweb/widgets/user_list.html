@@ -44,6 +44,7 @@
     }
 
     $(function () {
+        olwclient.serverUrl("{% url 'olw_system_view' %}");
         setTimeout(update_user_list, 30000);
     });
 </script>
