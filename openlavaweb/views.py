@@ -274,7 +274,7 @@ def queue_close(request, queue_name):
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
-        queue = Queue(queue=queue_name)
+        queue = Queue(queue_name)
         return render(request, 'openlavaweb/queue_close_confirm.html', {"object": queue})
 
 
@@ -282,7 +282,7 @@ def execute_queue_close(request, queue, queue_name):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
-        q = Queue(queue=queue_name)
+        q = Queue(queue_name)
         q.close()
         if request.is_ajax():
             queue.put(
@@ -319,7 +319,7 @@ def queue_open(request, queue_name):
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
-        queue = Queue(queue=queue_name)
+        queue = Queue(queue_name)
         return render(request, 'openlavaweb/queue_open_confirm.html', {"object": queue})
 
 
@@ -327,7 +327,7 @@ def execute_queue_open(request, queue, queue_name):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
-        q = Queue(queue=queue_name)
+        q = Queue(queue_name)
         q.open()
         if request.is_ajax():
             queue.put(
@@ -363,7 +363,7 @@ def queue_inactivate(request, queue_name):
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
-        queue = Queue(queue=queue_name)
+        queue = Queue(queue_name)
         return render(request, 'openlavaweb/queue_inactivate_confirm.html', {"object": queue})
 
 
@@ -371,7 +371,7 @@ def execute_queue_inactivate(request, queue, queue_name):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
-        q = Queue(queue=queue_name)
+        q = Queue(queue_name)
         q.inactivate()
         if request.is_ajax():
             queue.put(
@@ -407,7 +407,7 @@ def queue_activate(request, queue_name):
             else:
                 return render(request, 'openlavaweb/exception.html', {'exception': e})
     else:
-        queue = Queue(queue=queue_name)
+        queue = Queue(queue_name)
         return render(request, 'openlavaweb/queue_activate_confirm.html', {"object": queue})
 
 
@@ -415,7 +415,7 @@ def execute_queue_activate(request, queue, queue_name):
     try:
         user_id = pwd.getpwnam(request.user.username).pw_uid
         os.setuid(user_id)
-        q = Queue(queue=queue_name)
+        q = Queue(queue_name)
         q.activate()
         if request.is_ajax():
             queue.put(
@@ -1516,11 +1516,12 @@ def job_error(request, job_id, array_index=0):
         if q.empty():
             path = None
         else:
-            path = q.get(False) + ".err"
+            path = q.get(False)
 
         if isinstance(path, Exception):
             raise path
 
+        path += ".err"
         if path and os.path.exists(path):
             f = open(path, 'r')
             return HttpResponse(f, mimetype="text/plain")
@@ -1561,10 +1562,11 @@ def job_output(request, job_id, array_index=0):
         if q.empty():
             path = None
         else:
-            path = q.get(False) + ".out"
+            path = q.get(False)
 
         if isinstance(path, Exception):
             raise path
+        path += ".out"
         if path and os.path.exists(path):
             f = open(path, 'r')
             return HttpResponse(f, mimetype="text/plain")
