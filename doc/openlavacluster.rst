@@ -1,5 +1,5 @@
-Cluster API
-===========
+Openlava Cluster API
+====================
 
 The Cluster API defines the standard API used to interface with the local scheduling system, this is designed to be
 independent of the scheduling environment, currently a reference implementation exists for Openlava only.
@@ -16,7 +16,7 @@ Process Classes
 
 Process classes represent individual processes that are executing on a given host.
 
-.. autoclass:: cluster.Process
+.. autoclass:: openlavaweb.cluster.Process
     :members:
 
 Resource Limit Classes
@@ -24,7 +24,7 @@ Resource Limit Classes
 
 Resource limits classes define resource limits that are imposed on a given job.
 
-.. autoclass:: cluster.ResourceLimit
+.. autoclass:: openlavaweb.cluster.ResourceLimit
     :members:
 
 Consumed Resources
@@ -32,13 +32,13 @@ Consumed Resources
 
 Consumed resources represent resources that have been consumed by a given job.
 
-.. autoclass:: cluster.ConsumedResource
+.. autoclass:: openlavaweb.cluster.ConsumedResource
     :members:
 
 Cluster Resources
 -----------------
 
-.. autoclass:: cluster.openlavacluster.Resource
+.. autoclass:: openlavaweb.cluster.openlavacluster.Resource
     :members:
     :inherited-members:
 
@@ -49,10 +49,10 @@ Job classes are used to get information about, and manipulate jobs on the schedu
 remote client, or javascript implements the same interface, albeit with slightly different arguments where required.
 
 The local Job class uses openlava.lsblib to communicate with the Openlava Job Scheduler.  The current host must be
-part of an openlava cluster, although it does not need to be a job server.  cluster.openlavacluster.Job implements the
+part of an openlava cluster, although it does not need to be a job server.  openlavaweb.cluster.openlavacluster.Job implements the
 cluster.JobBase interface.
 
-.. autoclass:: cluster.openlavacluster.Job
+.. autoclass:: openlavaweb.cluster.openlavacluster.Job
     :members:
 
 Job Status
@@ -60,7 +60,7 @@ Job Status
 
 Job Status classes are used to define the current status of a job.
 
-.. autoclass:: cluster.openlavacluster.JobStatus
+.. autoclass:: openlavaweb.cluster.openlavacluster.JobStatus
     :members:
     :inherited-members:
 
@@ -69,11 +69,11 @@ Job Options
 
 Job Option classes define options that were specified for a job.
 
-.. autoclass:: cluster.openlavacluster.SubmitOption
+.. autoclass:: openlavaweb.cluster.openlavacluster.SubmitOption
     :members:
     :inherited-members:
 
-.. autoclass:: cluster.openlavacluster.Submit2Option
+.. autoclass:: openlavaweb.cluster.openlavacluster.Submit2Option
     :members:
     :inherited-members:
 
@@ -84,10 +84,10 @@ Host classes are used to get information about and manipulate hosts on the clust
 Host() class, however when associated with a Job() they may be through ExecutionHost classes which also contain
 information on the number of slots that are allocated to the job.
 
-.. autoclass:: cluster.openlavacluster.Host
+.. autoclass:: openlavaweb.cluster.openlavacluster.Host
     :members:
 
-.. autoclass:: cluster.openlavacluster.ExecutionHost
+.. autoclass:: openlavaweb.cluster.openlavacluster.ExecutionHost
     :members:
     :inherited-members:
 
@@ -96,7 +96,7 @@ Host Statuses
 
 Host Statuses define the status of an individual host.
 
-.. autoclass:: cluster.openlavacluster.HostStatus
+.. autoclass:: openlavaweb.cluster.openlavacluster.HostStatus
     :members:
     :inherited-members:
 
@@ -105,25 +105,25 @@ Queue Classes
 
 Queue classes represent individual queues that are configured as part of the cluster.
 
-.. autoclass:: cluster.openlavacluster.Queue
+.. autoclass:: openlavaweb.cluster.openlavacluster.Queue
     :members:
 
 Queue Statuses
 ^^^^^^^^^^^^^^
 
-.. autoclass:: cluster.openlavacluster.QueueStatus
+.. autoclass:: openlavaweb.cluster.openlavacluster.QueueStatus
 
 Queue Attributes
 ^^^^^^^^^^^^^^^^
 
-.. autoclass:: cluster.openlavacluster.QueueAttribute
+.. autoclass:: openlavaweb.cluster.openlavacluster.QueueAttribute
 
 user Classes
 ------------
 
 User classes represent individual users that are part of the cluster configuration.
 
-.. autoclass:: cluster.openlavacluster.User
+.. autoclass:: openlavaweb.cluster.openlavacluster.User
     :members:
 
 Exceptions
@@ -131,30 +131,29 @@ Exceptions
 
 The following exceptions are defined when using the Local interface.
 
-.. autoclass:: cluster.ClusterException
+.. autoclass:: openlavaweb.cluster.ClusterException
     :members:
 
-.. autoclass:: cluster.NoSuchHostError
+.. autoclass:: openlavaweb.cluster.NoSuchHostError
     :members:
 
-.. autoclass:: cluster.NoSuchJobError
+.. autoclass:: openlavaweb.cluster.NoSuchJobError
     :members:
 
-.. autoclass:: cluster.NoSuchQueueError
+.. autoclass:: openlavaweb.cluster.NoSuchQueueError
     :members:
 
-.. autoclass:: cluster.NoSuchUserError
+.. autoclass:: openlavaweb.cluster.NoSuchUserError
     :members:
 
-.. autoclass:: cluster.ResourceDoesntExistError
+.. autoclass:: openlavaweb.cluster.ResourceDoesntExistError
     :members:
 
-.. autoclass:: cluster.ClusterInterfaceError
+.. autoclass:: openlavaweb.cluster.ClusterInterfaceError
     :members:
 
-.. autoclass:: cluster.PermissionDeniedError
+.. autoclass:: openlavaweb.cluster.PermissionDeniedError
     :members:
 
-.. autoclass:: cluster.JobSubmitError
+.. autoclass:: openlavaweb.cluster.JobSubmitError
     :members:
-

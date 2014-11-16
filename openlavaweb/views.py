@@ -1700,7 +1700,7 @@ def execute_job_suspend(request, queue, job_id, array_index):
         os.setuid(user_id)
         job = Job(job_id=job_id, array_index=array_index)
         job.suspend()
-        if request.is_ajax():
+        if request.is_ajax() or request.GET.get("json", None):
             queue.put(create_js_response(message="Job suspended"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
@@ -1764,7 +1764,7 @@ def execute_job_resume(request, queue, job_id, array_index):
         os.setuid(user_id)
         job = Job(job_id=job_id, array_index=array_index)
         job.resume()
-        if request.is_ajax():
+        if request.is_ajax() or request.GET.get("json", None):
             queue.put(create_js_response(message="Job Resumed"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
@@ -1834,7 +1834,7 @@ def execute_job_requeue(request, queue, job_id, array_index, hold):
         os.setuid(user_id)
         job = Job(job_id=job_id, array_index=array_index)
         job.requeue(hold=hold)
-        if request.is_ajax():
+        if request.is_ajax() or request.GET.get("json", None):
             queue.put(create_js_response(message="Job Requeued"))
         else:
             queue.put(HttpResponseRedirect(reverse("olw_job_view_array", args=[job_id, array_index])))
