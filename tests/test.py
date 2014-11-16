@@ -44,61 +44,130 @@ class Cargs(object):
 class TestCLIScripts(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
-                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+                         and os.environ.get("OLWEB_PASSWORD", None)
+                         and os.environ.get("OLWCLIENT_PATH", None), "OLWEB not defined")
     def check_bhosts(self):
-        cmd = [
-            'badmin.py',
-            '--username',
-            os.environ.get("OLWEB_USERNAME", None),
-            '--password',
-            os.environ.get("OLWEB_PASSWORD", None),
-            os.environ.get("OLWEB_URL", None),
-        ]
         hosts = Host.get_host_list()
-        for mod in [[], ['-w']]:
+        for mod in [None, '-w']:
+            cmd = [
+                os.path.join(os.environ.get("OLWCLIENT_PATH", None), 'bhosts.py'),
+                '--username',
+                os.environ.get("OLWEB_USERNAME", None),
+                '--password',
+                os.environ.get("OLWEB_PASSWORD", None),
+            ]
+            if mod:
+                cmd.append(mod)
 
-            output = subprocess.check_output(cmd + mod)
+            cmd.append(
+                os.environ.get("OLWEB_URL", None)
+            )
 
+            output = subprocess.check_output(cmd)
             self.assertEqual(len(output.splitlines())-1, len(hosts))
 
             for host in hosts:
-                output = subprocess.check_output(cmd + mod + [host.name])
+                try:
+                    output = subprocess.check_output(cmd + [host.name])
+                except subprocess.CalledProcessError:
+                    print " ".join(cmd, [host.name])
+                    raise
+                self.assertGreater(len(output.splitlines()), 1)
+                if mod == "-l":
+                    continue
                 self.assertEqual(len(output.splitlines()), 2)
                 self.assertEqual(output.splitlines()[1].split()[0], host.name)
 
-        output = subprocess.check_output(cmd + ["-l"])
-        self.assertGreater(len(output), 0)
-
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
-                         and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
+                         and os.environ.get("OLWEB_PASSWORD", None)
+                         and os.environ.get("OLWCLIENT_PATH", None), "OLWEB not defined")
     def check_bjobs(self):
-        cmd = [
-            'bjobs.py',
-            '--username',
-            os.environ.get("OLWEB_USERNAME", None),
-            '--password',
-            os.environ.get("OLWEB_PASSWORD", None),
-            os.environ.get("OLWEB_URL", None),
-        ]
-        jobs = Host.get_host_list()
+        jobs = Job.get_job_list()
         for mod in [[], ['-w']]:
+            cmd = [
+                os.path.join(os.environ.get("OLWCLIENT_PATH", None), 'bjobs.py'),
+                '--username',
+                os.environ.get("OLWEB_USERNAME", None),
+                '--password',
+                os.environ.get("OLWEB_PASSWORD", None),
+            ]
+            if mod:
+                cmd.append(mod)
 
-            output = subprocess.check_output(cmd + mod)
+            cmd.append(
+                os.environ.get("OLWEB_URL", None)
+            )
+            try:
+                output = subprocess.check_output(cmd)
+            except subprocess.CalledProcessError:
+                    print " ".join(cmd)
+                    raise
 
-            self.assertEqual(len(output.splitlines())-1, len(jobs))
+            if mod not in ['-l']:
+                print " ".join(cmd)
+                self.assertEqual(len(output.splitlines())-1, len(jobs))
 
             for job in jobs:
                 job_str = str(job.job_id)
                 if job.array_index > 0:
                     job_str += "[%s]" % job.array_index
 
-                output = subprocess.check_output(cmd + mod + [job_str])
-                self.assertEqual(len(output.splitlines()), 2)
-                self.assertEqual(output.splitlines()[1].split()[0], str(job.job_id))
+                try:
+                    output = subprocess.check_output(cmd + [job_str])
+                except subprocess.CalledProcessError:
+                    print " ".join(cmd + [job_str])
+                    raise
 
-        output = subprocess.check_output(cmd + ["-l"])
-        self.assertGreater(len(output), 0)
+                self.assertGreater(len(output), 0)
+                if mod not in ['-l']:
+                    self.assertEqual(len(output.splitlines()), 2)
+                    if job.array_index == 0:
+                        self.assertEqual(str(job.job_id), output.splitlines()[1].split()[0])
+
+
+
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None)
+                         and os.environ.get("OLWCLIENT_PATH", None), "OLWEB not defined")
+    def check_bqueues(self):
+        queues = Queue.get_queue_list()
+        for mod in [[], ['-w']]:
+            cmd = [
+                os.path.join(os.environ.get("OLWCLIENT_PATH", None), 'bqueues.py'),
+                '--username',
+                os.environ.get("OLWEB_USERNAME", None),
+                '--password',
+                os.environ.get("OLWEB_PASSWORD", None),
+            ]
+            if mod:
+                cmd.append(mod)
+
+            cmd.append(
+                os.environ.get("OLWEB_URL", None)
+            )
+            try:
+                output = subprocess.check_output(cmd)
+            except subprocess.CalledProcessError:
+                    print " ".join(cmd)
+                    raise
+
+            if mod not in ['-l']:
+                print " ".join(cmd)
+                self.assertEqual(len(output.splitlines())-1, len(queues))
+
+            for queue in queues:
+                try:
+                    output = subprocess.check_output(cmd + [queue.name])
+                except subprocess.CalledProcessError:
+                    print " ".join(cmd + [queue.name])
+                    raise
+
+                self.assertGreater(len(output), 0)
+                if mod not in ['-l']:
+                    self.assertEqual(len(output.splitlines()), 2)
+                    self.assertEqual(output.splitlines()[1].split()[0], queue.name)
 
 
 class CompareWebLocal(unittest.TestCase):
@@ -817,4 +886,3 @@ class TestJob(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

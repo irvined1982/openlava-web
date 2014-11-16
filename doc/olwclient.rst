@@ -25,7 +25,7 @@ Cluster Resources
 
 Cluster Resource classes define resources that are available on the cluster for consumption by jobs.
 
-.. autoclass:: cluster.openlavacluster.Resource
+.. autoclass:: olwclient.Resource
     :members:
     :inherited-members:
     :noindex:
