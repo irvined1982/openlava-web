@@ -1520,9 +1520,10 @@ def job_error(request, job_id, array_index=0):
 
         if isinstance(path, Exception):
             raise path
-
-        path += ".err"
+        if path:
+            path += ".err"
         if path and os.path.exists(path):
+
             f = open(path, 'r')
             return HttpResponse(f, mimetype="text/plain")
         else:
@@ -1566,7 +1567,9 @@ def job_output(request, job_id, array_index=0):
 
         if isinstance(path, Exception):
             raise path
-        path += ".out"
+
+        if path:
+            path += ".out"
         if path and os.path.exists(path):
             f = open(path, 'r')
             return HttpResponse(f, mimetype="text/plain")
