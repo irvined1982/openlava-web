@@ -2,6 +2,11 @@ ReSTful Web Interface
 =====================
 
 Both the javascript library, and the olwclient library use the following ReSTful interface.
+There is no reason however, that this can not be used by other libraries or end users directly.
+
+Whenever a client passes the query parameter json (with a value) or uses an ajax call or accepts
+application/json content types, the response will be as follows.  All responses with the exception
+of job output (which return plain text.) use a standard response format as described below.
 
 .. contents::
 
