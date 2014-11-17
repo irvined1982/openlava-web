@@ -113,823 +113,824 @@ Host List
     Example::
 
         {
-        "data": [
-            {
-                "admins": [
-                    "openlava"
-                ],
-                "cluster_type": "openlava",
-                "cpu_factor": 100.0,
-                "description": "",
-                "has_checkpoint_support": true,
-                "has_kernel_checkpoint_copy": false,
-                "host_model": "IntelI5",
-                "host_name": "master",
-                "host_type": "linux",
-                "is_busy": false,
-                "is_closed": false,
-                "is_down": false,
-                "is_server": true,
-                "jobs": [],
-                "load_information": {
-                    "names": [
-                        "15s Load",
-                        "1m Load",
-                        "15m Load",
-                        "Avg CPU Utilization",
-                        "Paging Rate (Pages/Sec)",
-                        "Disk IO Rate (MB/Sec)",
-                        "Num Users",
-                        "Idle Time",
-                        "Tmp Space (MB)",
-                        "Free Swap (MB)",
-                        "Free Memory (MB)"
+            "data": [
+                {
+                    "admins": [
+                        "openlava"
                     ],
-                    "short_names": [
-                        "r15s",
-                        "r1m",
-                        "r15m",
-                        "ut",
-                        "pg",
-                        "io",
-                        "ls",
-                        "it",
-                        "tmp",
-                        "swp",
-                        "mem"
-                    ],
-                    "values": [
-                        {
-                            "name": "Actual Load",
-                            "values": [
-                                0.0,
-                                0.009999990463256836,
-                                0.04999995231628418,
-                                0.0,
-                                0.0,
-                                0.0,
-                                3.0,
-                                12.0,
-                                53895.0,
-                                509.48046875,
-                                578.59765625
-                            ]
-                        },
-                        {
-                            "name": "Stop Dispatching Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        },
-                        {
-                            "name": "Stop Executing Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        }
-                    ]
-                },
-                "max_jobs": 2,
-                "max_processors": 1,
-                "max_ram": 992,
-                "max_slots": 2,
-                "max_slots_per_user": 2147483647,
-                "max_swap": 509,
-                "max_tmp": 64002,
-                "name": "master",
-                "num_disks": 0,
-                "num_reserved_slots": 0,
-                "num_running_jobs": 0,
-                "num_running_slots": 0,
-                "num_suspended_jobs": 0,
-                "num_suspended_slots": 0,
-                "num_system_suspended_jobs": 0,
-                "num_system_suspended_slots": 0,
-                "num_user_suspended_jobs": 0,
-                "num_user_suspended_slots": 0,
-                "resources": [
-                    {
-                        "description": "Foo Variable",
-                        "flags": 4,
-                        "interval": 0.0,
-                        "name": "foo",
-                        "order": "NA",
-                        "type": "Boolean"
-                    }
-                ],
-                "run_windows": "-",
-                "statuses": [
-                    {
-                        "description": "Ready to accept and run jobs.  ",
-                        "friendly": "Ok",
-                        "name": "HOST_STAT_OK",
-                        "status": 0,
-                        "type": "HostStatus"
-                    }
-                ],
-                "total_jobs": 0,
-                "total_slots": 0,
-                "type": "Host"
-            },
-            {
-                "admins": [
-                    "openlava"
-                ],
-                "cluster_type": "openlava",
-                "cpu_factor": 100.0,
-                "description": "",
-                "has_checkpoint_support": true,
-                "has_kernel_checkpoint_copy": false,
-                "host_model": "IntelI5",
-                "host_name": "comp00",
-                "host_type": "linux",
-                "is_busy": false,
-                "is_closed": false,
-                "is_down": true,
-                "is_server": true,
-                "jobs": [],
-                "load_information": {
-                    "names": [
-                        "15s Load",
-                        "1m Load",
-                        "15m Load",
-                        "Avg CPU Utilization",
-                        "Paging Rate (Pages/Sec)",
-                        "Disk IO Rate (MB/Sec)",
-                        "Num Users",
-                        "Idle Time",
-                        "Tmp Space (MB)",
-                        "Free Swap (MB)",
-                        "Free Memory (MB)"
-                    ],
-                    "short_names": [
-                        "r15s",
-                        "r1m",
-                        "r15m",
-                        "ut",
-                        "pg",
-                        "io",
-                        "ls",
-                        "it",
-                        "tmp",
-                        "swp",
-                        "mem"
-                    ],
-                    "values": [
-                        {
-                            "name": "Actual Load",
-                            "values": [
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0
-                            ]
-                        },
-                        {
-                            "name": "Stop Dispatching Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        },
-                        {
-                            "name": "Stop Executing Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        }
-                    ]
-                },
-                "max_jobs": 1,
-                "max_processors": 0,
-                "max_ram": 0,
-                "max_slots": 1,
-                "max_slots_per_user": 2147483647,
-                "max_swap": 0,
-                "max_tmp": 0,
-                "name": "comp00",
-                "num_disks": 0,
-                "num_reserved_slots": 0,
-                "num_running_jobs": 0,
-                "num_running_slots": 0,
-                "num_suspended_jobs": 0,
-                "num_suspended_slots": 0,
-                "num_system_suspended_jobs": 0,
-                "num_system_suspended_slots": 0,
-                "num_user_suspended_jobs": 0,
-                "num_user_suspended_slots": 0,
-                "resources": [],
-                "run_windows": "-",
-                "statuses": [
-                    {
-                        "description": "Ready to accept and run jobs.  ",
-                        "friendly": "Ok",
-                        "name": "HOST_STAT_OK",
-                        "status": 0,
-                        "type": "HostStatus"
+                    "cluster_type": "openlava",
+                    "cpu_factor": 100.0,
+                    "description": "",
+                    "has_checkpoint_support": true,
+                    "has_kernel_checkpoint_copy": false,
+                    "host_model": "IntelI5",
+                    "host_name": "master",
+                    "host_type": "linux",
+                    "is_busy": false,
+                    "is_closed": false,
+                    "is_down": false,
+                    "is_server": true,
+                    "jobs": [],
+                    "load_information": {
+                        "names": [
+                            "15s Load",
+                            "1m Load",
+                            "15m Load",
+                            "Avg CPU Utilization",
+                            "Paging Rate (Pages/Sec)",
+                            "Disk IO Rate (MB/Sec)",
+                            "Num Users",
+                            "Idle Time",
+                            "Tmp Space (MB)",
+                            "Free Swap (MB)",
+                            "Free Memory (MB)"
+                        ],
+                        "short_names": [
+                            "r15s",
+                            "r1m",
+                            "r15m",
+                            "ut",
+                            "pg",
+                            "io",
+                            "ls",
+                            "it",
+                            "tmp",
+                            "swp",
+                            "mem"
+                        ],
+                        "values": [
+                            {
+                                "name": "Actual Load",
+                                "values": [
+                                    0.0,
+                                    0.009999990463256836,
+                                    0.04999995231628418,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    3.0,
+                                    12.0,
+                                    53895.0,
+                                    509.48046875,
+                                    578.59765625
+                                ]
+                            },
+                            {
+                                "name": "Stop Dispatching Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            },
+                            {
+                                "name": "Stop Executing Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        "description": "The LIM and sbatchd on this host are unavailable.  ",
-                        "friendly": "Unavailable",
-                        "name": "HOST_STAT_UNAVAIL",
-                        "status": 64,
-                        "type": "HostStatus"
-                    }
-                ],
-                "total_jobs": 0,
-                "total_slots": 0,
-                "type": "Host"
-            },
-            {
-                "admins": [
-                    "openlava"
-                ],
-                "cluster_type": "openlava",
-                "cpu_factor": 100.0,
-                "description": "",
-                "has_checkpoint_support": true,
-                "has_kernel_checkpoint_copy": false,
-                "host_model": "IntelI5",
-                "host_name": "comp01",
-                "host_type": "linux",
-                "is_busy": false,
-                "is_closed": false,
-                "is_down": true,
-                "is_server": true,
-                "jobs": [],
-                "load_information": {
-                    "names": [
-                        "15s Load",
-                        "1m Load",
-                        "15m Load",
-                        "Avg CPU Utilization",
-                        "Paging Rate (Pages/Sec)",
-                        "Disk IO Rate (MB/Sec)",
-                        "Num Users",
-                        "Idle Time",
-                        "Tmp Space (MB)",
-                        "Free Swap (MB)",
-                        "Free Memory (MB)"
-                    ],
-                    "short_names": [
-                        "r15s",
-                        "r1m",
-                        "r15m",
-                        "ut",
-                        "pg",
-                        "io",
-                        "ls",
-                        "it",
-                        "tmp",
-                        "swp",
-                        "mem"
-                    ],
-                    "values": [
+                    "max_jobs": 2,
+                    "max_processors": 1,
+                    "max_ram": 992,
+                    "max_slots": 2,
+                    "max_slots_per_user": 2147483647,
+                    "max_swap": 509,
+                    "max_tmp": 64002,
+                    "name": "master",
+                    "num_disks": 0,
+                    "num_reserved_slots": 0,
+                    "num_running_jobs": 0,
+                    "num_running_slots": 0,
+                    "num_suspended_jobs": 0,
+                    "num_suspended_slots": 0,
+                    "num_system_suspended_jobs": 0,
+                    "num_system_suspended_slots": 0,
+                    "num_user_suspended_jobs": 0,
+                    "num_user_suspended_slots": 0,
+                    "resources": [
                         {
-                            "name": "Actual Load",
-                            "values": [
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0
-                            ]
-                        },
-                        {
-                            "name": "Stop Dispatching Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        },
-                        {
-                            "name": "Stop Executing Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
+                            "description": "Foo Variable",
+                            "flags": 4,
+                            "interval": 0.0,
+                            "name": "foo",
+                            "order": "NA",
+                            "type": "Boolean"
                         }
-                    ]
-                },
-                "max_jobs": 1,
-                "max_processors": 0,
-                "max_ram": 0,
-                "max_slots": 1,
-                "max_slots_per_user": 2147483647,
-                "max_swap": 0,
-                "max_tmp": 0,
-                "name": "comp01",
-                "num_disks": 0,
-                "num_reserved_slots": 0,
-                "num_running_jobs": 0,
-                "num_running_slots": 0,
-                "num_suspended_jobs": 0,
-                "num_suspended_slots": 0,
-                "num_system_suspended_jobs": 0,
-                "num_system_suspended_slots": 0,
-                "num_user_suspended_jobs": 0,
-                "num_user_suspended_slots": 0,
-                "resources": [],
-                "run_windows": "-",
-                "statuses": [
-                    {
-                        "description": "Ready to accept and run jobs.  ",
-                        "friendly": "Ok",
-                        "name": "HOST_STAT_OK",
-                        "status": 0,
-                        "type": "HostStatus"
-                    },
-                    {
-                        "description": "The LIM and sbatchd on this host are unavailable.  ",
-                        "friendly": "Unavailable",
-                        "name": "HOST_STAT_UNAVAIL",
-                        "status": 64,
-                        "type": "HostStatus"
-                    }
-                ],
-                "total_jobs": 0,
-                "total_slots": 0,
-                "type": "Host"
-            },
-            {
-                "admins": [
-                    "openlava"
-                ],
-                "cluster_type": "openlava",
-                "cpu_factor": 100.0,
-                "description": "",
-                "has_checkpoint_support": true,
-                "has_kernel_checkpoint_copy": false,
-                "host_model": "IntelI5",
-                "host_name": "comp02",
-                "host_type": "linux",
-                "is_busy": false,
-                "is_closed": false,
-                "is_down": true,
-                "is_server": true,
-                "jobs": [],
-                "load_information": {
-                    "names": [
-                        "15s Load",
-                        "1m Load",
-                        "15m Load",
-                        "Avg CPU Utilization",
-                        "Paging Rate (Pages/Sec)",
-                        "Disk IO Rate (MB/Sec)",
-                        "Num Users",
-                        "Idle Time",
-                        "Tmp Space (MB)",
-                        "Free Swap (MB)",
-                        "Free Memory (MB)"
                     ],
-                    "short_names": [
-                        "r15s",
-                        "r1m",
-                        "r15m",
-                        "ut",
-                        "pg",
-                        "io",
-                        "ls",
-                        "it",
-                        "tmp",
-                        "swp",
-                        "mem"
-                    ],
-                    "values": [
+                    "run_windows": "-",
+                    "statuses": [
                         {
-                            "name": "Actual Load",
-                            "values": [
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0
-                            ]
-                        },
-                        {
-                            "name": "Stop Dispatching Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        },
-                        {
-                            "name": "Stop Executing Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
+                            "description": "Ready to accept and run jobs.  ",
+                            "friendly": "Ok",
+                            "name": "HOST_STAT_OK",
+                            "status": 0,
+                            "type": "HostStatus"
                         }
-                    ]
+                    ],
+                    "total_jobs": 0,
+                    "total_slots": 0,
+                    "type": "Host"
                 },
-                "max_jobs": 1,
-                "max_processors": 0,
-                "max_ram": 0,
-                "max_slots": 1,
-                "max_slots_per_user": 2147483647,
-                "max_swap": 0,
-                "max_tmp": 0,
-                "name": "comp02",
-                "num_disks": 0,
-                "num_reserved_slots": 0,
-                "num_running_jobs": 0,
-                "num_running_slots": 0,
-                "num_suspended_jobs": 0,
-                "num_suspended_slots": 0,
-                "num_system_suspended_jobs": 0,
-                "num_system_suspended_slots": 0,
-                "num_user_suspended_jobs": 0,
-                "num_user_suspended_slots": 0,
-                "resources": [],
-                "run_windows": "-",
-                "statuses": [
-                    {
-                        "description": "Ready to accept and run jobs.  ",
-                        "friendly": "Ok",
-                        "name": "HOST_STAT_OK",
-                        "status": 0,
-                        "type": "HostStatus"
+                {
+                    "admins": [
+                        "openlava"
+                    ],
+                    "cluster_type": "openlava",
+                    "cpu_factor": 100.0,
+                    "description": "",
+                    "has_checkpoint_support": true,
+                    "has_kernel_checkpoint_copy": false,
+                    "host_model": "IntelI5",
+                    "host_name": "comp00",
+                    "host_type": "linux",
+                    "is_busy": false,
+                    "is_closed": false,
+                    "is_down": true,
+                    "is_server": true,
+                    "jobs": [],
+                    "load_information": {
+                        "names": [
+                            "15s Load",
+                            "1m Load",
+                            "15m Load",
+                            "Avg CPU Utilization",
+                            "Paging Rate (Pages/Sec)",
+                            "Disk IO Rate (MB/Sec)",
+                            "Num Users",
+                            "Idle Time",
+                            "Tmp Space (MB)",
+                            "Free Swap (MB)",
+                            "Free Memory (MB)"
+                        ],
+                        "short_names": [
+                            "r15s",
+                            "r1m",
+                            "r15m",
+                            "ut",
+                            "pg",
+                            "io",
+                            "ls",
+                            "it",
+                            "tmp",
+                            "swp",
+                            "mem"
+                        ],
+                        "values": [
+                            {
+                                "name": "Actual Load",
+                                "values": [
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0
+                                ]
+                            },
+                            {
+                                "name": "Stop Dispatching Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            },
+                            {
+                                "name": "Stop Executing Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        "description": "The LIM and sbatchd on this host are unavailable.  ",
-                        "friendly": "Unavailable",
-                        "name": "HOST_STAT_UNAVAIL",
-                        "status": 64,
-                        "type": "HostStatus"
-                    }
-                ],
-                "total_jobs": 0,
-                "total_slots": 0,
-                "type": "Host"
-            },
-            {
-                "admins": [
-                    "openlava"
-                ],
-                "cluster_type": "openlava",
-                "cpu_factor": 100.0,
-                "description": "",
-                "has_checkpoint_support": true,
-                "has_kernel_checkpoint_copy": false,
-                "host_model": "IntelI5",
-                "host_name": "comp03",
-                "host_type": "linux",
-                "is_busy": false,
-                "is_closed": false,
-                "is_down": true,
-                "is_server": true,
-                "jobs": [],
-                "load_information": {
-                    "names": [
-                        "15s Load",
-                        "1m Load",
-                        "15m Load",
-                        "Avg CPU Utilization",
-                        "Paging Rate (Pages/Sec)",
-                        "Disk IO Rate (MB/Sec)",
-                        "Num Users",
-                        "Idle Time",
-                        "Tmp Space (MB)",
-                        "Free Swap (MB)",
-                        "Free Memory (MB)"
-                    ],
-                    "short_names": [
-                        "r15s",
-                        "r1m",
-                        "r15m",
-                        "ut",
-                        "pg",
-                        "io",
-                        "ls",
-                        "it",
-                        "tmp",
-                        "swp",
-                        "mem"
-                    ],
-                    "values": [
+                    "max_jobs": 1,
+                    "max_processors": 0,
+                    "max_ram": 0,
+                    "max_slots": 1,
+                    "max_slots_per_user": 2147483647,
+                    "max_swap": 0,
+                    "max_tmp": 0,
+                    "name": "comp00",
+                    "num_disks": 0,
+                    "num_reserved_slots": 0,
+                    "num_running_jobs": 0,
+                    "num_running_slots": 0,
+                    "num_suspended_jobs": 0,
+                    "num_suspended_slots": 0,
+                    "num_system_suspended_jobs": 0,
+                    "num_system_suspended_slots": 0,
+                    "num_user_suspended_jobs": 0,
+                    "num_user_suspended_slots": 0,
+                    "resources": [],
+                    "run_windows": "-",
+                    "statuses": [
                         {
-                            "name": "Actual Load",
-                            "values": [
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0
-                            ]
+                            "description": "Ready to accept and run jobs.  ",
+                            "friendly": "Ok",
+                            "name": "HOST_STAT_OK",
+                            "status": 0,
+                            "type": "HostStatus"
                         },
                         {
-                            "name": "Stop Dispatching Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        },
-                        {
-                            "name": "Stop Executing Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
+                            "description": "The LIM and sbatchd on this host are unavailable.  ",
+                            "friendly": "Unavailable",
+                            "name": "HOST_STAT_UNAVAIL",
+                            "status": 64,
+                            "type": "HostStatus"
                         }
-                    ]
+                    ],
+                    "total_jobs": 0,
+                    "total_slots": 0,
+                    "type": "Host"
                 },
-                "max_jobs": 1,
-                "max_processors": 0,
-                "max_ram": 0,
-                "max_slots": 1,
-                "max_slots_per_user": 2147483647,
-                "max_swap": 0,
-                "max_tmp": 0,
-                "name": "comp03",
-                "num_disks": 0,
-                "num_reserved_slots": 0,
-                "num_running_jobs": 0,
-                "num_running_slots": 0,
-                "num_suspended_jobs": 0,
-                "num_suspended_slots": 0,
-                "num_system_suspended_jobs": 0,
-                "num_system_suspended_slots": 0,
-                "num_user_suspended_jobs": 0,
-                "num_user_suspended_slots": 0,
-                "resources": [],
-                "run_windows": "-",
-                "statuses": [
-                    {
-                        "description": "Ready to accept and run jobs.  ",
-                        "friendly": "Ok",
-                        "name": "HOST_STAT_OK",
-                        "status": 0,
-                        "type": "HostStatus"
+                {
+                    "admins": [
+                        "openlava"
+                    ],
+                    "cluster_type": "openlava",
+                    "cpu_factor": 100.0,
+                    "description": "",
+                    "has_checkpoint_support": true,
+                    "has_kernel_checkpoint_copy": false,
+                    "host_model": "IntelI5",
+                    "host_name": "comp01",
+                    "host_type": "linux",
+                    "is_busy": false,
+                    "is_closed": false,
+                    "is_down": true,
+                    "is_server": true,
+                    "jobs": [],
+                    "load_information": {
+                        "names": [
+                            "15s Load",
+                            "1m Load",
+                            "15m Load",
+                            "Avg CPU Utilization",
+                            "Paging Rate (Pages/Sec)",
+                            "Disk IO Rate (MB/Sec)",
+                            "Num Users",
+                            "Idle Time",
+                            "Tmp Space (MB)",
+                            "Free Swap (MB)",
+                            "Free Memory (MB)"
+                        ],
+                        "short_names": [
+                            "r15s",
+                            "r1m",
+                            "r15m",
+                            "ut",
+                            "pg",
+                            "io",
+                            "ls",
+                            "it",
+                            "tmp",
+                            "swp",
+                            "mem"
+                        ],
+                        "values": [
+                            {
+                                "name": "Actual Load",
+                                "values": [
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0
+                                ]
+                            },
+                            {
+                                "name": "Stop Dispatching Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            },
+                            {
+                                "name": "Stop Executing Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        "description": "The LIM and sbatchd on this host are unavailable.  ",
-                        "friendly": "Unavailable",
-                        "name": "HOST_STAT_UNAVAIL",
-                        "status": 64,
-                        "type": "HostStatus"
-                    }
-                ],
-                "total_jobs": 0,
-                "total_slots": 0,
-                "type": "Host"
-            },
-            {
-                "admins": [
-                    "openlava"
-                ],
-                "cluster_type": "openlava",
-                "cpu_factor": 100.0,
-                "description": "",
-                "has_checkpoint_support": true,
-                "has_kernel_checkpoint_copy": false,
-                "host_model": "IntelI5",
-                "host_name": "comp04",
-                "host_type": "linux",
-                "is_busy": false,
-                "is_closed": false,
-                "is_down": true,
-                "is_server": true,
-                "jobs": [],
-                "load_information": {
-                    "names": [
-                        "15s Load",
-                        "1m Load",
-                        "15m Load",
-                        "Avg CPU Utilization",
-                        "Paging Rate (Pages/Sec)",
-                        "Disk IO Rate (MB/Sec)",
-                        "Num Users",
-                        "Idle Time",
-                        "Tmp Space (MB)",
-                        "Free Swap (MB)",
-                        "Free Memory (MB)"
-                    ],
-                    "short_names": [
-                        "r15s",
-                        "r1m",
-                        "r15m",
-                        "ut",
-                        "pg",
-                        "io",
-                        "ls",
-                        "it",
-                        "tmp",
-                        "swp",
-                        "mem"
-                    ],
-                    "values": [
+                    "max_jobs": 1,
+                    "max_processors": 0,
+                    "max_ram": 0,
+                    "max_slots": 1,
+                    "max_slots_per_user": 2147483647,
+                    "max_swap": 0,
+                    "max_tmp": 0,
+                    "name": "comp01",
+                    "num_disks": 0,
+                    "num_reserved_slots": 0,
+                    "num_running_jobs": 0,
+                    "num_running_slots": 0,
+                    "num_suspended_jobs": 0,
+                    "num_suspended_slots": 0,
+                    "num_system_suspended_jobs": 0,
+                    "num_system_suspended_slots": 0,
+                    "num_user_suspended_jobs": 0,
+                    "num_user_suspended_slots": 0,
+                    "resources": [],
+                    "run_windows": "-",
+                    "statuses": [
                         {
-                            "name": "Actual Load",
-                            "values": [
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0,
-                                2147483648.0
-                            ]
+                            "description": "Ready to accept and run jobs.  ",
+                            "friendly": "Ok",
+                            "name": "HOST_STAT_OK",
+                            "status": 0,
+                            "type": "HostStatus"
                         },
                         {
-                            "name": "Stop Dispatching Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
-                        },
-                        {
-                            "name": "Stop Executing Load",
-                            "values": [
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1,
-                                -1
-                            ]
+                            "description": "The LIM and sbatchd on this host are unavailable.  ",
+                            "friendly": "Unavailable",
+                            "name": "HOST_STAT_UNAVAIL",
+                            "status": 64,
+                            "type": "HostStatus"
                         }
-                    ]
+                    ],
+                    "total_jobs": 0,
+                    "total_slots": 0,
+                    "type": "Host"
                 },
-                "max_jobs": 1,
-                "max_processors": 0,
-                "max_ram": 0,
-                "max_slots": 1,
-                "max_slots_per_user": 2147483647,
-                "max_swap": 0,
-                "max_tmp": 0,
-                "name": "comp04",
-                "num_disks": 0,
-                "num_reserved_slots": 0,
-                "num_running_jobs": 0,
-                "num_running_slots": 0,
-                "num_suspended_jobs": 0,
-                "num_suspended_slots": 0,
-                "num_system_suspended_jobs": 0,
-                "num_system_suspended_slots": 0,
-                "num_user_suspended_jobs": 0,
-                "num_user_suspended_slots": 0,
-                "resources": [],
-                "run_windows": "-",
-                "statuses": [
-                    {
-                        "description": "Ready to accept and run jobs.  ",
-                        "friendly": "Ok",
-                        "name": "HOST_STAT_OK",
-                        "status": 0,
-                        "type": "HostStatus"
+                {
+                    "admins": [
+                        "openlava"
+                    ],
+                    "cluster_type": "openlava",
+                    "cpu_factor": 100.0,
+                    "description": "",
+                    "has_checkpoint_support": true,
+                    "has_kernel_checkpoint_copy": false,
+                    "host_model": "IntelI5",
+                    "host_name": "comp02",
+                    "host_type": "linux",
+                    "is_busy": false,
+                    "is_closed": false,
+                    "is_down": true,
+                    "is_server": true,
+                    "jobs": [],
+                    "load_information": {
+                        "names": [
+                            "15s Load",
+                            "1m Load",
+                            "15m Load",
+                            "Avg CPU Utilization",
+                            "Paging Rate (Pages/Sec)",
+                            "Disk IO Rate (MB/Sec)",
+                            "Num Users",
+                            "Idle Time",
+                            "Tmp Space (MB)",
+                            "Free Swap (MB)",
+                            "Free Memory (MB)"
+                        ],
+                        "short_names": [
+                            "r15s",
+                            "r1m",
+                            "r15m",
+                            "ut",
+                            "pg",
+                            "io",
+                            "ls",
+                            "it",
+                            "tmp",
+                            "swp",
+                            "mem"
+                        ],
+                        "values": [
+                            {
+                                "name": "Actual Load",
+                                "values": [
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0
+                                ]
+                            },
+                            {
+                                "name": "Stop Dispatching Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            },
+                            {
+                                "name": "Stop Executing Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        "description": "The LIM and sbatchd on this host are unavailable.  ",
-                        "friendly": "Unavailable",
-                        "name": "HOST_STAT_UNAVAIL",
-                        "status": 64,
-                        "type": "HostStatus"
-                    }
-                ],
-                "total_jobs": 0,
-                "total_slots": 0,
-                "type": "Host"
-            }
-        ],
-        "message": "",
-        "status": "OK"
-    }
+                    "max_jobs": 1,
+                    "max_processors": 0,
+                    "max_ram": 0,
+                    "max_slots": 1,
+                    "max_slots_per_user": 2147483647,
+                    "max_swap": 0,
+                    "max_tmp": 0,
+                    "name": "comp02",
+                    "num_disks": 0,
+                    "num_reserved_slots": 0,
+                    "num_running_jobs": 0,
+                    "num_running_slots": 0,
+                    "num_suspended_jobs": 0,
+                    "num_suspended_slots": 0,
+                    "num_system_suspended_jobs": 0,
+                    "num_system_suspended_slots": 0,
+                    "num_user_suspended_jobs": 0,
+                    "num_user_suspended_slots": 0,
+                    "resources": [],
+                    "run_windows": "-",
+                    "statuses": [
+                        {
+                            "description": "Ready to accept and run jobs.  ",
+                            "friendly": "Ok",
+                            "name": "HOST_STAT_OK",
+                            "status": 0,
+                            "type": "HostStatus"
+                        },
+                        {
+                            "description": "The LIM and sbatchd on this host are unavailable.  ",
+                            "friendly": "Unavailable",
+                            "name": "HOST_STAT_UNAVAIL",
+                            "status": 64,
+                            "type": "HostStatus"
+                        }
+                    ],
+                    "total_jobs": 0,
+                    "total_slots": 0,
+                    "type": "Host"
+                },
+                {
+                    "admins": [
+                        "openlava"
+                    ],
+                    "cluster_type": "openlava",
+                    "cpu_factor": 100.0,
+                    "description": "",
+                    "has_checkpoint_support": true,
+                    "has_kernel_checkpoint_copy": false,
+                    "host_model": "IntelI5",
+                    "host_name": "comp03",
+                    "host_type": "linux",
+                    "is_busy": false,
+                    "is_closed": false,
+                    "is_down": true,
+                    "is_server": true,
+                    "jobs": [],
+                    "load_information": {
+                        "names": [
+                            "15s Load",
+                            "1m Load",
+                            "15m Load",
+                            "Avg CPU Utilization",
+                            "Paging Rate (Pages/Sec)",
+                            "Disk IO Rate (MB/Sec)",
+                            "Num Users",
+                            "Idle Time",
+                            "Tmp Space (MB)",
+                            "Free Swap (MB)",
+                            "Free Memory (MB)"
+                        ],
+                        "short_names": [
+                            "r15s",
+                            "r1m",
+                            "r15m",
+                            "ut",
+                            "pg",
+                            "io",
+                            "ls",
+                            "it",
+                            "tmp",
+                            "swp",
+                            "mem"
+                        ],
+                        "values": [
+                            {
+                                "name": "Actual Load",
+                                "values": [
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0
+                                ]
+                            },
+                            {
+                                "name": "Stop Dispatching Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            },
+                            {
+                                "name": "Stop Executing Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            }
+                        ]
+                    },
+                    "max_jobs": 1,
+                    "max_processors": 0,
+                    "max_ram": 0,
+                    "max_slots": 1,
+                    "max_slots_per_user": 2147483647,
+                    "max_swap": 0,
+                    "max_tmp": 0,
+                    "name": "comp03",
+                    "num_disks": 0,
+                    "num_reserved_slots": 0,
+                    "num_running_jobs": 0,
+                    "num_running_slots": 0,
+                    "num_suspended_jobs": 0,
+                    "num_suspended_slots": 0,
+                    "num_system_suspended_jobs": 0,
+                    "num_system_suspended_slots": 0,
+                    "num_user_suspended_jobs": 0,
+                    "num_user_suspended_slots": 0,
+                    "resources": [],
+                    "run_windows": "-",
+                    "statuses": [
+                        {
+                            "description": "Ready to accept and run jobs.  ",
+                            "friendly": "Ok",
+                            "name": "HOST_STAT_OK",
+                            "status": 0,
+                            "type": "HostStatus"
+                        },
+                        {
+                            "description": "The LIM and sbatchd on this host are unavailable.  ",
+                            "friendly": "Unavailable",
+                            "name": "HOST_STAT_UNAVAIL",
+                            "status": 64,
+                            "type": "HostStatus"
+                        }
+                    ],
+                    "total_jobs": 0,
+                    "total_slots": 0,
+                    "type": "Host"
+                },
+                {
+                    "admins": [
+                        "openlava"
+                    ],
+                    "cluster_type": "openlava",
+                    "cpu_factor": 100.0,
+                    "description": "",
+                    "has_checkpoint_support": true,
+                    "has_kernel_checkpoint_copy": false,
+                    "host_model": "IntelI5",
+                    "host_name": "comp04",
+                    "host_type": "linux",
+                    "is_busy": false,
+                    "is_closed": false,
+                    "is_down": true,
+                    "is_server": true,
+                    "jobs": [],
+                    "load_information": {
+                        "names": [
+                            "15s Load",
+                            "1m Load",
+                            "15m Load",
+                            "Avg CPU Utilization",
+                            "Paging Rate (Pages/Sec)",
+                            "Disk IO Rate (MB/Sec)",
+                            "Num Users",
+                            "Idle Time",
+                            "Tmp Space (MB)",
+                            "Free Swap (MB)",
+                            "Free Memory (MB)"
+                        ],
+                        "short_names": [
+                            "r15s",
+                            "r1m",
+                            "r15m",
+                            "ut",
+                            "pg",
+                            "io",
+                            "ls",
+                            "it",
+                            "tmp",
+                            "swp",
+                            "mem"
+                        ],
+                        "values": [
+                            {
+                                "name": "Actual Load",
+                                "values": [
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0,
+                                    2147483648.0
+                                ]
+                            },
+                            {
+                                "name": "Stop Dispatching Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            },
+                            {
+                                "name": "Stop Executing Load",
+                                "values": [
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1
+                                ]
+                            }
+                        ]
+                    },
+                    "max_jobs": 1,
+                    "max_processors": 0,
+                    "max_ram": 0,
+                    "max_slots": 1,
+                    "max_slots_per_user": 2147483647,
+                    "max_swap": 0,
+                    "max_tmp": 0,
+                    "name": "comp04",
+                    "num_disks": 0,
+                    "num_reserved_slots": 0,
+                    "num_running_jobs": 0,
+                    "num_running_slots": 0,
+                    "num_suspended_jobs": 0,
+                    "num_suspended_slots": 0,
+                    "num_system_suspended_jobs": 0,
+                    "num_system_suspended_slots": 0,
+                    "num_user_suspended_jobs": 0,
+                    "num_user_suspended_slots": 0,
+                    "resources": [],
+                    "run_windows": "-",
+                    "statuses": [
+                        {
+                            "description": "Ready to accept and run jobs.  ",
+                            "friendly": "Ok",
+                            "name": "HOST_STAT_OK",
+                            "status": 0,
+                            "type": "HostStatus"
+                        },
+                        {
+                            "description": "The LIM and sbatchd on this host are unavailable.  ",
+                            "friendly": "Unavailable",
+                            "name": "HOST_STAT_UNAVAIL",
+                            "status": 64,
+                            "type": "HostStatus"
+                        }
+                    ],
+                    "total_jobs": 0,
+                    "total_slots": 0,
+                    "type": "Host"
+                }
+            ],
+            "message": "",
+            "status": "OK"
+        }
+
 Getting information on a Host
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
