@@ -40,7 +40,7 @@ Contents
 
    screenshots
    installation
-   cluster
+   openlavacluster
    olwclient
    restful
    javascript
