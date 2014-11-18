@@ -1,6 +1,7 @@
 {% extends "openlavaweb/base.html" %}
 {% block content %}
-	<h1>Hosts</h1>
+	<!--suppress ALL -->
+    <h1>Hosts</h1>
 	{% include "openlavaweb/widgets/host_list.html" %}
         <ul class="pager">
 		{% if host_list.has_previous %}

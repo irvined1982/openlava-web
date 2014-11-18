@@ -89,7 +89,7 @@ Client Tools Installation
 =========================
 
 Download Openlava-Web
---------------------
+---------------------
 
 Use git to checkout `Openlava-Web <https://github.com/irvined1982/openlava-web>`_.::
 
@@ -103,3 +103,4 @@ Enter the client-tools directory and use setuptools to install the module.::
 
     $ cd client-tools
     $ sudo python setup.py install
+

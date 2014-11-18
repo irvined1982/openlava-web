@@ -208,6 +208,7 @@ olwclient.Job = function(data){
 
     for (var propName in data){
         if (propName == "submission_host" || propName == "execution_hosts"){
+            //Todo:: Sort submission host information if needed.
             continue;
         }else if (data.hasOwnProperty(propName))this[propName] = data[propName];
     }
@@ -239,8 +240,7 @@ olwclient.Job = function(data){
         console.log(error + ": " + message);
     });*/
 
-
-}
+};
 
 
 olwclient.Job.prototype.submit_time_datetime = function(){

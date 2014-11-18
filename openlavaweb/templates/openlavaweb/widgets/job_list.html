@@ -65,7 +65,7 @@
     <script>
         $(function(){
             olwclient.serverUrl("{% url 'olw_system_view' %}");
-            console.log("Updating: {{ job.job_id}}[{{ job.array_index }}] ")
+            console.log("Updating: {{ job.job_id}}[{{ job.array_index }}] ");
             updateJob('{{ job.job_id}}', '{{ job.array_index }}');
         });
     </script>

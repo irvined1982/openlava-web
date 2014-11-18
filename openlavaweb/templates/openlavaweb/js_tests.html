@@ -13,7 +13,7 @@
         expect(1);
         olwclient.serverUrl("{% url 'olw_system_view' %}");
         olwclient.Host.getHostList(function(hosts){
-            assert.ok(hosts.length > 0, "Hostlist Length")
+            assert.ok(hosts.length > 0, "Hostlist Length");
             QUnit.start();
         },function(){
             QUnit.start();
@@ -25,7 +25,7 @@
         expect(1);
         olwclient.serverUrl("{% url 'olw_system_view' %}");
         olwclient.Queue.getQueueList(function(queues){
-            assert.ok(queues.length > 0, "Queuelist length")
+            assert.ok(queues.length > 0, "Queuelist length");
             QUnit.start();
         },function(){
             QUnit.start();
@@ -37,7 +37,7 @@
         expect(1);
         olwclient.serverUrl("{% url 'olw_system_view' %}");
         olwclient.User.getUserList(function(users){
-            assert.ok(users.length > 0, "Userlist length")
+            assert.ok(users.length > 0, "Userlist length");
             QUnit.start();
         },function(){
             QUnit.start();
@@ -49,7 +49,7 @@
         expect(1);
         olwclient.serverUrl("{% url 'olw_system_view' %}");
         olwclient.Jobs.getJobList(function(jobs){
-            assert.ok(jobs.length > 0, "JobList length")
+            assert.ok(jobs.length > 0, "JobList length");
             QUnit.start();
         },function(){
             QUnit.start();
