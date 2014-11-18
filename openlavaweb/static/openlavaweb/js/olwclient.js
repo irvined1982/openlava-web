@@ -339,7 +339,7 @@ olwclient.resumeJob = function(job_id, array_index, callback, errback){
 
 
 olwclient.executeCommand = function(subUrl, callback, errback){
-    $.getJSON(olwclient.url + subUrl, null, function(data){
+    $.getJSON(olwclient._serverUrl, null, function(data){
         olwclient.handleJSONResponse(data, function(parsed_data){
             callback(parsed_data);
         }, errback);
