@@ -207,10 +207,7 @@ olwclient.inactivateQueue = function(queueName, callback, errback){
 olwclient.Job = function(data){
 
     for (var propName in data){
-        if (propName == "submission_host" || propName == "execution_hosts"){
-            //Todo:: Sort submission host information if needed.
-            continue;
-        }else if (data.hasOwnProperty(propName))this[propName] = data[propName];
+        if (data.hasOwnProperty(propName))this[propName] = data[propName];
     }
     return this;
 
@@ -315,8 +312,9 @@ olwclient.Job.prototype.requeue = function(hold, callback, errback){
 };
 
 olwclient.requeueJob = function(job_id, array_index, hold, callback, errback){
-    var url = "/jobs/" + job_id + "/" + array_index + "/requeue";
+    var url = "/job/" + job_id + "/" + array_index + "/requeue";
     if (hold)url += "?hold=True";
+    console.log(url);
     olwclient.executeCommand(url, callback, errback)
 };
 
@@ -325,7 +323,7 @@ olwclient.Job.prototype.suspend = function(callback, errback){
 };
 
 olwclient.suspendJob = function(job_id, array_index, callback, errback){
-    var url = "/jobs/" + job_id + "/" + array_index + "/suspend";
+    var url = "/job/" + job_id + "/" + array_index + "/suspend";
     olwclient.executeCommand(url, callback, errback)
 };
 
@@ -334,7 +332,7 @@ olwclient.Job.prototype.resume = function(callback, errback){
 };
 
 olwclient.resumeJob = function(job_id, array_index, callback, errback){
-    var url = "/jobs/" + job_id + "/" + array_index + "/resume";
+    var url = "/job/" + job_id + "/" + array_index + "/resume";
     olwclient.executeCommand(url, callback, errback)
 };
 
