@@ -2844,7 +2844,7 @@ class Job(JobBase):
         elif self.status.name == u"JOB_STAT_EXIT":
             rq.options = lsblib.REQUEUE_EXIT
         else:
-            raise ValueError(self.status)
+            raise ClusterException("Job has an invalid state for requeue: %s" % self.status)
 
         rc = lsblib.lsb_requeuejob(rq)
         if rc == 0:
