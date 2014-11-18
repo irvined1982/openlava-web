@@ -304,7 +304,7 @@ olwclient.Job.prototype.kill = function(callback, errback){
 };
 
 olwclient.killJob = function(job_id, array_index, callback, errback){
-    olwclient.executeCommand("/jobs/" + job_id + "/" + array_index + "/kill", callback, errback)
+    olwclient.executeCommand("/job/" + job_id + "/" + array_index + "/kill", callback, errback)
 };
 
 olwclient.Job.prototype.requeue = function(hold, callback, errback){
@@ -339,7 +339,9 @@ olwclient.resumeJob = function(job_id, array_index, callback, errback){
 
 
 olwclient.executeCommand = function(subUrl, callback, errback){
-    $.getJSON(olwclient._serverUrl, null, function(data){
+    var fullUrl = olwclient._serverUrl + subUrl;
+    console.log(fullUrl);
+    $.getJSON(fullUrl, null, function(data){
         olwclient.handleJSONResponse(data, function(parsed_data){
             callback(parsed_data);
         }, errback);
