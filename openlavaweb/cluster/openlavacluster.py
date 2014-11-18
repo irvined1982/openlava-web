@@ -4522,7 +4522,6 @@ class Queue(QueueBase, SingleArgMemoized):
         self.resume_condition = queue.resumeCond.lstrip()
         self.stop_condition = queue.stopCond.lstrip()
 
-
     def update_job_count(self):
         self._total_jobs = 0
         self._num_running_jobs = 0

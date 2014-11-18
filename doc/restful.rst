@@ -7115,8 +7115,8 @@ Suspending and Resuming Jobs
             "status": "OK"
         }
 
-Requeing a job
-^^^^^^^^^^^^^^
+Requeuing a job
+^^^^^^^^^^^^^^^
 
 .. http:get:: job/(int:job_id)/(int:array_index)/requeue
 

@@ -22,7 +22,8 @@ import urllib
 import urllib2
 import subprocess
 
-from olwclient import User as OLUser, Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaConnection, RemoteServerError, NoSuchHostError, NoSuchJobError, \
+from olwclient import User as OLUser, Job as OLJob, Host as OLHost, Queue as OLQueue, OpenLavaConnection, \
+    RemoteServerError, NoSuchHostError, NoSuchJobError, \
     NoSuchQueueError, NoSuchUserError, ResourceDoesntExistError, ClusterInterfaceError, PermissionDeniedError, \
     JobSubmitError
 
@@ -70,7 +71,7 @@ class TestCLIScripts(unittest.TestCase):
                 try:
                     output = subprocess.check_output(cmd + [host.name])
                 except subprocess.CalledProcessError:
-                    print " ".join(cmd, [host.name])
+                    print " ".join(cmd + [host.name])
                     raise
                 self.assertGreater(len(output.splitlines()), 1)
                 if mod == "-l":
@@ -125,8 +126,6 @@ class TestCLIScripts(unittest.TestCase):
                     if job.array_index == 0:
                         self.assertEqual(str(job.job_id), output.splitlines()[1].split()[0])
 
-
-
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
                          and os.environ.get("OLWEB_PASSWORD", None)
@@ -171,6 +170,7 @@ class TestCLIScripts(unittest.TestCase):
 
 
 class CompareWebLocal(unittest.TestCase):
+    # noinspection PyTypeChecker
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
                          and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
@@ -207,6 +207,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         remote_list = OLQueue.get_queue_list(connection)
@@ -233,6 +234,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         for local_user in Host.get_host_list():
@@ -262,6 +264,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         remote_list = OLUser.get_user_list(connection)
@@ -288,6 +291,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         for local_host in Host.get_host_list():
@@ -317,6 +321,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         remote_list = OLHost.get_host_list(connection)
@@ -336,7 +341,6 @@ class CompareWebLocal(unittest.TestCase):
         for ob in remote_list:
             self.assertIn(str(ob), local_names)
 
-
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
                          and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
@@ -344,6 +348,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         for local_job in Job.get_job_list():
@@ -366,7 +371,6 @@ class CompareWebLocal(unittest.TestCase):
                 else:
                     self.assertEqual(str(local_attr_val), str(remote_attr_val))
 
-
     @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
                          and os.environ.get("OLWEB_USERNAME", None)
                          and os.environ.get("OLWEB_PASSWORD", None), "OLWEB_URL not defined")
@@ -374,6 +378,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         remote_job_list = OLJob.get_job_list(connection)
@@ -399,6 +404,7 @@ class CompareWebLocal(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
 
         for local_job in Job.get_job_list():
@@ -577,6 +583,7 @@ class TestRemoteExceptions(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         base_url = os.environ.get("OLWEB_URL", None)
         base_url.rstrip("/")
@@ -608,6 +615,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         job_list = OLJob.get_job_list(connection)
         for job in job_list:
@@ -620,6 +628,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, requested_slots=1, command="hostname")
         self.assertIs(len(jobs), 1, msg="Submitting one job returns 1 item")
@@ -632,6 +641,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, job_name="JobTestSubmitArray[1-100]", requested_slots=1, command="hostname")
         self.assertIs(len(jobs), 100, msg="Submitting one job returns 1 item")
@@ -669,6 +679,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
         job = jobs.pop()
@@ -688,6 +699,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
         job = jobs.pop()
@@ -704,6 +716,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
         job = jobs.pop()
@@ -724,6 +737,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
         job = jobs.pop()
@@ -753,6 +767,7 @@ class TestRemoteJob(unittest.TestCase):
         Cargs.username = os.environ.get("OLWEB_USERNAME")
         Cargs.password = os.environ.get("OLWEB_PASSWORD")
         Cargs.url = os.environ.get("OLWEB_URL")
+        # noinspection PyTypeChecker
         connection = OpenLavaConnection(Cargs)
         jobs = OLJob.submit(connection, requested_slots=1, command="sleep 1000")
         job = jobs.pop()
