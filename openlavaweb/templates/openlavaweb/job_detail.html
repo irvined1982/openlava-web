@@ -143,8 +143,8 @@
                         $("#killMessage").alert('close');
                     }, 10000);
                 },
-                function () {
-                    $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-warning">Unable to kill job.</div>');
+                function (errType, message) {
+                    $("#killMessageBody").html('<div id="killMessage" class="fade in alert alert-warning">Unable to kill job: ' + message + '</div>');
                     $("#killMessage").alert();
                     setTimeout(function () {
                         $("#killMessage").alert('close');
@@ -162,8 +162,8 @@
                         $("#suspendMessage").alert('close');
                     }, 10000);
                 },
-                function () {
-                    $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-warning">Unable to suspend job.</div>');
+                function (errType, message) {
+                    $("#suspendMessageBody").html('<div id="suspendMessage" class="fade in alert alert-warning">Unable to suspend job: ' + message + '</div>');
                     $("#suspendMessage").alert();
                     setTimeout(function () {
                         $("#suspendMessage").alert('close');
@@ -181,8 +181,8 @@
                         $("#resumeMessage").alert('close');
                     },10000);
                 },
-                function () {
-                    $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-warning">Unable to resume job.</div>');
+                function (errType, message) {
+                    $("#resumeMessageBody").html('<div id="resumeMessage" class="fade in alert alert-warning">Unable to resume job: ' + message + '</div>');
                     $("#resumeMessage").alert();
                     setTimeout(function(){
                         $("#resumeMessage").alert('close');
@@ -201,8 +201,8 @@
                     }, 10000);
 
                 },
-                function () {
-                    $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
+                function (errType, message) {
+                    $("#requeueHoldMessageBody").html('<div id="requeueHoldMessage" class="fade in alert alert-warning">Unable to requeue job: ' + message + '</div>');
                     $("#requeueHoldMessage").alert();
                     setTimeout(function () {
                         $("#requeueHoldMessage").alert('close');
@@ -221,8 +221,8 @@
                         $("#requeuePendMessage").alert('close');
                     }, 10000);
                 },
-                function () {
-                    $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-warning">Unable to requeue job.</div>');
+                function (errType, message) {
+                    $("#requeuePendMessageBody").html('<div id="requeuePendMessage" class="fade in alert alert-warning">Unable to requeue job: ' + message + '</div>');
                     $("#requeuePendMessage").alert();
                     setTimeout(function () {
                         $("#requeuePendMessage").alert('close');
