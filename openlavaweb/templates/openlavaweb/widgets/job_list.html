@@ -69,7 +69,7 @@
             updateJob('{{ job.job_id}}', '{{ job.array_index }}');
         });
     </script>
-    <tr id="jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_row"
+    <tr id="jl_{% if prefix  %}{{ prefix }}_{% endif %}{{ job.job_id}}_{{ job.array_index }}_row"
             {% if job.is_running %}class="active"
             {% elif job.is_pending %}class="info"
             {% elif job.is_failed %}"class="danger"
@@ -78,10 +78,10 @@
             {% endif %}>
         <td><a href="{% url 'olw_job_view_array' job.job_id job.array_index %}">{{ job.job_id }}{% if job.array_index > 0 %}[{{ job.array_index }}]{% endif %}</a></td>
         <td><a href="{% url 'olw_user_view' job.user_name %}">{{ job.user_name }}</a></td>
-        <td id="jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_status">{{ job.status }}</td>
-        <td id="jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_submit_time">{{ job.submit_time_datetime_local }}</td>
-        <td id='jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_start_time'>{% if job.start_time %}{{ job.start_time_datetime_local }}{% else %}Not yet started{% endif %}</td>
-        <td id='jl_{% if prefix  %}prefix_{% endif %}{{ job.job_id}}_{{ job.array_index }}_end_time'>{% if job.end_time %}{{ job.end_time_datetime_local }}{% else %}Not yet finished{% endif %}</td>
+        <td id="jl_{% if prefix  %}{{ prefix }}_{% endif %}{{ job.job_id}}_{{ job.array_index }}_status">{{ job.status }}</td>
+        <td id="jl_{% if prefix  %}{{ prefix }}_{% endif %}{{ job.job_id}}_{{ job.array_index }}_submit_time">{{ job.submit_time_datetime_local }}</td>
+        <td id='jl_{% if prefix  %}{{ prefix }}_{% endif %}{{ job.job_id}}_{{ job.array_index }}_start_time'>{% if job.start_time %}{{ job.start_time_datetime_local }}{% else %}Not yet started{% endif %}</td>
+        <td id='jl_{% if prefix  %}{{ prefix }}_{% endif %}{{ job.job_id}}_{{ job.array_index }}_end_time'>{% if job.end_time %}{{ job.end_time_datetime_local }}{% else %}Not yet finished{% endif %}</td>
     </tr>
     {% endif %}
     {% empty %}
