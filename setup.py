@@ -7,7 +7,7 @@ README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 
 setup(
     name='django-openlavaweb',
-    version='1.0',
+    version='1.1',
     packages=['openlavaweb', 'openlavaweb.cluster'],
     include_package_data=True,
     license="GPL 3",

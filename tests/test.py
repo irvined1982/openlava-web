@@ -168,6 +168,34 @@ class TestCLIScripts(unittest.TestCase):
                     self.assertEqual(len(output.splitlines()), 2)
                     self.assertEqual(output.splitlines()[1].split()[0], queue.name)
 
+    @unittest.skipUnless(os.environ.get("OLWEB_URL", None)
+                         and os.environ.get("OLWEB_USERNAME", None)
+                         and os.environ.get("OLWEB_PASSWORD", None)
+                         and os.environ.get("OLWCLIENT_PATH", None), "OLWEB not defined")
+    def check_sub_and_kill(self):
+
+        cmd = [
+            os.path.join(os.environ.get("OLWCLIENT_PATH", None), 'bsub.py'),
+            '--username',
+            os.environ.get("OLWEB_USERNAME", None),
+            '--password',
+            os.environ.get("OLWEB_PASSWORD", None),
+            os.environ.get("OLWEB_URL", None),
+            "sleep 100"
+        ]
+        output = subprocess.check_output(cmd)
+        output = output[5:-14]
+        job_id, para, arr = output.partition("[")
+        cmd = [
+            os.path.join(os.environ.get("OLWCLIENT_PATH", None), 'bkill.py'),
+            '--username',
+            os.environ.get("OLWEB_USERNAME", None),
+            '--password',
+            os.environ.get("OLWEB_PASSWORD", None),
+            os.environ.get("OLWEB_URL", None),
+            job_id
+        ]
+        subprocess.check_output(cmd)
 
 class CompareWebLocal(unittest.TestCase):
     # noinspection PyTypeChecker
