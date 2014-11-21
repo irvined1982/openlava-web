@@ -40,11 +40,12 @@ Contents
 
    screenshots
    installation
+   changes
+   commands
+   restful
    openlavacluster
    olwclient
-   restful
    javascript
-   commands
 
 Indices and tables
 ==================
