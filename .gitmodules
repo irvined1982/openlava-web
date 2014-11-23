@@ -10,3 +10,6 @@
 [submodule "openlavaweb/static/openlavaweb/d3"]
 	path = openlavaweb/static/openlavaweb/d3
 	url = https://github.com/mbostock/d3.git
+[submodule "openlava-python"]
+	path = openlava-python
+	url = https://github.com/irvined1982/openlava-python.git
