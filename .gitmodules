@@ -13,3 +13,6 @@
 [submodule "openlava-python"]
 	path = openlava-python
 	url = https://github.com/irvined1982/openlava-python.git
+[submodule "lavastorm"]
+	path = lavastorm
+	url = https://github.com/irvined1982/lavastorm.git
